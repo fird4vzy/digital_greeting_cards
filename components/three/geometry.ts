@@ -1,0 +1,104 @@
+import * as THREE from 'three';
+
+/**
+ * Procedural geometry for the atmosphere layer.
+ *
+ * Everything here is built from `THREE.Shape` rather than loaded from a GLTF:
+ * a petal is a handful of bezier control points, so it costs nothing to ship,
+ * nothing to download, and it triangulates to a few dozen faces. The entire
+ * 3D layer of this product adds zero asset bytes to the bundle.
+ */
+
+/** A single flower petal — wide at the base, tapered, gently curved. */
+export function petalShape(width = 0.5, length = 1): THREE.Shape {
+  const shape = new THREE.Shape();
+  const w = width / 2;
+
+  shape.moveTo(0, 0);
+  shape.bezierCurveTo(w, length * 0.16, w * 1.08, length * 0.62, 0, length);
+  shape.bezierCurveTo(-w * 1.08, length * 0.62, -w, length * 0.16, 0, 0);
+
+  return shape;
+}
+
+/** A rounder, blunter sakura petal with the characteristic notched tip. */
+export function sakuraPetalShape(width = 0.6, length = 0.82): THREE.Shape {
+  const shape = new THREE.Shape();
+  const w = width / 2;
+
+  shape.moveTo(0, 0);
+  shape.bezierCurveTo(w * 1.1, length * 0.2, w, length * 0.78, w * 0.22, length);
+  shape.quadraticCurveTo(0, length * 0.86, -w * 0.22, length);
+  shape.bezierCurveTo(-w, length * 0.78, -w * 1.1, length * 0.2, 0, 0);
+
+  return shape;
+}
+
+/** The classic heart curve, used for the romantic template's centrepiece. */
+export function heartShape(scale = 1): THREE.Shape {
+  const shape = new THREE.Shape();
+  const s = scale;
+
+  shape.moveTo(0, -0.75 * s);
+  shape.bezierCurveTo(0.72 * s, -0.2 * s, 1.05 * s, 0.42 * s, 0.52 * s, 0.72 * s);
+  shape.bezierCurveTo(0.24 * s, 0.88 * s, 0.05 * s, 0.72 * s, 0, 0.55 * s);
+  shape.bezierCurveTo(-0.05 * s, 0.72 * s, -0.24 * s, 0.88 * s, -0.52 * s, 0.72 * s);
+  shape.bezierCurveTo(-1.05 * s, 0.42 * s, -0.72 * s, -0.2 * s, 0, -0.75 * s);
+
+  return shape;
+}
+
+/**
+ * Geometry cache. Scenes mount and unmount as the reader scrolls; rebuilding
+ * the same extrusion each time is wasteful and causes a visible hitch on
+ * mid-range phones.
+ */
+const cache = new Map<string, THREE.BufferGeometry>();
+
+function cached(key: string, build: () => THREE.BufferGeometry): THREE.BufferGeometry {
+  const hit = cache.get(key);
+  if (hit) return hit;
+  const geometry = build();
+  cache.set(key, geometry);
+  return geometry;
+}
+
+export type PetalKind = 'rose' | 'sakura' | 'mote';
+
+export function petalGeometry(kind: PetalKind): THREE.BufferGeometry {
+  return cached(`petal-${kind}`, () => {
+    if (kind === 'mote') {
+      // Embers and dust motes: a hexagon is indistinguishable from a circle at
+      // this size and costs a quarter of the triangles.
+      return new THREE.CircleGeometry(0.09, 6);
+    }
+
+    const shape = kind === 'sakura' ? sakuraPetalShape() : petalShape();
+    const geometry = new THREE.ShapeGeometry(shape, 8);
+    // Origin at the centre of mass so instances tumble around themselves
+    // rather than pivoting about their base.
+    geometry.translate(0, -0.45, 0);
+    geometry.scale(0.42, 0.42, 0.42);
+    return geometry;
+  });
+}
+
+export function heartGeometry(): THREE.BufferGeometry {
+  return cached('heart', () => {
+    const geometry = new THREE.ExtrudeGeometry(heartShape(1), {
+      depth: 0.36,
+      bevelEnabled: true,
+      bevelSegments: 5,
+      bevelSize: 0.11,
+      bevelThickness: 0.11,
+      curveSegments: 18,
+    });
+    geometry.center();
+    return geometry;
+  });
+}
+
+export function disposeGeometryCache(): void {
+  cache.forEach((geometry) => geometry.dispose());
+  cache.clear();
+}
