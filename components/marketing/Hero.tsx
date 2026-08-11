@@ -1,11 +1,12 @@
 'use client';
 
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { Atmosphere } from '@/components/three/Atmosphere';
 import { ArrowGlyph, ButtonLink } from '@/components/ui/Button';
 import { Reveal } from '@/components/ui/Reveal';
 import { easing } from '@/lib/design/motion';
+import { useMotionPrefs } from '@/lib/hooks/useMotionPrefs';
 
 /** Warm brand particles — the marketing surface is not inside a card scope. */
 const BRAND_PARTICLES = ['#e7c9c6', '#c1836a', '#efe7db'];
@@ -20,7 +21,11 @@ const BRAND_PARTICLES = ['#e7c9c6', '#c1836a', '#efe7db'];
  */
 export function Hero() {
   const ref = useRef<HTMLElement | null>(null);
-  const reduced = useReducedMotion();
+  // Deliberately not framer's `useReducedMotion`: it reads the media query
+  // synchronously, so the server renders the animated tree and the client
+  // renders the static one, and React throws a hydration mismatch. Ours starts
+  // false everywhere and upgrades after mount.
+  const { reduced } = useMotionPrefs();
 
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const sceneY = useTransform(scrollYProgress, [0, 1], ['0%', reduced ? '0%' : '14%']);
@@ -119,7 +124,7 @@ export function Hero() {
 
 /** One headline line, revealed from behind its own baseline. */
 function HeroLine({ text, delay, italic }: { text: string; delay: number; italic?: boolean }) {
-  const reduced = useReducedMotion();
+  const { reduced } = useMotionPrefs();
 
   return (
     <span className="block overflow-hidden">
