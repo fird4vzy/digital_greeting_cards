@@ -1,7 +1,7 @@
 import { resolveTemplate } from '@/templates';
 import type { StoryInput } from '@/lib/card/template';
 import { demoPhotos } from '@/lib/utils/placeholder';
-import { palettes } from '@/lib/design/palettes';
+import { palettes, photoColors } from '@/lib/design/palettes';
 import type { Order } from './types';
 
 /**
@@ -50,7 +50,7 @@ export function seedOrders(): Order[] {
     mood: 'romantic',
     story:
       'Alina,\n\nI have started this message eleven times. Every version sounded either too small or too much, so here is the plain one.\n\nTwo years ago you were a stranger with strong opinions about coffee. Now you are the person I tell things to before I have finished thinking them. Somewhere in between, without either of us announcing it, my ordinary days quietly became better.\n\nYou notice things. You remember what people said months ago. You are kind in the unglamorous way, the kind nobody claps for.\n\nI bought you peonies because you said once, offhandedly, that they look like they are mid-sentence. I have not stopped thinking about that.',
-    photos: demoPhotos('alina', 4, [...palettes.duskRose.swatches]),
+    photos: demoPhotos('alina', 4, photoColors(palettes.duskRose)),
     moments: [
       { date: 'March 2023', title: 'The coffee argument', text: 'You were right. I have never admitted this until now.' },
       { date: 'August 2023', title: 'The train we missed', text: 'Best four hours of that entire year.' },
@@ -72,7 +72,7 @@ export function seedOrders(): Order[] {
     mood: 'warm',
     story:
       'Marta!\n\nAnother year, and you are still the person who answers the phone at 1am and pretends she was awake.\n\nThis year you moved cities, started something terrifying, and somehow still made it to every one of my things. I do not know how you do it. I suspect you do not either.\n\nSo: happy birthday. Have the day you actually want, not the one you think you should want.',
-    photos: demoPhotos('marta', 4, [...palettes.champagne.swatches]),
+    photos: demoPhotos('marta', 4, photoColors(palettes.champagne)),
     memories: [
       { label: 'The move', text: 'Four flights of stairs, no lift, in July.' },
       { label: 'Karaoke', text: 'We do not discuss the karaoke.' },
@@ -88,7 +88,7 @@ export function seedOrders(): Order[] {
     mood: 'warm',
     story:
       'Mama,\n\nI called last Sunday and we talked about the weather for twenty minutes, which is our way of saying the other thing.\n\nSo I am writing the other thing down.\n\nAlmost everything I do well, I do because I watched you do it first — the patience especially, though I am still some distance behind. You never made any of it look like effort. I understand now that it was.\n\nThank you. For the enormous things, and for the thousand small ones I only noticed years later.',
-    photos: demoPhotos('mama', 3, [...palettes.linen.swatches]),
+    photos: demoPhotos('mama', 3, photoColors(palettes.linen)),
     moments: [
       { date: 'Every September', title: 'The first day of school', text: 'You ironed the shirt twice.' },
       { date: '2016', title: 'The year everything moved', text: 'You never once said you were tired.' },

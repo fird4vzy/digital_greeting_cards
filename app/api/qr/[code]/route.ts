@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getOrderByCode } from '@/lib/db';
 import { cardUrl, qrSvg } from '@/lib/qr';
-import { siteOrigin } from '@/lib/site';
+import { siteOrigin } from '@/lib/site-origin';
 
 /**
  * GET /api/qr/8FJ29K[?dark=%23191512&size=512]

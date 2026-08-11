@@ -145,6 +145,21 @@ export function getPalette(id: string): CardPalette {
 }
 
 /**
+ * Colour sets for generated imagery.
+ *
+ * `photoColors` reads as a well-exposed photograph — mid-tones and highlights,
+ * used wherever a real customer photo will eventually sit. `moodyColors` sits
+ * a stop or two under, for the full-bleed cards that carry white type.
+ */
+export function photoColors(palette: CardPalette): string[] {
+  return [palette.accent, palette.accentSoft, palette.particles[0], palette.particles[2]];
+}
+
+export function moodyColors(palette: CardPalette): string[] {
+  return [palette.bgDeep, palette.accent, palette.accentSoft, palette.particles[0]];
+}
+
+/**
  * Turns a palette into the custom properties consumed by `.card-scope`.
  * Cast is required because React's CSSProperties does not model custom props.
  */

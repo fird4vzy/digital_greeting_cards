@@ -1,0 +1,62 @@
+'use client';
+
+import { motion, useMotionValueEvent, useScroll } from 'framer-motion';
+import Link from 'next/link';
+import { useState } from 'react';
+import { ButtonLink } from '@/components/ui/Button';
+import { Wordmark } from './Wordmark';
+import { cn } from '@/lib/utils/cn';
+
+const links = [
+  { href: '/templates', label: 'Templates' },
+  { href: '/#bouquet', label: 'How it works' },
+];
+
+/**
+ * Floats transparently over the hero and settles into a paper bar once the
+ * reader leaves it — so the first screen stays a photograph, not a web page.
+ */
+export function Header({ overlay = false }: { overlay?: boolean }) {
+  const { scrollY } = useScroll();
+  const [settled, setSettled] = useState(!overlay);
+
+  useMotionValueEvent(scrollY, 'change', (value) => {
+    if (overlay) setSettled(value > 80);
+  });
+
+  return (
+    <motion.header
+      className={cn(
+        'fixed inset-x-0 top-0 z-50 transition-[background-color,backdrop-filter,border-color] duration-500 ease-[var(--ease-out-expo)]',
+        settled
+          ? 'border-b border-line bg-paper/85 backdrop-blur-xl'
+          : 'border-b border-transparent bg-transparent',
+      )}
+      initial={{ y: -24, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+    >
+      <div className="mx-auto flex h-[4.5rem] w-full max-w-[86rem] items-center justify-between px-[var(--spacing-gutter)]">
+        <Wordmark />
+
+        <nav className="flex items-center gap-1 sm:gap-6">
+          <div className="hidden items-center gap-6 sm:flex">
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="relative text-caption text-ink-soft transition-colors duration-300 hover:text-ink"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+
+          <ButtonLink href="/create" size="sm" className="ml-2">
+            Create a card
+          </ButtonLink>
+        </nav>
+      </div>
+    </motion.header>
+  );
+}
