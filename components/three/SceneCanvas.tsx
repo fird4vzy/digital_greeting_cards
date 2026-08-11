@@ -56,8 +56,11 @@ export default function SceneCanvas({
       style={{ pointerEvents: 'none', touchAction: 'pan-y' }}
       aria-hidden="true"
     >
-      <ambientLight intensity={1.35} />
-      <directionalLight position={[3, 5, 4]} intensity={1.15} />
+      {/* Petal fields use Lambert and want flat, generous fill. The glass
+          scene wants the opposite — ambient light is what makes a refractive
+          material read as matte plastic. */}
+      <ambientLight intensity={scene === 'heart' ? 0.5 : 1.35} />
+      <directionalLight position={[3, 5, 4]} intensity={scene === 'heart' ? 0.7 : 1.15} />
       <directionalLight position={[-4, -2, 2]} intensity={0.4} color={colors[1] ?? '#ffffff'} />
 
       {scene === 'petals' && (

@@ -13,9 +13,12 @@ export function IntroSection({ section }: { section: SectionOfKind<'intro'> }) {
   const variant = section.variant ?? 'centered';
 
   return (
+    // Tall rather than full-height: a full screen of air here, followed by the
+    // letter's own top padding, opens a dead zone the reader scrolls through
+    // wondering whether the card has ended.
     <Beat
-      full
       center={variant === 'centered'}
+      className="flex min-h-[68svh] flex-col justify-center"
       innerClassName={cn(variant === 'offset' && 'max-w-[34rem] sm:ml-[8%]')}
     >
       {section.eyebrow ? (

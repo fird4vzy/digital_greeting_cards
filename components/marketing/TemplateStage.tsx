@@ -1,14 +1,14 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Blossom, Motif } from '@/components/cards/primitives/Motif';
-import { COVER_HEADLINE } from '@/lib/card/copy';
+import { COVER_HEADLINE, copyFor } from '@/lib/card/copy';
+import { demoStory } from '@/lib/card/demo';
 import type { TemplateSummary } from '@/lib/card/template';
-import { getPalette, paletteVars, photoColors } from '@/lib/design/palettes';
+import { getPalette, paletteVars } from '@/lib/design/palettes';
 import { easing } from '@/lib/design/motion';
 import { useMotionPrefs } from '@/lib/hooks/useMotionPrefs';
-import { photoPlaceholder } from '@/lib/utils/placeholder';
 import { cn } from '@/lib/utils/cn';
 
 /**
@@ -23,64 +23,48 @@ import { cn } from '@/lib/utils/cn';
  * the weight, so a gallery of six previews stays cheap.
  */
 
-const DEMO: Record<string, { name: string; letter: string; final: string; from: string }> = {
-  romantic: {
-    name: 'Alina',
-    letter:
-      'Two years ago you were a stranger with strong opinions about coffee. Now you are the person I tell things to before I have finished thinking them.',
-    final: 'Some people make ordinary days feel a little less ordinary.',
-    from: 'Firdavs',
-  },
-  birthday: {
-    name: 'Marta',
-    letter:
-      'Another year, and you are still the person who answers the phone at 1am and pretends she was awake.',
-    final: 'Here is to another year of you being exactly who you are.',
-    from: 'Kasia',
-  },
-  mom: {
-    name: 'Mama',
-    letter:
-      'I called last Sunday and we talked about the weather for twenty minutes, which is our way of saying the other thing.',
-    final: 'Thank you. For all of it, including the parts I never noticed.',
-    from: 'Firdavs',
-  },
-  anniversary: {
-    name: 'Daniel',
-    letter:
-      'Ten years. What I keep coming back to is not the big occasions but the ordinary evenings.',
-    final: 'Still you. Still this. Still glad.',
-    from: 'Sofia',
-  },
-  memories: {
-    name: 'Lena',
-    letter: 'Nobody in our family had done it before. You went first, and you made it look survivable.',
-    final: 'Whatever comes next, you have already proved the point.',
-    from: 'Tomás',
-  },
-  sakura: {
-    name: 'Haruto',
-    letter: 'No occasion. I saw the branch in the window and thought of you.',
-    final: 'No reason. That is the whole reason.',
-    from: 'Emi',
-  },
-};
-
-const FALLBACK = DEMO.romantic;
 const BEAT_MS = 3400;
+
+/** What the four beats say. Defaults to the template's demo story. */
+export type StageContent = {
+  name: string;
+  letter: string;
+  final: string;
+  from: string;
+  photos: string[];
+};
 
 export function TemplateStage({
   template,
   /** Pause cycling — used when the stage is a static gallery thumbnail. */
   still = false,
+  /** Override the demo story, e.g. to preview what a customer just wrote. */
+  content,
   className,
 }: {
   template: TemplateSummary;
   still?: boolean;
+  content?: StageContent;
   className?: string;
 }) {
   const palette = getPalette(template.paletteId);
-  const demo = DEMO[template.id] ?? FALLBACK;
+
+  // The same demo content the full preview and the gallery use, so a
+  // miniature never tells a different story than the card it opens.
+  // Memoised because building it also generates the placeholder imagery.
+  const demoDefaults = useMemo(() => {
+    const story = demoStory(template.id);
+    return {
+      name: story.recipientName,
+      letter: story.story.split(/\n\s*\n/)[0] ?? '',
+      final: copyFor(story.occasion).finalHeadline,
+      from: story.senderName,
+      photos: story.photos.slice(0, 3).map((photo) => photo.url),
+    };
+  }, [template.id]);
+
+  const demo = content ?? demoDefaults;
+
   const { reduced } = useMotionPrefs();
   const [beat, setBeat] = useState(0);
 
@@ -91,14 +75,6 @@ export function TemplateStage({
     const timer = window.setInterval(() => setBeat((current) => (current + 1) % 4), BEAT_MS);
     return () => window.clearInterval(timer);
   }, [template.id, still]);
-
-  const photos = [0, 1, 2].map((index) =>
-    photoPlaceholder(`${template.id}-stage-${index}`, {
-      colors: photoColors(palette),
-      width: 700,
-      height: 900,
-    }),
-  );
 
   const transition = { duration: reduced ? 0.25 : 0.85, ease: easing.cinematic };
 
@@ -124,9 +100,11 @@ export function TemplateStage({
 
     // 3 — the photographs
     <div key="gallery" className="flex h-full flex-col justify-center gap-3 px-6">
-      <span className="eyebrow mb-1 opacity-45">Together</span>
+      <span className="eyebrow mb-1 opacity-45">
+        {demo.photos.length > 0 ? 'Together' : 'No photographs yet'}
+      </span>
       <div className="grid grid-cols-3 gap-2">
-        {photos.map((url, index) => (
+        {demo.photos.map((url, index) => (
           <motion.span
             key={url}
             className="block overflow-hidden rounded-[3px]"

@@ -17,6 +17,11 @@ export function LetterSection({ section }: { section: SectionOfKind<'letter'> })
   const variant = section.variant ?? 'serif';
   const blocks = paragraphs(section.body);
 
+  // A drop cap needs a paragraph deep enough for the text to wrap around it.
+  // Letters routinely open on a bare salutation ("Alina,"), where a drop cap
+  // leaves a stranded capital and a hole in the column.
+  const dropCap = variant === 'serif' && (blocks[0]?.length ?? 0) >= 90;
+
   const bodyClass = cn(
     'text-pretty',
     variant === 'handwritten'
@@ -41,9 +46,7 @@ export function LetterSection({ section }: { section: SectionOfKind<'letter'> })
       <RevealGroup step={0.14} className="space-y-7 text-[var(--card-ink-soft)]">
         {blocks.map((block, index) => (
           <Reveal key={index} preset="fade" as="p" className={bodyClass}>
-            {/* A drop cap on the opening paragraph, but only when the letter
-                is long enough to carry one — otherwise it looks affected. */}
-            {variant === 'serif' && index === 0 && blocks.length > 1 ? (
+            {dropCap && index === 0 ? (
               <>
                 <span
                   aria-hidden="true"

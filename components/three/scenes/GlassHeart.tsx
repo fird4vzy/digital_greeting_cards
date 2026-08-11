@@ -1,23 +1,33 @@
 'use client';
 
-import { Environment, Lightformer } from '@react-three/drei';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import type * as THREE from 'three';
 import { heartGeometry } from '../geometry';
+import { useStudioEnvironment } from '../useStudioEnvironment';
 
 /**
  * The romantic template's centrepiece: a heart in cast glass, turning slowly.
  *
- * Reflections come from an inline `Environment` built out of Lightformers and
- * baked in a single frame — no HDRI download, no CDN dependency, ~64px cube
- * target. That keeps a genuinely refractive material affordable enough to ship
- * on a phone, and it is only ever mounted on devices that opted into the rich
- * tier.
+ * Cut crystal rather than smooth glass: the geometry is faceted (see
+ * `heartGeometry`) and lit by two coloured rim lights plus a 64×32 environment
+ * map generated in memory. Facets catch the lights individually as it turns,
+ * which is what reads as glass — smooth transmission needs a real HDRI to
+ * avoid looking like tinted plastic, and an HDRI is a megabyte of network on a
+ * page someone opens standing next to a bouquet.
  */
 export function GlassHeart({ colors }: { colors: string[] }) {
   const mesh = useRef<THREE.Mesh>(null);
   const geometry = useMemo(() => heartGeometry(), []);
+  const viewport = useThree((state) => state.viewport);
+
+  useStudioEnvironment(colors);
+
+  // Sized against the *narrow* axis and capped, so it stays a small pendant
+  // floating above the name rather than a centrepiece the headline has to
+  // compete with. A phone is ~2 world units wide; a laptop is ~7.
+  const scale = Math.min(Math.min(viewport.width, viewport.height) * 0.2, 0.62);
+  const lift = viewport.height * 0.26;
 
   useFrame((state, delta) => {
     const node = mesh.current;
@@ -28,52 +38,34 @@ export function GlassHeart({ colors }: { colors: string[] }) {
 
     node.rotation.y += dt * 0.26;
     node.rotation.z = Math.sin(t * 0.42) * 0.07;
-    node.position.y = Math.sin(t * 0.62) * 0.08;
+    node.position.y = lift + Math.sin(t * 0.62) * 0.08;
   });
 
   return (
     <group>
-      <mesh ref={mesh} geometry={geometry} scale={1.15}>
+      <mesh ref={mesh} geometry={geometry} scale={scale} position={[0, lift, 0]}>
         <meshPhysicalMaterial
-          transmission={0.98}
-          thickness={1.15}
-          roughness={0.09}
-          ior={1.46}
-          iridescence={0.45}
-          iridescenceIOR={1.32}
+          flatShading
+          color={colors[0] ?? '#ffffff'}
+          transparent
+          opacity={0.72}
+          roughness={0.14}
+          metalness={0.08}
+          ior={1.5}
+          iridescence={1}
+          iridescenceIOR={1.4}
+          iridescenceThicknessRange={[120, 520]}
           clearcoat={1}
-          clearcoatRoughness={0.12}
-          color={colors[2] ?? '#ffffff'}
-          attenuationColor={colors[1] ?? colors[0] ?? '#ffffff'}
-          attenuationDistance={1.6}
-          envMapIntensity={1.35}
-          toneMapped={false}
+          clearcoatRoughness={0.06}
+          envMapIntensity={2.2}
+          specularIntensity={1}
         />
       </mesh>
 
-      <Environment resolution={64} frames={1}>
-        <Lightformer
-          form="rect"
-          intensity={2.6}
-          color={colors[0] ?? '#ffffff'}
-          position={[3, 3, 4]}
-          scale={[7, 7, 1]}
-        />
-        <Lightformer
-          form="circle"
-          intensity={1.9}
-          color={colors[2] ?? '#ffffff'}
-          position={[-4, 1, 2]}
-          scale={[5, 5, 1]}
-        />
-        <Lightformer
-          form="rect"
-          intensity={1.2}
-          color={colors[1] ?? '#ffffff'}
-          position={[0, -4, -3]}
-          scale={[9, 4, 1]}
-        />
-      </Environment>
+      {/* Two close, coloured points give the moving specular that sells a
+          polished surface; the environment map does the refraction. */}
+      <pointLight position={[1.4, lift + 1.1, 2]} intensity={4} color={colors[2] ?? '#ffffff'} distance={9} />
+      <pointLight position={[-1.6, lift - 0.4, 1.4]} intensity={2.4} color={colors[1] ?? '#ffffff'} distance={8} />
     </group>
   );
 }

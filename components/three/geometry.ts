@@ -83,18 +83,29 @@ export function petalGeometry(kind: PetalKind): THREE.BufferGeometry {
   });
 }
 
+/**
+ * A deliberately low-segment extrusion, un-indexed so every face gets its own
+ * normal. Flat facets each catch the lights at a different angle, which is
+ * what actually reads as cut crystal — a smooth transmissive mesh needs a real
+ * HDRI to look like anything but tinted plastic, and this does not.
+ */
 export function heartGeometry(): THREE.BufferGeometry {
   return cached('heart', () => {
     const geometry = new THREE.ExtrudeGeometry(heartShape(1), {
-      depth: 0.36,
+      depth: 0.42,
       bevelEnabled: true,
-      bevelSegments: 5,
-      bevelSize: 0.11,
-      bevelThickness: 0.11,
-      curveSegments: 18,
+      bevelSegments: 2,
+      bevelSize: 0.14,
+      bevelThickness: 0.16,
+      curveSegments: 7,
     });
-    geometry.center();
-    return geometry;
+
+    const faceted = geometry.toNonIndexed();
+    faceted.computeVertexNormals();
+    faceted.center();
+    geometry.dispose();
+
+    return faceted;
   });
 }
 
