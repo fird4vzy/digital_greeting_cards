@@ -165,8 +165,16 @@ The app depends on `OrderRepository`, never on a concrete store.
 
 ```bash
 export DATABASE_URL=postgres://…
-psql "$DATABASE_URL" -f lib/db/schema.sql
+npm run db:apply       # or: psql "$DATABASE_URL" -f lib/db/schema.sql
 ```
+
+`db:apply` exists because neither obvious route is reliable: `psql` is not
+installed everywhere, and the SQL console in the Vercel dashboard sends the
+editor's contents as one prepared statement, which cannot hold more than one
+command — so a 91-line schema comes back as *"cannot insert multiple commands
+into a prepared statement"*. The script applies the file in a single
+transaction, so a failure leaves nothing behind; schema.sql has no
+`IF NOT EXISTS` anywhere, and a half-applied schema is worse than none.
 
 The `pg` import in `lib/db/postgres.ts` is lazy but deliberately written so a
 bundler can see it. Hiding it — behind a computed specifier, say — keeps the
@@ -203,8 +211,9 @@ every QR code the shop prints, so a card tagged while it pointed at a
 `*.vercel.app` preview keeps pointing there forever — long after the custom
 domain is live. Set it to the final domain *before* anyone prints a tag.
 
-Apply `lib/db/schema.sql` to the database once, before the first deploy that
-has `DATABASE_URL` set.
+Apply the schema to the database once, before the first deploy that has
+`DATABASE_URL` set — point `DATABASE_URL` at it locally and run
+`npm run db:apply`.
 
 ---
 
