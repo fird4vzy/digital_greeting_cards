@@ -13,15 +13,30 @@ import type { CardConfig, Photo } from '@/lib/card/schema';
  * (versioning, expiry, transfer between orders), that is the seam to split on.
  */
 
-export const ORDER_STATUSES = ['NEW', 'PROCESSING', 'REVIEW', 'READY', 'PUBLISHED'] as const;
+export const ORDER_STATUSES = [
+  'NEW',
+  'PROCESSING',
+  'REVIEW',
+  'READY',
+  'PUBLISHED',
+  'CANCELLED',
+] as const;
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
 
+/**
+ * `CANCELLED` is a status rather than a deletion, and that is the whole point.
+ * A card's code may already be printed onto a tag and tied to a bouquet, so
+ * the row has to survive: it keeps the code reserved forever, and it keeps the
+ * history of what was ordered. `/c/[code]` serves only `PUBLISHED`, so
+ * cancelling takes a live card down on its own.
+ */
 export const STATUS_META: Record<OrderStatus, { label: string; hint: string; tone: string }> = {
   NEW: { label: 'New', hint: 'Just arrived from the shop', tone: 'var(--color-ink-muted)' },
   PROCESSING: { label: 'Processing', hint: 'Being written and composed', tone: 'var(--color-clay)' },
   REVIEW: { label: 'Review', hint: 'Waiting on a human read-through', tone: 'var(--color-gold)' },
   READY: { label: 'Ready', hint: 'Approved, not yet live', tone: 'var(--color-sage)' },
   PUBLISHED: { label: 'Published', hint: 'Live and attached to a bouquet', tone: 'var(--color-accent)' },
+  CANCELLED: { label: 'Cancelled', hint: 'Called off; the code stays reserved', tone: 'var(--color-ink-faint)' },
 };
 
 export type Customer = {
@@ -84,3 +99,17 @@ export type PublishedCard = {
   publishedAt: string | null;
   url: string;
 };
+
+/**
+ * Whether an order may be deleted outright.
+ *
+ * Publishing is the point of no return. From then on the code can be printed
+ * onto a tag, tied to a bouquet and handed to someone, and removing the row
+ * would leave them scanning into a 404 with no way to find out why. Retiring a
+ * live card is `CANCELLED` instead: the page goes down, the row and its code
+ * stay. `publishedAt` is checked as well as the status, so an order that was
+ * published and later moved back to `READY` is still protected.
+ */
+export function isDeletable(order: Pick<Order, 'status' | 'publishedAt'>): boolean {
+  return order.status !== 'PUBLISHED' && !order.publishedAt;
+}

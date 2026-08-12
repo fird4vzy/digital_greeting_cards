@@ -1,4 +1,5 @@
 import type { MoodId, OccasionId, RecipientId } from '@/lib/card/taxonomy';
+import type { OrderStatus } from '@/lib/db/types';
 
 /**
  * The dictionary contract.
@@ -234,10 +235,7 @@ export type Dictionary = {
       unconfigured: string;
     };
     /** Overlaid onto STATUS_META, which keeps the structure and the colour. */
-    status: Record<'NEW' | 'PROCESSING' | 'REVIEW' | 'READY' | 'PUBLISHED', {
-      label: string;
-      hint: string;
-    }>;
+    status: Record<OrderStatus, { label: string; hint: string }>;
     overview: {
       title: string;
       count: PluralForms;
@@ -253,6 +251,7 @@ export type Dictionary = {
       all: string;
       noMatch: string;
       from: string;
+      export: string;
       columns: {
         recipient: string;
         for: string;
@@ -318,6 +317,11 @@ export type Dictionary = {
       notesPlaceholder: string;
       saveNotes: string;
       panelStatus: string;
+      panelDanger: string;
+      deleteHint: string;
+      deleteAction: string;
+      deleteConfirm: string;
+      deleteBlocked: string;
       panelCard: string;
       panelQr: string;
       generate: string;

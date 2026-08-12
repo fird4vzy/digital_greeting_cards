@@ -251,6 +251,7 @@ export const uz: Dictionary = {
       REVIEW: { label: 'Tekshiruvda', hint: 'Odam qayta o‘qishini kutyapti' },
       READY: { label: 'Tayyor', hint: "Tasdiqlangan, hali e'lon qilinmagan" },
       PUBLISHED: { label: "E'lon qilingan", hint: 'Ishlayapti va guldastaga biriktirilgan' },
+      CANCELLED: { label: 'Bekor qilingan', hint: 'Bekor qilindi; kod band bo‘lib qoladi' },
     },
 
     overview: {
@@ -270,6 +271,7 @@ export const uz: Dictionary = {
       all: 'Hammasi',
       noMatch: 'Hech narsa topilmadi.',
       from: 'kimdan:',
+      export: 'Hammasini yuklab olish',
       columns: {
         recipient: 'Kimga',
         for: 'Kim bo‘ladi',
@@ -342,6 +344,11 @@ export const uz: Dictionary = {
         'Olib ketish vaqti, qadoq, keyingi odam bilishi kerak bo‘lgan hamma narsa.',
       saveNotes: 'Eslatmalarni saqlash',
       panelStatus: 'Holat',
+      panelDanger: 'Qaytarib bo‘lmaydi',
+      deleteHint: 'Buyurtma hech qachon e’lon qilinmagan, shuning uchun uni butunlay o‘chirish mumkin.',
+      deleteAction: 'Buyurtmani o‘chirish',
+      deleteConfirm: 'Buyurtma butunlay o‘chirilsinmi? Buni qaytarib bo‘lmaydi.',
+      deleteBlocked: 'E’lon qilingan buyurtmani o‘chirib bo‘lmaydi: kod yorliqqa chop etilgan bo‘lishi mumkin. Uni bekor qiling — otkritka yo‘qoladi, kod esa band bo‘lib qoladi.',
       panelCard: 'Otkritka',
       panelQr: 'QR',
       generate: 'Otkritkani yig‘ish',

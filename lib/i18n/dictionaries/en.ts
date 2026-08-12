@@ -247,6 +247,7 @@ export const en: Dictionary = {
       REVIEW: { label: 'Review', hint: 'Waiting on a human read-through' },
       READY: { label: 'Ready', hint: 'Approved, not yet live' },
       PUBLISHED: { label: 'Published', hint: 'Live and attached to a bouquet' },
+      CANCELLED: { label: 'Cancelled', hint: 'Called off; the code stays reserved' },
     },
 
     overview: {
@@ -265,6 +266,7 @@ export const en: Dictionary = {
       all: 'All',
       noMatch: 'No orders match that.',
       from: 'from',
+      export: 'Download all',
       columns: {
         recipient: 'Recipient',
         for: 'For',
@@ -337,6 +339,11 @@ export const en: Dictionary = {
       notesPlaceholder: 'Pickup time, packaging, anything the next person needs to know.',
       saveNotes: 'Save notes',
       panelStatus: 'Status',
+      panelDanger: 'Irreversible',
+      deleteHint: 'This order was never published, so it can be deleted for good.',
+      deleteAction: 'Delete the order',
+      deleteConfirm: 'Delete this order permanently? This cannot be undone.',
+      deleteBlocked: 'A published order cannot be deleted: its code may already be printed on a tag. Cancel it instead — the card goes down and the code stays reserved.',
       panelCard: 'Card',
       panelQr: 'QR',
       generate: 'Generate card',

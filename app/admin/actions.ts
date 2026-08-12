@@ -2,10 +2,11 @@
 
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { ADMIN_SESSION_COOKIE, verifyAdminSession } from '@/lib/auth/admin';
 import { composeConfigForOrder } from '@/lib/card/service';
-import { getOrder, updateOrder } from '@/lib/db';
-import { ORDER_STATUSES, type OrderStatus } from '@/lib/db/types';
+import { getOrder, removeOrder, updateOrder } from '@/lib/db';
+import { ORDER_STATUSES, isDeletable, type OrderStatus } from '@/lib/db/types';
 
 /**
  * Admin mutations.
@@ -73,4 +74,27 @@ export async function saveOrderNotes(id: string, notes: string) {
 
   await updateOrder(id, { notes });
   revalidatePath(`/admin/orders/${id}`);
+}
+
+/**
+ * Deletes an order, if `isDeletable` allows it.
+ *
+ * The rule is enforced here rather than by hiding the button: the button is a
+ * courtesy, this is the boundary.
+ */
+export async function deleteOrder(id: string) {
+  await requireAdmin();
+
+  const order = await getOrder(id);
+  if (!order || !isDeletable(order)) return;
+
+  await removeOrder(id);
+
+  revalidatePath('/admin');
+  revalidatePath('/admin/orders');
+  revalidatePath('/admin/cards');
+
+  // The order's own page no longer exists; sending the operator back to the
+  // queue is the only sensible destination.
+  redirect('/admin/orders');
 }

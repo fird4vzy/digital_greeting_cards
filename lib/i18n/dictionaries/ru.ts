@@ -253,6 +253,7 @@ export const ru: Dictionary = {
       REVIEW: { label: 'На проверке', hint: 'Ждёт, пока человек перечитает' },
       READY: { label: 'Готов', hint: 'Одобрен, но ещё не опубликован' },
       PUBLISHED: { label: 'Опубликован', hint: 'Живой и прикреплён к букету' },
+      CANCELLED: { label: 'Отменён', hint: 'Отменён; код остаётся занятым' },
     },
 
     overview: {
@@ -281,6 +282,7 @@ export const ru: Dictionary = {
       all: 'Все',
       noMatch: 'Ничего не найдено.',
       from: 'от',
+      export: 'Скачать все',
       columns: {
         recipient: 'Получатель',
         for: 'Кто это',
@@ -370,6 +372,11 @@ export const ru: Dictionary = {
       notesPlaceholder: 'Время самовывоза, упаковка, всё, что нужно знать следующему.',
       saveNotes: 'Сохранить заметки',
       panelStatus: 'Статус',
+      panelDanger: 'Необратимое',
+      deleteHint: 'Заказ ни разу не публиковался, поэтому его можно удалить насовсем.',
+      deleteAction: 'Удалить заказ',
+      deleteConfirm: 'Удалить заказ навсегда? Это нельзя отменить.',
+      deleteBlocked: 'Опубликованный заказ удалить нельзя: код мог быть напечатан на бирке. Отмените его — открытка исчезнет, а код останется занятым.',
       panelCard: 'Открытка',
       panelQr: 'QR',
       generate: 'Собрать открытку',

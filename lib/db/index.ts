@@ -57,6 +57,15 @@ export async function updateOrder(...args: Parameters<OrderRepository['update']>
   return (await getRepository()).update(...args);
 }
 
+/**
+ * Permanent. Callers must refuse to delete anything that has ever been
+ * published — a code printed onto a tag has to keep resolving, so the way to
+ * retire a live card is `status: 'CANCELLED'`, not this.
+ */
+export async function removeOrder(...args: Parameters<OrderRepository['remove']>) {
+  return (await getRepository()).remove(...args);
+}
+
 export function toPublishedCard(order: Order, origin: string): PublishedCard {
   return {
     id: order.id,

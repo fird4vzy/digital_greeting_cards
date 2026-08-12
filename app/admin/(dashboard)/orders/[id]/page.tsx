@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { regenerateCard, saveOrderNotes, setOrderStatus } from '../../../actions';
+import { deleteOrder, regenerateCard, saveOrderNotes, setOrderStatus } from '../../../actions';
 import { StatusPill } from '@/components/admin/StatusPill';
 import { CopyButton } from '@/components/admin/CopyButton';
+import { DeleteOrderButton } from '@/components/admin/DeleteOrderButton';
 import { getOrder } from '@/lib/db';
-import { ORDER_STATUSES } from '@/lib/db/types';
+import { ORDER_STATUSES, isDeletable } from '@/lib/db/types';
 import { getI18n } from '@/lib/i18n/server';
 import {
   localiseTemplate,
@@ -229,6 +230,19 @@ export default async function OrderDetail({ params }: Props) {
             </div>
             <p className="mt-4 break-all text-[0.7rem] leading-relaxed text-ink-faint">{url}</p>
           </Panel>
+
+          <Panel title={t.panelDanger}>
+            <p className="text-[0.75rem] leading-relaxed text-ink-muted">
+              {isDeletable(order) ? t.deleteHint : t.deleteBlocked}
+            </p>
+
+            {isDeletable(order) ? (
+              <form action={destroy} className="mt-4">
+                <input type="hidden" name="id" value={order.id} />
+                <DeleteOrderButton label={t.deleteAction} confirmText={t.deleteConfirm} />
+              </form>
+            ) : null}
+          </Panel>
         </aside>
       </div>
     </>
@@ -250,6 +264,11 @@ async function regenerate(formData: FormData) {
 async function saveNotes(formData: FormData) {
   'use server';
   await saveOrderNotes(String(formData.get('id')), String(formData.get('notes') ?? ''));
+}
+
+async function destroy(formData: FormData) {
+  'use server';
+  await deleteOrder(String(formData.get('id')));
 }
 
 function Detail({ label, children }: { label: string; children: React.ReactNode }) {

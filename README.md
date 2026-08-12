@@ -170,8 +170,15 @@ The app depends on `OrderRepository`, never on a concrete store.
 
 ```bash
 export DATABASE_URL=postgres://…
-npm run db:apply       # or: psql "$DATABASE_URL" -f lib/db/schema.sql
+npm run db:apply       # create a database from scratch
+npm run db:migrate     # bring an existing one forward
 ```
+
+`db:apply` runs `schema.sql` once, in a transaction. `db:migrate` applies
+anything new in `lib/db/migrations/`, recording each file in
+`schema_migrations` so it is safe to run repeatedly. Both are needed: once a
+deployment is live, a change like adding an order status cannot be delivered by
+re-running the schema.
 
 `db:apply` exists because neither obvious route is reliable: `psql` is not
 installed everywhere, and the SQL console in the Vercel dashboard sends the
@@ -245,7 +252,15 @@ domain is live. Set it to the final domain *before* anyone prints a tag.
 
 Apply the schema to the database once, before the first deploy that has
 `DATABASE_URL` set — point `DATABASE_URL` at it locally and run
-`npm run db:apply`.
+`npm run db:apply`. After any release that adds a migration, run
+`npm run db:migrate` against the same URL before the deploy goes live.
+
+**Deleting versus cancelling.** A published card's code may already be printed
+onto a tag and tied to a bouquet, so the row can never go away: `CANCELLED`
+takes the page down and keeps the code reserved, and `isDeletable` in
+`lib/db/types.ts` refuses to delete anything that has ever been published.
+`/admin/export` hands the shop the whole order book as one JSON file — the
+provider's backups restore a database, this restores a business.
 
 ---
 

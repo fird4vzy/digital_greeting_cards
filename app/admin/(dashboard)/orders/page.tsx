@@ -57,6 +57,16 @@ export default async function OrdersPage({ searchParams }: Props) {
           >
             {t.search}
           </button>
+
+          {/* A plain link, not a fetch: the browser's own download handling is
+              better than anything we would build, and it works with no JS. */}
+          <a
+            href="/admin/export"
+            download
+            className="flex h-9 items-center rounded-full border border-line-strong px-4 text-caption text-ink-soft transition-colors hover:border-ink hover:text-ink"
+          >
+            {t.export}
+          </a>
         </form>
       </header>
 

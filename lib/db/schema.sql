@@ -11,7 +11,9 @@
 -- library — all three point away from a normalised section table.
 -- ---------------------------------------------------------------------------
 
-CREATE TYPE order_status AS ENUM ('NEW', 'PROCESSING', 'REVIEW', 'READY', 'PUBLISHED');
+-- 'CANCELLED' is a terminal state, not a deletion: a printed tag must keep
+-- resolving to a reserved code. See lib/db/types.ts.
+CREATE TYPE order_status AS ENUM ('NEW', 'PROCESSING', 'REVIEW', 'READY', 'PUBLISHED', 'CANCELLED');
 
 CREATE TABLE orders (
   id              TEXT PRIMARY KEY,
