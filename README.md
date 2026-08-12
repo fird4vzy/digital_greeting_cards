@@ -204,9 +204,12 @@ mid-checkout must always end up with a card.
 
 Honest list of what a v1 does not have:
 
-- **The admin has no authentication.** Every mutation in `app/admin/actions.ts`
-  is a natural place to enforce session auth and a per-shop ownership check;
-  none of them do yet. This must land before the admin is on a public hostname.
+- **The admin has one shared password, not accounts.** `/admin` is gated by
+  HTTP Basic auth in middleware against `ADMIN_PASSWORD` (`lib/auth/admin.ts`),
+  which is enough to keep the order queue off the open internet. It is not an
+  identity layer: there are no per-operator sessions and no per-shop ownership
+  check, so any operator can act on any shop's order. `app/admin/actions.ts` is
+  where that check belongs.
 - **Photos are stored as data URLs** in the order record. They are downscaled
   and re-encoded on the device first, which keeps them small, but object
   storage is the right home — `lib/utils/image.ts` is the one function that

@@ -8,11 +8,12 @@ import { ORDER_STATUSES, type OrderStatus } from '@/lib/db/types';
 /**
  * Admin mutations.
  *
- * ⚠️ These are unauthenticated. The admin surface is scoped to the shop-side
- * workflow and has no identity layer yet — before this is exposed on a public
- * hostname it needs session auth and a per-shop ownership check on every
- * order. Every action below is a natural place to enforce that: they are the
- * only writes the admin can perform.
+ * ⚠️ These carry no identity. A shared password in middleware
+ * (`lib/auth/admin.ts`) is all that stands in front of them: it establishes
+ * that the caller is *an* operator, never *which* operator. So there is still
+ * no per-shop ownership check — any authenticated caller can act on any shop's
+ * order. Every action below is where that check belongs once orders have an
+ * owner; they are the only writes the admin can perform.
  */
 
 export async function setOrderStatus(id: string, status: string) {

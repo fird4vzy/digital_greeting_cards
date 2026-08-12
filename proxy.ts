@@ -1,8 +1,16 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { adminAuthResponse, checkAdminAuth } from '@/lib/auth/admin';
 import { LOCALE_COOKIE, LOCALE_HEADER, isLocale, negotiateLocale } from '@/lib/i18n/config';
 
 /**
- * Locale negotiation.
+ * Admin gate and locale negotiation.
+ *
+ * `/admin` is password-gated here because the proxy is the one place that also
+ * covers the server actions in `app/admin/actions.ts`: they POST back to the
+ * admin path they were invoked from, so a check that runs before routing
+ * catches the writes as well as the reads. The admin layout re-checks anyway —
+ * Next's own guidance is not to let the proxy be the only thing standing
+ * between a request and protected data. See `lib/auth/admin.ts`.
  *
  * The visitor's language is resolved once, here, and handed to the app on a
  * request header. An explicit choice they made earlier (cookie) beats their
@@ -20,7 +28,12 @@ import { LOCALE_COOKIE, LOCALE_HEADER, isLocale, negotiateLocale } from '@/lib/i
  * `/c/…` is excluded entirely: a published card's language comes from the card
  * itself, never from whoever is holding the phone.
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    const auth = checkAdminAuth(request.headers.get('authorization'));
+    if (!auth.ok) return adminAuthResponse(auth.reason);
+  }
+
   const cookie = request.cookies.get(LOCALE_COOKIE)?.value;
   const locale = isLocale(cookie)
     ? cookie
