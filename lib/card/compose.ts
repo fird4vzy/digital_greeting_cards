@@ -1,5 +1,6 @@
 ﻿import { cardStrings, copyFor, coverHeadline, openPrompt } from './copy';
 import type { CardSection, SectionKind } from './schema';
+import type { SectionVariant, SectionVariants } from './variants';
 import type { StoryInput } from './template';
 
 /**
@@ -74,8 +75,7 @@ export function memoryItems(input: StoryInput) {
 export function standardArc(
   input: StoryInput,
   options: {
-    envelopeVariant?: string;
-    openPrompt?: string;
+    envelopeVariant?: SectionVariant<'envelope'>;
     /** Beats to omit even if data exists, e.g. a minimal template. */
     exclude?: SectionKind[];
   } = {},
@@ -96,8 +96,14 @@ export function standardArc(
       hint: strings.scrollGently,
     },
     {
+      // The prompt is always derived, never passed in. Templates used to hand
+      // over a literal ("Open it", "Pull the ribbon"), which shadowed this call
+      // and printed English on Russian and Uzbek cards — the strings they
+      // passed were word-for-word the English dictionary entries, so the bug
+      // was invisible in English and total everywhere else. A template that
+      // wants different wording adds a dictionary key.
       type: 'envelope',
-      prompt: options.openPrompt ?? openPrompt(options.envelopeVariant, input.locale),
+      prompt: openPrompt(options.envelopeVariant, input.locale),
       variant: options.envelopeVariant,
       note: undefined,
     },
@@ -143,7 +149,7 @@ export function standardArc(
 /** Applies a template's per-section look to a composed section list. */
 export function applyVariants(
   sections: CardSection[],
-  variants: Partial<Record<SectionKind, string>>,
+  variants: SectionVariants,
 ): CardSection[] {
   return sections.map((section) => {
     const variant = section.variant ?? variants[section.type];

@@ -42,7 +42,7 @@ export const anniversaryTemplate: TemplateDefinition = {
     closing: 'seal',
   },
   compose(input) {
-    const sections = standardArc(input, { envelopeVariant: 'wax', openPrompt: 'Open it' });
+    const sections = standardArc(input, { envelopeVariant: 'wax' });
 
     // The anniversary story reads better chronology-first: the timeline moves
     // ahead of the letter so the letter lands as the conclusion, not the setup.

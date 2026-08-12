@@ -42,10 +42,7 @@ export const momTemplate: TemplateDefinition = {
     closing: 'signature',
   },
   compose(input) {
-    const sections = standardArc(input, {
-      envelopeVariant: 'ribbon',
-      openPrompt: 'Open it',
-    });
+    const sections = standardArc(input, { envelopeVariant: 'ribbon' });
     return applyVariants(sections, this.sectionVariants);
   },
 };

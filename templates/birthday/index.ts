@@ -47,10 +47,7 @@ export const birthdayTemplate: TemplateDefinition = {
         ? input.wishes
         : ['A slow morning', 'Something you did not plan', 'People who show up', 'One very good meal'];
 
-    const sections = standardArc(
-      { ...input, wishes },
-      { envelopeVariant: 'ribbon', openPrompt: 'Pull the ribbon' },
-    );
+    const sections = standardArc({ ...input, wishes }, { envelopeVariant: 'ribbon' });
     return applyVariants(sections, this.sectionVariants);
   },
 };

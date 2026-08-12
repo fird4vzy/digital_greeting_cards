@@ -108,6 +108,8 @@ templates/    one directory per template
 
 ## The template engine
 
+*Adding one: [`templates/README.md`](./templates/README.md).*
+
 A template is a **recipe**, not a page. It declares which beats it plays, how
 the shared sections should look, and its colourway:
 

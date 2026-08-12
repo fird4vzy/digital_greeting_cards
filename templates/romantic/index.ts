@@ -42,7 +42,7 @@ export const romanticTemplate: TemplateDefinition = {
     closing: 'seal',
   },
   compose(input) {
-    const sections = standardArc(input, { envelopeVariant: 'wax', openPrompt: 'Open it' });
+    const sections = standardArc(input, { envelopeVariant: 'wax' });
     return applyVariants(sections, this.sectionVariants);
   },
 };

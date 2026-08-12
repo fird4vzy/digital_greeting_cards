@@ -42,7 +42,7 @@ export const sakuraTemplate: TemplateDefinition = {
     closing: 'seal',
   },
   compose(input) {
-    const sections = standardArc(input, { envelopeVariant: 'washi', openPrompt: 'Unfold' });
+    const sections = standardArc(input, { envelopeVariant: 'washi' });
     return applyVariants(sections, this.sectionVariants);
   },
 };

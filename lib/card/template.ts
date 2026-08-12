@@ -1,5 +1,6 @@
 ﻿import type { PaletteId } from '@/lib/design/palettes';
 import type { CardSection, Photo, SectionKind } from './schema';
+import type { SectionVariants } from './variants';
 import type { MoodId, OccasionId } from './taxonomy';
 
 /**
@@ -57,8 +58,12 @@ export type TemplateDefinition = {
   motif: MotifId;
   /** Beats this template is able to render, in canonical order. */
   supportedSections: SectionKind[];
-  /** Per-section look. Missing entries fall back to the component default. */
-  sectionVariants: Partial<Record<SectionKind, string>>;
+  /**
+   * Per-section look, checked against `SECTION_VARIANTS`. Missing entries fall
+   * back to the component default; a look nobody has built is a build error
+   * rather than a silent fallback.
+   */
+  sectionVariants: SectionVariants;
   /** Turns story input into a full section list. The heart of the engine. */
   compose: (input: StoryInput) => CardSection[];
 };
