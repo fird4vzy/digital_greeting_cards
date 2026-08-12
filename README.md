@@ -164,10 +164,15 @@ The app depends on `OrderRepository`, never on a concrete store.
 - **`DATABASE_URL` set** → PostgreSQL, against `lib/db/schema.sql`.
 
 ```bash
-npm install pg
 export DATABASE_URL=postgres://…
 psql "$DATABASE_URL" -f lib/db/schema.sql
 ```
+
+The `pg` import in `lib/db/postgres.ts` is lazy but deliberately written so a
+bundler can see it. Hiding it — behind a computed specifier, say — keeps the
+driver out of a traced deployment's output, and the fallback then turns that
+into silence: no `DATABASE_URL` error, just an in-memory store quietly
+forgetting every order.
 
 Card configuration is `JSONB` deliberately: it is validated at the application
 boundary by zod, read as a whole document every time, and its shape evolves
@@ -176,6 +181,30 @@ with the template library.
 A "card" is not a second table — it is a published order, addressed by its
 short code. `lib/db/types.ts` explains where to split that seam if cards ever
 need their own lifecycle.
+
+---
+
+## Deploying
+
+The app is a standard Next.js server build — anywhere that runs `next build`
+and `next start` will do. On Vercel, import the repository and the defaults are
+correct; nothing in `next.config.ts` needs changing.
+
+Three environment variables decide whether the deployment is real or a demo:
+
+| Variable | Consequence if unset |
+|---|---|
+| `DATABASE_URL` | Serverless filesystems are read-only, so the file store degrades to memory. The site works, every order placed is lost. |
+| `ADMIN_PASSWORD` | `/admin` refuses every request with a 503. Deliberate — see `lib/auth/admin.ts`. |
+| `NEXT_PUBLIC_SITE_URL` | QR codes and share links are generated against the request's own origin. |
+
+`NEXT_PUBLIC_SITE_URL` deserves more care than the other two. It is baked into
+every QR code the shop prints, so a card tagged while it pointed at a
+`*.vercel.app` preview keeps pointing there forever — long after the custom
+domain is live. Set it to the final domain *before* anyone prints a tag.
+
+Apply `lib/db/schema.sql` to the database once, before the first deploy that
+has `DATABASE_URL` set.
 
 ---
 

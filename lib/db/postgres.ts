@@ -4,13 +4,19 @@ import type { Order, OrderDraft, OrderFilter, OrderPatch } from './types';
 /**
  * PostgreSQL implementation of `OrderRepository`, against lib/db/schema.sql.
  *
- * `pg` is an optional dependency: installations that run on the file-backed
- * store should not have to carry a database driver. It is therefore loaded
- * through a runtime-computed specifier so no bundler tries to resolve it at
- * build time, and `createPostgresStore` returns null if it is absent — the
- * caller falls back rather than crashing the app on boot.
+ * `pg` is a real dependency but a lazily loaded one: the driver is only
+ * imported when `DATABASE_URL` is set, so a file-store installation never pays
+ * to connect it. `createPostgresStore` still returns null if the import fails,
+ * and the caller falls back rather than crashing the app on boot.
  *
- *   npm install pg && export DATABASE_URL=postgres://??
+ * **The import must stay statically analysable.** It was once hidden behind a
+ * runtime-computed specifier to keep bundlers away from it. That is exactly
+ * wrong on a traced deployment: Next follows the import graph to decide which
+ * files ship, so an import it cannot see means `pg` is missing at runtime, the
+ * catch below swallows it, and the app quietly serves orders from an in-memory
+ * store that forgets them. `pg` is on Next's `serverExternalPackages` list, so
+ * a plain `import()` is already left as a native require rather than bundled.
+ *
  *   psql "$DATABASE_URL" -f lib/db/schema.sql
  */
 
@@ -42,11 +48,6 @@ type OrderRow = {
   updated_at: Date | string;
   published_at: Date | string | null;
 };
-
-// Hidden from bundler static analysis; evaluated only in the Node runtime.
-const dynamicImport = new Function('specifier', 'return import(specifier)') as (
-  specifier: string,
-) => Promise<Record<string, unknown>>;
 
 function iso(value: Date | string | null): string | null {
   if (!value) return null;
@@ -91,7 +92,12 @@ export async function createPostgresStore(connectionString: string): Promise<Ord
   let pool: Pool;
 
   try {
-    const pg = (await dynamicImport('pg')) as { default?: { Pool: new (c: unknown) => Pool }; Pool?: new (c: unknown) => Pool };
+    // `pg` is CommonJS: under ESM interop the named export may only be
+    // reachable through `default`, so try both rather than assume a shape.
+    const pg = (await import('pg')) as unknown as {
+      default?: { Pool?: new (c: unknown) => Pool };
+      Pool?: new (c: unknown) => Pool;
+    };
     const PoolCtor = pg.Pool ?? pg.default?.Pool;
     if (!PoolCtor) return null;
 
@@ -160,8 +166,13 @@ export async function createPostgresStore(connectionString: string): Promise<Ord
                moments, memories, wishes, template_id, status, config, notes,
                published_at
              ) VALUES (
-               $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,
-               CASE WHEN $18 = 'PUBLISHED' THEN now() ELSE NULL END
+               $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,
+               $18::order_status,$19,$20,
+               -- Both casts are load-bearing. $18 appears twice, and without
+               -- them Postgres deduces order_status from the column and text
+               -- from the comparison, then rejects the statement outright
+               -- (42P08). Naming the type at both sites keeps them agreeing.
+               CASE WHEN $18::order_status = 'PUBLISHED' THEN now() ELSE NULL END
              )
              RETURNING ${COLUMNS}`,
             [
