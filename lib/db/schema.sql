@@ -45,6 +45,8 @@ CREATE TABLE orders (
   -- Validated against cardConfigSchema before it is written.
   config          JSONB,
   notes           TEXT,
+  -- The customer's instructions to the shop. Never rendered into the card.
+  brief           TEXT,
 
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),

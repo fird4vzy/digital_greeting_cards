@@ -44,6 +44,7 @@ type OrderRow = {
   status: Order['status'];
   config: Order['config'];
   notes: string | null;
+  brief: string | null;
   created_at: Date | string;
   updated_at: Date | string;
   published_at: Date | string | null;
@@ -107,6 +108,7 @@ function toOrder(row: OrderRow): Order {
     status: row.status,
     config: row.config,
     notes: row.notes ?? undefined,
+    brief: row.brief ?? undefined,
     createdAt: iso(row.created_at) ?? new Date().toISOString(),
     updatedAt: iso(row.updated_at) ?? new Date().toISOString(),
     publishedAt: iso(row.published_at),
@@ -115,7 +117,7 @@ function toOrder(row: OrderRow): Order {
 
 const COLUMNS = `id, code, customer_name, customer_email, customer_phone, shop,
   recipient_name, relationship, occasion, mood, locale, message, photos, moments,
-  memories, wishes, template_id, status, config, notes, created_at, updated_at,
+  memories, wishes, template_id, status, config, notes, brief, created_at, updated_at,
   published_at`;
 
 export async function createPostgresStore(connectionString: string): Promise<OrderRepository | null> {
@@ -194,10 +196,10 @@ export async function createPostgresStore(connectionString: string): Promise<Ord
                id, code, customer_name, customer_email, customer_phone, shop,
                recipient_name, relationship, occasion, mood, locale, message, photos,
                moments, memories, wishes, template_id, status, config, notes,
-               published_at
+               brief, published_at
              ) VALUES (
                $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,
-               $18::order_status,$19,$20,
+               $18::order_status,$19,$20,$21,
                -- Both casts are load-bearing. $18 appears twice, and without
                -- them Postgres deduces order_status from the column and text
                -- from the comparison, then rejects the statement outright
@@ -226,6 +228,7 @@ export async function createPostgresStore(connectionString: string): Promise<Ord
               status,
               draft.config ? JSON.stringify(draft.config) : null,
               draft.notes ?? null,
+              draft.brief ?? null,
             ],
           );
 
@@ -266,6 +269,7 @@ export async function createPostgresStore(connectionString: string): Promise<Ord
       if (patch.templateId !== undefined) push('template_id', patch.templateId);
       if (patch.config !== undefined) push('config', patch.config ? JSON.stringify(patch.config) : null);
       if (patch.notes !== undefined) push('notes', patch.notes ?? null);
+      if (patch.brief !== undefined) push('brief', patch.brief ?? null);
 
       if (patch.status !== undefined) {
         push('status', patch.status);

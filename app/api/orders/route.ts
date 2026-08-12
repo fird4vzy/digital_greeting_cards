@@ -4,15 +4,25 @@ import { createOrder, listOrders } from '@/lib/db';
 import { ORDER_STATUSES } from '@/lib/db/types';
 import { photoSchema } from '@/lib/card/schema';
 import { composeConfigForOrder } from '@/lib/card/service';
+import { notifyNewOrder } from '@/lib/notify/telegram';
+import { siteOrigin } from '@/lib/site-origin';
 import { DEFAULT_TEMPLATE_ID } from '@/templates';
 
 const draftSchema = z.object({
-  customer: z.object({
-    name: z.string().min(1),
-    email: z.string().email().optional(),
-    phone: z.string().optional(),
-    shop: z.string().optional(),
-  }),
+  customer: z
+    .object({
+      name: z.string().min(1),
+      email: z.email().optional().or(z.literal('')),
+      phone: z.string().optional(),
+      shop: z.string().optional(),
+    })
+    // The shop has to be able to reach whoever ordered: an order it cannot
+    // ask a question about is an order it cannot finish. Either channel will
+    // do, but not neither.
+    .refine((customer) => Boolean(customer.email?.trim() || customer.phone?.trim()), {
+      message: 'Give a phone number or an email address',
+      path: ['phone'],
+    }),
   recipient: z.object({ name: z.string().min(1), relationship: z.string().min(1) }),
   occasion: z.string().min(1),
   mood: z.string().min(1),
@@ -27,6 +37,8 @@ const draftSchema = z.object({
   wishes: z.array(z.string()).default([]),
   templateId: z.string().default(DEFAULT_TEMPLATE_ID),
   notes: z.string().optional(),
+  /** The customer's instructions to the shop. Never rendered into the card. */
+  brief: z.string().max(4000).optional(),
   /** Compose and publish in one call — used by the customer creation flow. */
   publish: z.boolean().default(false),
 });
@@ -58,18 +70,22 @@ export async function POST(request: Request) {
 
   const { publish, ...draft } = parsed.data;
 
-  const order = await createOrder({ ...draft, status: 'NEW', config: null });
+  // The card is always composed, so the shop opens a finished draft rather
+  // than an empty record and the customer can see something immediately.
+  // `publish` decides only whether it is live: on the customer flow it is
+  // false, and a person reviews the draft before a code goes onto a tag.
+  const created = await createOrder({ ...draft, status: 'NEW', config: null });
+  const config = composeConfigForOrder(created);
 
-  if (!publish) {
-    return NextResponse.json({ order }, { status: 201 });
-  }
-
-  // Compose through the same service the admin uses, then publish.
   const { updateOrder } = await import('@/lib/db');
-  const published = await updateOrder(order.id, {
-    config: composeConfigForOrder(order),
-    status: 'PUBLISHED',
-  });
+  const order =
+    (await updateOrder(created.id, {
+      config,
+      ...(publish ? { status: 'PUBLISHED' as const } : {}),
+    })) ?? created;
 
-  return NextResponse.json({ order: published ?? order }, { status: 201 });
+  // After the order is safely stored: a notification is not worth failing on.
+  await notifyNewOrder(order, await siteOrigin());
+
+  return NextResponse.json({ order }, { status: 201 });
 }

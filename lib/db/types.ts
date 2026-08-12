@@ -72,6 +72,13 @@ export type Order = {
   /** Null until the card has been composed. */
   config: CardConfig | null;
   notes?: string;
+  /**
+   * What the customer asked for, in their own words — deadlines, styling
+   * requests, anything the eight questions do not have a slot for. Read by
+   * the shop, never rendered into the card: `message` is the card's text,
+   * this is the instruction that comes with it.
+   */
+  brief?: string;
   createdAt: string;
   updatedAt: string;
   publishedAt?: string | null;

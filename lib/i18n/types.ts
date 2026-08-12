@@ -181,10 +181,28 @@ export type Dictionary = {
           action: string;
           working: string;
         };
+        /** Instructions to the shop: deadlines, styling, anything else. */
+        brief: {
+          eyebrow: string;
+          question: string;
+          hint: string;
+          placeholder: string;
+          skip: string;
+        };
+        /** How the shop reaches them. At least one channel is required. */
+        contact: {
+          eyebrow: string;
+          question: string;
+          hint: string;
+          phone: string;
+          email: string;
+          required: string;
+        };
       };
       done: {
         title: string;
         lead: string;
+        openPreview: string;
         codeLabel: string;
         copyLink: string;
         copied: string;
@@ -199,6 +217,7 @@ export type Dictionary = {
       copyLink: string;
       copied: string;
     };
+    preview: { draft: string };
     notFound: { title: string; lead: string; hint: string; back: string; makeOwn: string };
     card: { madeWith: string };
     localeSwitcher: { label: string };
@@ -295,6 +314,7 @@ export type Dictionary = {
       back: string;
       from: string;
       sectionOrder: string;
+      sectionBrief: string;
       sectionMessage: string;
       sectionPhotos: string;
       sectionDetails: string;

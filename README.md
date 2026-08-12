@@ -53,8 +53,9 @@ Worth visiting:
 | `/` | The landing page |
 | `/templates` | The gallery — every template plays a live miniature |
 | `/templates/romantic` | A full preview: the real renderer, demo content |
-| `/create` | The eight-question creation flow |
+| `/create` | The nine-question creation flow |
 | `/c/8FJ29K` | A published card |
+| `/c/8FJ29K/preview` | The customer's look at a draft the shop has not published |
 | `/c/8FJ29K/qr` | The printable tag the shop ties to the flowers |
 | `/admin/login` | The way in — one shared password |
 | `/admin` | The shop-side queue |
@@ -231,6 +232,26 @@ overlaid at render time by `lib/i18n/localise.ts`.
 
 ---
 
+## How an order travels
+
+The customer answers nine questions and submits. The card is **composed
+immediately** but published by nobody: it arrives in the dashboard as `NEW`
+with a finished draft attached, and the customer gets a link to
+`/c/[code]/preview` so the work is visible while the shop still owns the
+outcome. `/c/[code]` stays `PUBLISHED`-only, which is what keeps a code
+printed onto a tag from ever resolving to an unfinished card.
+
+The shop reads the brief, adjusts the template or regenerates the card, then
+publishes. A Telegram message goes out the moment an order lands, so nobody has
+to sit watching the queue.
+
+Two fields exist purely for that hand-off: `brief`, the customer's instructions
+to the shop, which is never rendered into the card, and a contact — phone or
+email, at least one, enforced in the API as well as the form. An order the shop
+cannot ask a question about is an order it cannot finish.
+
+---
+
 ## Deploying
 
 The app is a standard Next.js server build — anywhere that runs `next build`
@@ -244,6 +265,7 @@ Three environment variables decide whether the deployment is real or a demo:
 | `DATABASE_URL` | Serverless filesystems are read-only, so the file store degrades to memory. The site works, every order placed is lost. |
 | `ADMIN_PASSWORD` | `/admin/login` says it is not configured and lets nobody through. Deliberate — see `lib/auth/admin.ts`. |
 | `NEXT_PUBLIC_SITE_URL` | QR codes and share links are generated against the request's own origin. |
+| `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` | No notification is sent. Orders still arrive; somebody has to open the dashboard to find them. |
 
 `NEXT_PUBLIC_SITE_URL` deserves more care than the other two. It is baked into
 every QR code the shop prints, so a card tagged while it pointed at a

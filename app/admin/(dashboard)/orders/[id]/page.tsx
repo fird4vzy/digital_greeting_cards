@@ -68,6 +68,11 @@ export default async function OrderDetail({ params }: Props) {
               <Detail label={t.fields.orderId}>{order.id}</Detail>
               <Detail label={t.fields.customer}>
                 {order.customer.name}
+                {/* Both channels, not just email: this is how the shop gets
+                    hold of someone mid-order, so it must be the whole answer. */}
+                {order.customer.phone ? (
+                  <span className="block text-ink-muted">{order.customer.phone}</span>
+                ) : null}
                 {order.customer.email ? (
                   <span className="block text-ink-muted">{order.customer.email}</span>
                 ) : null}
@@ -88,6 +93,21 @@ export default async function OrderDetail({ params }: Props) {
               </Detail>
             </dl>
           </section>
+
+          {/* Above the card's own text on purpose: this is the instruction,
+              and an operator should read it before the thing it applies to. */}
+          {order.brief?.trim() ? (
+            <section>
+              <h2 className="eyebrow mb-5 text-ink-muted">{t.sectionBrief}</h2>
+              <div className="space-y-4 rounded-[1rem] border border-accent/30 bg-accent/[0.04] p-6">
+                {paragraphs(order.brief).map((block, index) => (
+                  <p key={index} className="text-body leading-[1.8] text-ink-soft">
+                    {block}
+                  </p>
+                ))}
+              </div>
+            </section>
+          ) : null}
 
           <section>
             <h2 className="eyebrow mb-5 text-ink-muted">{t.sectionMessage}</h2>

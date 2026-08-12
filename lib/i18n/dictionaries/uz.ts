@@ -188,10 +188,26 @@ export const uz: Dictionary = {
           action: 'Kartochkani chop etish',
           working: 'Chop etilmoqda…',
         },
+        brief: {
+          eyebrow: 'Salon uchun',
+          question: 'Alohida istaklar bormi?',
+          hint: 'Muddat, bezak, yuqoridagi savollarga sig‘magan narsalar. Buni salon ko‘radi — otkritkaga tushmaydi.',
+          placeholder: 'Jumagacha kerak, yorqin ranglarsiz bo‘lsa yaxshi, to‘y suratini kattaroq qo‘ying...',
+          skip: 'Istaklar yo‘q',
+        },
+        contact: {
+          eyebrow: 'Siz bilan qanday bog‘lanamiz',
+          question: 'Aloqa qoldiring.',
+          hint: 'Salonda otkritkangiz bo‘yicha savol tug‘ilsa kerak bo‘ladi. Bittasi yetarli.',
+          phone: 'Telefon',
+          email: 'Pochta',
+          required: 'Telefon yoki pochta qoldiring.',
+        },
       },
       done: {
-        title: '{name} uchun tayyor.',
-        lead: "Kodni gul do'koniga bering. Ular uni kichkina kartochkaga chop etib, poyalarga bog'lashadi — skanerlangunicha kartochka shaxsiy bo'lib qoladi.",
+        title: '{name} uchun ariza qabul qilindi.',
+        lead: 'Salon otkritkani yig‘adi va siz bilan bog‘lanadi. Qoralamani hozir ham ko‘rish mumkin — salon tugatgach u o‘zgaradi.',
+        openPreview: 'Qoralamani ko‘rish',
         codeLabel: 'Kod',
         copyLink: 'Havolani nusxalash',
         copied: 'Havola nusxalandi',
@@ -207,6 +223,8 @@ export const uz: Dictionary = {
       copyLink: 'Havolani nusxalash',
       copied: 'Nusxalandi',
     },
+
+    preview: { draft: 'Qoralama. Salon otkritkani hali tayyorlayapti — havolani sovg‘a qilish erta.' },
 
     notFound: {
       title: "Bu kartochka bu yerda yo'q.",
@@ -321,6 +339,7 @@ export const uz: Dictionary = {
       back: '← Buyurtmalar',
       from: 'kimdan:',
       sectionOrder: 'Buyurtma',
+      sectionBrief: 'Buyurtmachi istaklari',
       sectionMessage: 'Buyurtmachi nima yozgan',
       sectionPhotos: 'Suratlar',
       sectionDetails: 'Yana nima ko‘rsatilgan',

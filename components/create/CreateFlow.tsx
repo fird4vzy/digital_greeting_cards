@@ -42,6 +42,7 @@ const STEPS = [
   'story',
   'photos',
   'template',
+  'brief',
   'preview',
   'publish',
 ] as const;
@@ -55,6 +56,11 @@ type Draft = {
   story: string;
   photos: Photo[];
   templateId: string;
+  /** Instructions for the shop. Never rendered into the card. */
+  brief: string;
+  /** How the shop reaches them. At least one is required to submit. */
+  phone: string;
+  email: string;
   /** The language the card is written in. Defaults to the browsing language,
    *  but they are genuinely independent choices — see the language step. */
   locale: string;
@@ -69,6 +75,9 @@ const EMPTY: Draft = {
   story: '',
   photos: [],
   templateId: '',
+  brief: '',
+  phone: '',
+  email: '',
   locale: '',
 };
 
@@ -156,7 +165,11 @@ export function CreateFlow({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customer: { name: draft.senderName || 'Someone' },
+          customer: {
+            name: draft.senderName || 'Someone',
+            phone: draft.phone.trim() || undefined,
+            email: draft.email.trim() || undefined,
+          },
           recipient: { name: draft.recipientName || 'You', relationship: draft.recipientId || 'someone-special' },
           occasion: draft.occasion || 'just-because',
           mood: draft.mood || 'warm',
@@ -167,7 +180,10 @@ export function CreateFlow({
           memories: [],
           wishes: [],
           templateId: activeTemplate?.id ?? 'romantic',
-          publish: true,
+          brief: draft.brief.trim() || undefined,
+          // The shop publishes, not the customer: a code only goes onto a tag
+          // once a person has read the card through.
+          publish: false,
         }),
       });
 
@@ -196,6 +212,9 @@ export function CreateFlow({
       />
     );
   }
+
+  // Either channel will do; the API enforces the same rule server-side.
+  const hasContact = Boolean(draft.phone.trim() || draft.email.trim());
 
   const cardLocale = draft.locale || locale;
   const cardCopy = copyFor(draft.occasion || 'just-because', cardLocale);
@@ -444,8 +463,36 @@ export function CreateFlow({
 
         {step === 6 && (
           <StepShell
-            key="preview"
+            key="brief"
             index={6}
+            total={STEPS.length}
+            strings={{ back: copy.back, continue: copy.continue, progress: copy.progress }}
+            eyebrow={copy.steps.brief.eyebrow}
+            question={copy.steps.brief.question}
+            hint={copy.steps.brief.hint}
+            onBack={back}
+            onNext={next}
+            canContinue
+            skip={{ label: copy.steps.brief.skip, onSkip: next }}
+          >
+            <label className="block">
+              <span className="sr-only">{copy.steps.brief.question}</span>
+              <textarea
+                value={draft.brief}
+                onChange={(event) => patch({ brief: event.target.value })}
+                rows={6}
+                autoFocus
+                placeholder={copy.steps.brief.placeholder}
+                className="w-full resize-none rounded-[1rem] border border-line-strong bg-white/60 p-6 font-sans text-body leading-[1.8] text-ink outline-none transition-colors duration-400 placeholder:text-ink-faint focus:border-ink focus:bg-white"
+              />
+            </label>
+          </StepShell>
+        )}
+
+        {step === 7 && (
+          <StepShell
+            key="preview"
+            index={7}
             total={STEPS.length}
             strings={{ back: copy.back, continue: copy.continue, progress: copy.progress }}
             eyebrow={copy.steps.preview.eyebrow}
@@ -468,10 +515,10 @@ export function CreateFlow({
           </StepShell>
         )}
 
-        {step === 7 && (
+        {step === 8 && (
           <StepShell
             key="publish"
-            index={7}
+            index={8}
             total={STEPS.length}
             strings={{ back: copy.back, continue: copy.continue, progress: copy.progress }}
             eyebrow={copy.steps.publish.eyebrow}
@@ -484,13 +531,43 @@ export function CreateFlow({
                 {t(copy.steps.publish.explain, { name: draft.recipientName || '—' })}
               </p>
 
+              {/* Contact lives on the submit screen rather than in a step of
+                  its own: it is the one thing asked for the shop's benefit
+                  instead of the card's, and a ninth question for two optional
+                  fields would be a step too many. */}
+              <div className="mt-7 border-t border-line pt-7">
+                <p className="text-caption text-ink-muted">{copy.steps.contact.hint}</p>
+
+                <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                  <Field
+                    label={copy.steps.contact.phone}
+                    value={draft.phone}
+                    onChange={(phone) => patch({ phone })}
+                  />
+                  <Field
+                    label={copy.steps.contact.email}
+                    value={draft.email}
+                    onChange={(email) => patch({ email })}
+                  />
+                </div>
+
+                {!hasContact ? (
+                  <p className="mt-4 text-caption text-ink-faint">{copy.steps.contact.required}</p>
+                ) : null}
+              </div>
+
               {error ? (
                 <p className="mt-5 rounded-[0.6rem] bg-accent/10 px-4 py-3 text-caption text-accent-deep">
                   {error}
                 </p>
               ) : null}
 
-              <Button onClick={publish} disabled={publishing} size="lg" className="mt-7 w-full sm:w-auto">
+              <Button
+                onClick={publish}
+                disabled={publishing || !hasContact}
+                size="lg"
+                className="mt-7 w-full sm:w-auto"
+              >
                 {publishing ? copy.steps.publish.working : copy.steps.publish.action}
               </Button>
             </div>

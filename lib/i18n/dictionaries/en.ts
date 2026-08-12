@@ -184,10 +184,26 @@ export const en: Dictionary = {
           action: 'Publish the card',
           working: 'Publishing…',
         },
+        brief: {
+          eyebrow: 'For the shop',
+          question: 'Anything else they should know?',
+          hint: 'Deadlines, styling, anything the questions above had no room for. The shop reads this; it never goes into the card.',
+          placeholder: 'Needed by Friday, nothing too bright, make the wedding photograph larger...',
+          skip: 'Nothing to add',
+        },
+        contact: {
+          eyebrow: 'How to reach you',
+          question: 'Leave a contact.',
+          hint: 'Needed if the shop has a question about your card. One is enough.',
+          phone: 'Phone',
+          email: 'Email',
+          required: 'Leave a phone number or an email address.',
+        },
       },
       done: {
-        title: "It's ready for {name}.",
-        lead: 'Give the code to the flower shop. They print it onto a small card and tie it to the stems — and the card stays private until someone scans it.',
+        title: 'The order for {name} is in.',
+        lead: 'The shop will put the card together and get in touch. You can look at the draft now — it will change once they are finished.',
+        openPreview: 'See the draft',
         codeLabel: 'The code',
         copyLink: 'Copy the link',
         copied: 'Link copied',
@@ -203,6 +219,8 @@ export const en: Dictionary = {
       copyLink: 'Copy card link',
       copied: 'Copied',
     },
+
+    preview: { draft: 'A draft. The shop is still working on this card — too early to give the link away.' },
 
     notFound: {
       title: "This card isn't here.",
@@ -317,6 +335,7 @@ export const en: Dictionary = {
       back: '← Orders',
       from: 'from',
       sectionOrder: 'The order',
+      sectionBrief: 'What the customer asked for',
       sectionMessage: 'What the customer wrote',
       sectionPhotos: 'Photographs',
       sectionDetails: 'Details supplied',

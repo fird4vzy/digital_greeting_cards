@@ -77,8 +77,10 @@ export function PublishedCard({
           >
             {copied ? strings.copied : strings.copyLink}
           </Button>
-          <ButtonLink href={`/c/${code}`} variant="secondary">
-            {strings.openCard}
+          {/* The draft, not `/c/[code]`: that URL stays published-only so a
+              printed tag can never resolve to an unfinished card. */}
+          <ButtonLink href={`/c/${code}/preview`} variant="secondary">
+            {strings.openPreview}
             <ArrowGlyph />
           </ButtonLink>
         </div>
