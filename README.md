@@ -3,6 +3,9 @@
 A premium platform for personalised digital greeting cards attached to physical
 flower bouquets by QR code.
 
+*Picking the work back up? [`STATUS.md`](./STATUS.md) has the current state,
+what is deployed, and what is waiting.*
+
 ```
 Customer  →  Flower shop  →  This platform  →  Recipient
 ```
