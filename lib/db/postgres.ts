@@ -49,6 +49,36 @@ type OrderRow = {
   published_at: Date | string | null;
 };
 
+/**
+ * TLS settings deduced from the connection string.
+ *
+ * Decided by *where the database is*, not by whether the URL happens to spell
+ * `sslmode=require`. Matching on that substring failed open: a managed host
+ * whose URL omitted it — or wrote `verify-full` instead — got a plaintext
+ * connection attempt, which every managed provider then refuses. Anything that
+ * is not loopback is treated as remote and gets TLS.
+ *
+ * Certificates are verified. Neon, Vercel Postgres and Supabase all present
+ * publicly-signed certificates, so verification costs nothing and an encrypted
+ * connection nobody authenticates is not much of a defence. A host with a
+ * self-signed certificate can opt out with `sslmode=no-verify`, the same
+ * spelling libpq uses.
+ */
+function sslOptionsFor(connectionString: string): { rejectUnauthorized: boolean } | undefined {
+  let host: string;
+  try {
+    host = new URL(connectionString).hostname;
+  } catch {
+    // Unparseable: assume remote. Failing towards TLS is the safe direction.
+    return { rejectUnauthorized: true };
+  }
+
+  const isLocal = host === 'localhost' || host === '127.0.0.1' || host === '::1' || host === '';
+  if (isLocal && !connectionString.includes('sslmode=require')) return undefined;
+
+  return { rejectUnauthorized: !connectionString.includes('sslmode=no-verify') };
+}
+
 function iso(value: Date | string | null): string | null {
   if (!value) return null;
   return value instanceof Date ? value.toISOString() : value;
@@ -105,7 +135,7 @@ export async function createPostgresStore(connectionString: string): Promise<Ord
       connectionString,
       max: 10,
       idleTimeoutMillis: 30_000,
-      ssl: connectionString.includes('sslmode=require') ? { rejectUnauthorized: false } : undefined,
+      ssl: sslOptionsFor(connectionString),
     });
   } catch {
     return null;
