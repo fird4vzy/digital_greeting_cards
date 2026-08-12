@@ -6,6 +6,8 @@ import { photoSchema } from '@/lib/card/schema';
 
 const bodySchema = z.object({
   brief: z.string().min(1).max(8000),
+  /** Language the card should be written in, not the language of the brief. */
+  locale: z.string().default('ru'),
   photos: z.array(photoSchema).max(30).default([]),
   hints: z
     .object({
@@ -33,13 +35,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
 
-  const result = await planCard({ brief: parsed.data.brief, hints: parsed.data.hints });
+  const result = await planCard({
+    brief: parsed.data.brief,
+    hints: parsed.data.hints,
+    locale: parsed.data.locale,
+  });
 
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: 422 });
   }
 
-  const story = planToStoryInput(result.plan, parsed.data.photos);
+  const story = planToStoryInput(result.plan, parsed.data.photos, parsed.data.locale);
   const config = composeConfig(story, result.plan.template);
 
   return NextResponse.json({

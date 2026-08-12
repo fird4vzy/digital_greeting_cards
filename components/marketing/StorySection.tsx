@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowGlyph, ButtonLink } from '@/components/ui/Button';
 import { Reveal } from '@/components/ui/Reveal';
-import type { TemplateSummary } from '@/lib/card/template';
+import type { LocalisedTemplate } from '@/lib/i18n/localise';
+import type { Dictionary } from '@/lib/i18n/types';
 import { getPalette } from '@/lib/design/palettes';
 import { easing } from '@/lib/design/motion';
 import { cn } from '@/lib/utils/cn';
@@ -20,7 +21,15 @@ import { TemplateStage } from './TemplateStage';
  * behaves like a viewfinder: the reader sweeps the library without ever
  * leaving the page.
  */
-export function StorySection({ templates }: { templates: TemplateSummary[] }) {
+export function StorySection({
+  templates,
+  strings,
+  locale,
+}: {
+  templates: LocalisedTemplate[];
+  strings: Dictionary['ui']['story'];
+  locale: string;
+}) {
   const [activeId, setActiveId] = useState(templates[0]?.id ?? '');
   const active = templates.find((template) => template.id === activeId) ?? templates[0];
 
@@ -30,9 +39,9 @@ export function StorySection({ templates }: { templates: TemplateSummary[] }) {
     <section className="relative overflow-hidden bg-paper-warm px-[var(--spacing-gutter)] py-[var(--spacing-section)]">
       <div className="mx-auto w-full max-w-[86rem]">
         <SectionHeading
-          eyebrow="Step two"
-          title="Choose a story."
-          lead="Six ways to say it. Each one is a real experience with its own pace, palette and motion — not a colour swap."
+          eyebrow={strings.eyebrow}
+          title={strings.title}
+          lead={strings.lead}
         />
 
         <div className="mt-16 grid gap-12 lg:grid-cols-[1fr_20rem] lg:items-start lg:gap-20">
@@ -111,11 +120,11 @@ export function StorySection({ templates }: { templates: TemplateSummary[] }) {
             <Reveal preset="fade">
               <div className="mt-10 flex flex-wrap items-center gap-4">
                 <ButtonLink href={`/templates/${active.id}`} variant="secondary">
-                  Preview {active.name}
+                  {strings.previewPrefix} {active.name}
                   <ArrowGlyph />
                 </ButtonLink>
                 <ButtonLink href="/templates" variant="ghost">
-                  All templates
+                  {strings.allTemplates}
                 </ButtonLink>
               </div>
             </Reveal>
@@ -125,11 +134,11 @@ export function StorySection({ templates }: { templates: TemplateSummary[] }) {
           <div className="order-1 lg:order-2 lg:sticky lg:top-28">
             <Reveal preset="image">
               <PhoneFrame label={`Preview of the ${active.name} template`}>
-                <TemplateStage template={active} />
+                <TemplateStage template={active} locale={locale} />
               </PhoneFrame>
             </Reveal>
             <p className="mt-5 text-center text-caption text-ink-muted">
-              Live preview — no video, no mockup.
+              {strings.livePreview}
             </p>
           </div>
         </div>

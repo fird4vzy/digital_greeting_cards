@@ -3,7 +3,7 @@
 import { Atmosphere } from '@/components/three/Atmosphere';
 import { ArrowGlyph, ButtonLink } from '@/components/ui/Button';
 import { Reveal, WordReveal } from '@/components/ui/Reveal';
-import { SITE } from '@/lib/site';
+import type { Dictionary } from '@/lib/i18n/types';
 
 const NIGHT_PARTICLES = ['#e7c9c6', '#a33b48', '#c1836a'];
 
@@ -11,7 +11,7 @@ const NIGHT_PARTICLES = ['#e7c9c6', '#a33b48', '#c1836a'];
  * The last screen. One line, one action, and the petals that opened the page
  * drifting back through — the visual rhyme that closes the story.
  */
-export function ClosingCta() {
+export function ClosingCta({ strings }: { strings: Dictionary['ui']['closing'] }) {
   return (
     <section className="grain grain-invert relative flex min-h-[88svh] items-center justify-center overflow-hidden bg-noir px-[var(--spacing-gutter)] py-[var(--spacing-section)] text-center">
       <Atmosphere scene="petals" colors={NIGHT_PARTICLES} className="absolute inset-0" />
@@ -25,21 +25,21 @@ export function ClosingCta() {
       <div className="relative mx-auto max-w-[46rem]">
         <WordReveal
           as="h2"
-          text="More than a bouquet."
+          text={strings.title}
           step={0.07}
           className="font-display text-display leading-[0.98] tracking-[-0.035em] text-paper"
         />
 
         <Reveal preset="fade" delay={0.3}>
           <p className="mx-auto mt-8 max-w-[38ch] text-body-lg text-pretty text-paper/60">
-            {SITE.promise}
+            {strings.promise}
           </p>
         </Reveal>
 
         <Reveal preset="fade" delay={0.45}>
           <div className="mt-12 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
             <ButtonLink href="/create" variant="inverse" size="lg">
-              Create something beautiful
+              {strings.ctaPrimary}
               <ArrowGlyph />
             </ButtonLink>
             <ButtonLink
@@ -48,7 +48,7 @@ export function ClosingCta() {
               size="lg"
               className="text-paper/70 hover:text-paper"
             >
-              Open a finished card
+              {strings.ctaSecondary}
             </ButtonLink>
           </div>
         </Reveal>

@@ -40,6 +40,12 @@ export type Order = {
   recipient: { name: string; relationship: string };
   occasion: string;
   mood: string;
+  /**
+   * The language the card is written in. Independent of the language the
+   * customer ordered in — a Tashkent shop browsing in Uzbek routinely sends
+   * a Russian card, and the recipient's phone language is irrelevant to both.
+   */
+  locale: string;
   /** The customer's own words from "Tell us the story". */
   message: string;
   photos: Photo[];

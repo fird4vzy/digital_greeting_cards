@@ -7,6 +7,7 @@ import { ArrowGlyph, ButtonLink } from '@/components/ui/Button';
 import { Reveal } from '@/components/ui/Reveal';
 import { easing } from '@/lib/design/motion';
 import { useMotionPrefs } from '@/lib/hooks/useMotionPrefs';
+import type { Dictionary } from '@/lib/i18n/types';
 
 /** Warm brand particles — the marketing surface is not inside a card scope. */
 const BRAND_PARTICLES = ['#e7c9c6', '#c1836a', '#efe7db'];
@@ -19,7 +20,7 @@ const BRAND_PARTICLES = ['#e7c9c6', '#c1836a', '#efe7db'];
  * centred landing page. The only scroll-linked motion is a slow parallax
  * drift on the scene — enough to feel alive, not enough to notice.
  */
-export function Hero() {
+export function Hero({ strings }: { strings: Dictionary['ui']['hero'] }) {
   const ref = useRef<HTMLElement | null>(null);
   // Deliberately not framer's `useReducedMotion`: it reads the media query
   // synchronously, so the server renders the animated tree and the client
@@ -65,30 +66,30 @@ export function Hero() {
           <Reveal preset="fade" immediate>
             <span className="eyebrow inline-flex items-center gap-2.5 text-ink-muted">
               <span aria-hidden="true" className="h-px w-7 bg-accent/60" />
-              A digital card for a real bouquet
+              {strings.eyebrow}
             </span>
           </Reveal>
 
           <h1 className="mt-8 font-display text-display leading-[0.96] tracking-[-0.03em] text-ink">
-            <HeroLine text="Some feelings" delay={0.15} />
-            <HeroLine text="deserve more" delay={0.28} />
-            <HeroLine text="than a message." delay={0.41} italic />
+            <HeroLine text={strings.line1} delay={0.15} />
+            <HeroLine text={strings.line2} delay={0.28} />
+            <HeroLine text={strings.line3} delay={0.41} italic />
           </h1>
 
           <Reveal preset="fade" immediate delay={0.75}>
             <p className="mt-8 max-w-[34ch] text-body-lg text-pretty text-ink-soft">
-              Create a little digital world for someone special.
+              {strings.sub}
             </p>
           </Reveal>
 
           <Reveal preset="fade" immediate delay={0.9}>
             <div className="mt-11 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
               <ButtonLink href="/create" size="lg">
-                Create something beautiful
+                {strings.ctaPrimary}
                 <ArrowGlyph />
               </ButtonLink>
               <ButtonLink href="/templates" variant="secondary" size="lg">
-                Explore templates
+                {strings.ctaSecondary}
               </ButtonLink>
             </div>
           </Reveal>
@@ -115,7 +116,7 @@ export function Hero() {
               />
             ) : null}
           </span>
-          Scroll
+          {strings.scroll}
         </span>
       </motion.div>
     </section>

@@ -15,7 +15,7 @@ import type { StoryInput } from './template';
  * in the gallery is exactly what the renderer will produce.
  */
 
-type DemoSeed = Omit<StoryInput, 'photos'> & { photoCount: number };
+type DemoSeed = Omit<StoryInput, 'photos' | 'locale'> & { photoCount: number };
 
 const SEEDS: Record<string, DemoSeed> = {
   romantic: {
@@ -116,7 +116,7 @@ const SEEDS: Record<string, DemoSeed> = {
   },
 };
 
-export function demoStory(templateId: string): StoryInput {
+export function demoStory(templateId: string, locale = 'en'): StoryInput {
   const template = resolveTemplate(templateId);
   const seed = SEEDS[template.id] ?? SEEDS.romantic;
   const palette = getPalette(template.paletteId);
@@ -124,11 +124,17 @@ export function demoStory(templateId: string): StoryInput {
 
   return {
     ...rest,
+    locale,
+    // The handwritten demo prose above only exists in English. Rather than
+    // show a Russian visitor an English letter, we hand the composer an empty
+    // story for other locales and let it fall back to that locale's own
+    // letter from the copy bank — which is written, not machine-translated.
+    story: locale === 'en' ? rest.story : '',
     photos: demoPhotos(`demo-${template.id}`, photoCount, photoColors(palette)),
   };
 }
 
-export function demoConfig(templateId: string): CardConfig {
+export function demoConfig(templateId: string, locale = 'en'): CardConfig {
   const template = resolveTemplate(templateId);
-  return composeConfig(demoStory(template.id), template.id);
+  return composeConfig(demoStory(template.id, locale), template.id);
 }

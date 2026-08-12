@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Instrument_Serif, Inter } from 'next/font/google';
+import { LOCALE_META } from '@/lib/i18n/config';
+import { getLocale } from '@/lib/i18n/server';
 import './globals.css';
 
 /**
@@ -48,9 +50,14 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Card routes are excluded from locale negotiation, so this is the site's
+  // language. A published card overrides it on its own wrapper — see
+  // CardRenderer — because a card's language belongs to the card.
+  const locale = await getLocale();
+
   return (
-    <html lang="en" className={`${display.variable} ${sans.variable}`}>
+    <html lang={LOCALE_META[locale].htmlLang} className={`${display.variable} ${sans.variable}`}>
       <body className="antialiased">{children}</body>
     </html>
   );

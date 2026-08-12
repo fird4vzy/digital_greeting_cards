@@ -1,4 +1,5 @@
 import { resolveTemplate } from '@/templates';
+import { asLocale } from '@/lib/i18n/config';
 import type { Order } from '@/lib/db/types';
 import { CARD_CONFIG_VERSION, cardConfigSchema, type CardConfig } from './schema';
 import type { StoryInput } from './template';
@@ -15,6 +16,7 @@ export function orderToStoryInput(order: Order): StoryInput {
     recipientName: order.recipient.name,
     senderName: order.customer.name,
     relationship: order.recipient.relationship,
+    locale: order.locale,
     occasion: order.occasion,
     mood: order.mood,
     story: order.message,
@@ -35,7 +37,9 @@ export function composeConfig(input: StoryInput, templateId: string): CardConfig
     sender: { name: input.senderName },
     occasion: String(input.occasion),
     mood: String(input.mood),
-    locale: 'en',
+    // The card carries its own language forever: every localisable string in
+    // it was resolved at compose time from exactly this value.
+    locale: asLocale(input.locale),
     sections: template.compose(input),
   };
 

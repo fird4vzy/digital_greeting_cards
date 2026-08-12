@@ -5,7 +5,10 @@ import { Header } from '@/components/site/Header';
 import { TemplateCard } from '@/components/marketing/TemplateCard';
 import { SectionHeading } from '@/components/marketing/SectionHeading';
 import { Reveal, RevealGroup } from '@/components/ui/Reveal';
-import { OCCASIONS, occasionLabel, type OccasionId } from '@/lib/card/taxonomy';
+import { OCCASIONS, type OccasionId } from '@/lib/card/taxonomy';
+import { localiseTemplates, localisedOccasions, occasionLabel } from '@/lib/i18n/localise';
+import { getI18n } from '@/lib/i18n/server';
+import { t } from '@/lib/i18n';
 import { listTemplateSummaries } from '@/templates';
 import { cn } from '@/lib/utils/cn';
 
@@ -19,21 +22,22 @@ type Props = { searchParams: Promise<{ feeling?: string }> };
 
 export default async function TemplatesPage({ searchParams }: Props) {
   const { feeling } = await searchParams;
-  const all = listTemplateSummaries();
+  const { locale, dict } = await getI18n();
 
+  const all = localiseTemplates(listTemplateSummaries(), dict);
   const active = OCCASIONS.some((o) => o.id === feeling) ? (feeling as OccasionId) : undefined;
-  const templates = active ? all.filter((t) => t.occasions.includes(active)) : all;
+  const templates = active ? all.filter((template) => template.occasions.includes(active)) : all;
 
   return (
     <>
-      <Header />
+      <Header locale={locale} strings={{ ...dict.ui.nav, language: dict.ui.localeSwitcher.label }} />
       <main className="pt-[4.5rem]">
         <section className="px-[var(--spacing-gutter)] pb-16 pt-[var(--spacing-section)]">
           <div className="mx-auto w-full max-w-[86rem]">
             <SectionHeading
-              eyebrow="The library"
-              title="Choose a story."
-              lead="Every template below is playing itself — the same components, palette and motion the finished card will use. Nothing here is a mockup."
+              eyebrow={dict.ui.templates.eyebrow}
+              title={dict.ui.templates.title}
+              lead={dict.ui.templates.lead}
             />
 
             {/* Filter by feeling. Plain links, so the filter is shareable and
@@ -41,9 +45,9 @@ export default async function TemplatesPage({ searchParams }: Props) {
             <Reveal preset="fade">
               <div className="mt-12 flex flex-wrap gap-2">
                 <FilterChip href="/templates" active={!active}>
-                  Everything
+                  {dict.ui.templates.everything}
                 </FilterChip>
-                {OCCASIONS.map((occasion) => (
+                {localisedOccasions(dict).map((occasion) => (
                   <FilterChip
                     key={occasion.id}
                     href={`/templates?feeling=${occasion.id}`}
@@ -57,8 +61,10 @@ export default async function TemplatesPage({ searchParams }: Props) {
 
             {active ? (
               <p className="mt-8 text-caption text-ink-muted">
-                {templates.length} template{templates.length === 1 ? '' : 's'} suited to{' '}
-                <span className="text-ink">{occasionLabel(active)}</span>.
+                {t(dict.ui.templates.countLine, {
+                  count: templates.length,
+                  feeling: occasionLabel(active, dict),
+                })}
               </p>
             ) : null}
 
@@ -68,14 +74,19 @@ export default async function TemplatesPage({ searchParams }: Props) {
             >
               {templates.map((template) => (
                 <Reveal key={template.id} preset="fade">
-                  <TemplateCard template={template} />
+                  <TemplateCard
+                    template={template}
+                    strings={dict.ui.templates}
+                    dict={dict}
+                    locale={locale}
+                  />
                 </Reveal>
               ))}
             </RevealGroup>
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer strings={dict.ui.footer} />
     </>
   );
 }

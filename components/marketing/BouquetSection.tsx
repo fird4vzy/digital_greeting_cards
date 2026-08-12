@@ -1,6 +1,7 @@
 import { Reveal, RevealGroup } from '@/components/ui/Reveal';
 import { cardUrl, qrSvg } from '@/lib/qr';
 import { siteOrigin } from '@/lib/site-origin';
+import type { Dictionary } from '@/lib/i18n/types';
 import { SectionHeading } from './SectionHeading';
 
 /**
@@ -10,36 +11,29 @@ import { SectionHeading } from './SectionHeading';
  * demo card's code and it scans. Showing a fake code on the page that explains
  * the code would be the wrong kind of shortcut.
  */
-export async function BouquetSection({ demoCode = '8FJ29K' }: { demoCode?: string }) {
+export async function BouquetSection({
+  dict,
+  demoCode = '8FJ29K',
+}: {
+  dict: Dictionary;
+  demoCode?: string;
+}) {
   const origin = await siteOrigin();
   const qr = await qrSvg(cardUrl(origin, demoCode), { dark: '#f6f2ec', width: 240, margin: 0 });
 
-  const steps = [
-    {
-      n: '01',
-      title: 'The bouquet',
-      body: 'Chosen at the shop, the way it has always been done.',
-      art: <BouquetArt />,
-    },
-    {
-      n: '02',
-      title: 'The card',
-      body: 'A small printed card tied to the stems. One line, one code.',
-      art: <QrCardArt qr={qr} code={demoCode} />,
-    },
-    {
-      n: '03',
-      title: 'The scan',
-      body: 'They lift their phone before they have even found a vase.',
-      art: <ScanArt />,
-    },
-    {
-      n: '04',
-      title: 'The world',
-      body: 'A little world, made just for them, opening one screen at a time.',
-      art: <WorldArt />,
-    },
+  const art = [
+    <BouquetArt key="bouquet" />,
+    <QrCardArt key="card" qr={qr} code={demoCode} />,
+    <ScanArt key="scan" />,
+    <WorldArt key="world" />,
   ];
+
+  const steps = dict.ui.bouquet.steps.map((step, index) => ({
+    n: `0${index + 1}`,
+    title: step.title,
+    body: step.body,
+    art: art[index],
+  }));
 
   return (
     <section
@@ -54,9 +48,9 @@ export async function BouquetSection({ demoCode = '8FJ29K' }: { demoCode?: strin
 
       <div className="relative mx-auto w-full max-w-[86rem]">
         <SectionHeading
-          eyebrow="The bridge"
-          title="Attach it to a bouquet."
-          lead="The flowers arrive the way they always have. The card is the part they keep."
+          eyebrow={dict.ui.bouquet.eyebrow}
+          title={dict.ui.bouquet.title}
+          lead={dict.ui.bouquet.lead}
           tone="paper"
         />
 
@@ -89,7 +83,7 @@ export async function BouquetSection({ demoCode = '8FJ29K' }: { demoCode?: strin
 
         <Reveal preset="fade">
           <p className="mx-auto mt-20 max-w-[36ch] text-center font-display text-title italic leading-snug text-paper/70">
-            The QR is only the doorway. Nobody remembers a doorway.
+            {dict.ui.bouquet.note}
           </p>
         </Reveal>
       </div>

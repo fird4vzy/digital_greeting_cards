@@ -1,4 +1,4 @@
-import { generateCode, generateId, type OrderRepository } from './repository';
+﻿import { generateCode, generateId, type OrderRepository } from './repository';
 import type { Order, OrderDraft, OrderFilter, OrderPatch } from './types';
 
 /**
@@ -10,7 +10,7 @@ import type { Order, OrderDraft, OrderFilter, OrderPatch } from './types';
  * build time, and `createPostgresStore` returns null if it is absent — the
  * caller falls back rather than crashing the app on boot.
  *
- *   npm install pg && export DATABASE_URL=postgres://…
+ *   npm install pg && export DATABASE_URL=postgres://??
  *   psql "$DATABASE_URL" -f lib/db/schema.sql
  */
 
@@ -28,6 +28,7 @@ type OrderRow = {
   relationship: string;
   occasion: string;
   mood: string;
+  locale: string;
   message: string;
   photos: Order['photos'];
   moments: Order['moments'];
@@ -65,6 +66,7 @@ function toOrder(row: OrderRow): Order {
     recipient: { name: row.recipient_name, relationship: row.relationship },
     occasion: row.occasion,
     mood: row.mood,
+    locale: row.locale ?? 'ru',
     message: row.message,
     photos: row.photos ?? [],
     moments: row.moments ?? [],
@@ -81,7 +83,7 @@ function toOrder(row: OrderRow): Order {
 }
 
 const COLUMNS = `id, code, customer_name, customer_email, customer_phone, shop,
-  recipient_name, relationship, occasion, mood, message, photos, moments,
+  recipient_name, relationship, occasion, mood, locale, message, photos, moments,
   memories, wishes, template_id, status, config, notes, created_at, updated_at,
   published_at`;
 
@@ -154,12 +156,12 @@ export async function createPostgresStore(connectionString: string): Promise<Ord
           const result = await pool.query<OrderRow>(
             `INSERT INTO orders (
                id, code, customer_name, customer_email, customer_phone, shop,
-               recipient_name, relationship, occasion, mood, message, photos,
+               recipient_name, relationship, occasion, mood, locale, message, photos,
                moments, memories, wishes, template_id, status, config, notes,
                published_at
              ) VALUES (
-               $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,
-               CASE WHEN $17 = 'PUBLISHED' THEN now() ELSE NULL END
+               $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,
+               CASE WHEN $18 = 'PUBLISHED' THEN now() ELSE NULL END
              )
              RETURNING ${COLUMNS}`,
             [
@@ -173,6 +175,7 @@ export async function createPostgresStore(connectionString: string): Promise<Ord
               draft.recipient.relationship,
               draft.occasion,
               draft.mood,
+              draft.locale,
               draft.message,
               JSON.stringify(draft.photos ?? []),
               JSON.stringify(draft.moments ?? []),
@@ -213,6 +216,7 @@ export async function createPostgresStore(connectionString: string): Promise<Ord
       if (patch.recipient?.relationship !== undefined) push('relationship', patch.recipient.relationship);
       if (patch.occasion !== undefined) push('occasion', patch.occasion);
       if (patch.mood !== undefined) push('mood', patch.mood);
+      if (patch.locale !== undefined) push('locale', patch.locale);
       if (patch.message !== undefined) push('message', patch.message);
       if (patch.photos !== undefined) push('photos', JSON.stringify(patch.photos));
       if (patch.moments !== undefined) push('moments', JSON.stringify(patch.moments));

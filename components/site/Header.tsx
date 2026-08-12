@@ -4,19 +4,36 @@ import { motion, useMotionValueEvent, useScroll } from 'framer-motion';
 import Link from 'next/link';
 import { useState } from 'react';
 import { ButtonLink } from '@/components/ui/Button';
+import type { Locale } from '@/lib/i18n/config';
+import { LocaleSwitcher } from './LocaleSwitcher';
 import { Wordmark } from './Wordmark';
 import { cn } from '@/lib/utils/cn';
 
-const links = [
-  { href: '/templates', label: 'Templates' },
-  { href: '/#bouquet', label: 'How it works' },
-];
+export type HeaderStrings = {
+  templates: string;
+  howItWorks: string;
+  createCard: string;
+  language: string;
+};
 
 /**
  * Floats transparently over the hero and settles into a paper bar once the
  * reader leaves it — so the first screen stays a photograph, not a web page.
  */
-export function Header({ overlay = false }: { overlay?: boolean }) {
+export function Header({
+  overlay = false,
+  locale,
+  strings,
+}: {
+  overlay?: boolean;
+  locale: Locale;
+  strings: HeaderStrings;
+}) {
+  const links = [
+    { href: '/templates', label: strings.templates },
+    { href: '/#bouquet', label: strings.howItWorks },
+  ];
+
   const { scrollY } = useScroll();
   const [settled, setSettled] = useState(!overlay);
 
@@ -52,8 +69,10 @@ export function Header({ overlay = false }: { overlay?: boolean }) {
             ))}
           </div>
 
-          <ButtonLink href="/create" size="sm" className="ml-2">
-            Create a card
+          <LocaleSwitcher locale={locale} label={strings.language} />
+
+          <ButtonLink href="/create" size="sm" className="ml-1">
+            {strings.createCard}
           </ButtonLink>
         </nav>
       </div>

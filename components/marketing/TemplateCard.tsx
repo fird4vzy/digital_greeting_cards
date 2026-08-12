@@ -2,16 +2,27 @@ import Link from 'next/link';
 import { PhoneFrame } from './PhoneFrame';
 import { TemplateStage } from './TemplateStage';
 import { ArrowGlyph } from '@/components/ui/Button';
-import type { TemplateSummary } from '@/lib/card/template';
+import type { LocalisedTemplate } from '@/lib/i18n/localise';
+import type { Dictionary } from '@/lib/i18n/types';
 import { getPalette } from '@/lib/design/palettes';
-import { occasionLabel } from '@/lib/card/taxonomy';
+import { moodLabel, occasionLabel } from '@/lib/i18n/localise';
 
 /**
  * One template in the gallery: a live miniature above the specification the
  * brief asks every template to carry — mood, motion, palette and the sections
  * it can actually render.
  */
-export function TemplateCard({ template }: { template: TemplateSummary }) {
+export function TemplateCard({
+  template,
+  strings,
+  dict,
+  locale,
+}: {
+  template: LocalisedTemplate;
+  strings: Dictionary['ui']['templates'];
+  dict: Dictionary;
+  locale: string;
+}) {
   const palette = getPalette(template.paletteId);
 
   return (
@@ -21,7 +32,7 @@ export function TemplateCard({ template }: { template: TemplateSummary }) {
           className="max-w-[15rem] transition-transform duration-[900ms] ease-[var(--ease-out-expo)] group-hover:-translate-y-1.5"
           label={`Preview of ${template.name}`}
         >
-          <TemplateStage template={template} />
+          <TemplateStage template={template} locale={locale} />
         </PhoneFrame>
       </Link>
 
@@ -50,10 +61,14 @@ export function TemplateCard({ template }: { template: TemplateSummary }) {
         </p>
 
         <dl className="mt-6 space-y-3 border-t border-line pt-5 text-caption">
-          <Row label="Mood">{template.moods.map(capitalise).join(' · ')}</Row>
-          <Row label="Motion">{template.animationStyle}</Row>
-          <Row label="Suits">{template.occasions.map(occasionLabel).join(' · ')}</Row>
-          <Row label="Sections">
+          <Row label={strings.mood}>
+            {template.moods.map((mood) => moodLabel(mood, dict)).join(' · ')}
+          </Row>
+          <Row label={strings.motion}>{template.animationStyle}</Row>
+          <Row label={strings.suits}>
+            {template.occasions.map((occasion) => occasionLabel(occasion, dict)).join(' · ')}
+          </Row>
+          <Row label={strings.sections}>
             {template.supportedSections.map(capitalise).join(' · ')}
           </Row>
         </dl>
@@ -62,7 +77,7 @@ export function TemplateCard({ template }: { template: TemplateSummary }) {
           href={`/templates/${template.id}`}
           className="group/link mt-6 inline-flex items-center gap-2 text-caption text-ink transition-colors hover:text-accent"
         >
-          Open full preview
+          {strings.openPreview}
           <ArrowGlyph className="group-hover/link:translate-x-1" />
         </Link>
       </div>

@@ -1,4 +1,4 @@
-import { resolveTemplate } from '@/templates';
+import { composeConfig } from '@/lib/card/service';
 import type { StoryInput } from '@/lib/card/template';
 import { demoPhotos } from '@/lib/utils/placeholder';
 import { palettes, photoColors } from '@/lib/design/palettes';
@@ -10,20 +10,17 @@ import type { Order } from './types';
  * Every seeded order is composed through the real template engine — the same
  * code path a customer order takes — so the admin, the gallery and the
  * published cards all show genuine output rather than hand-written fixtures.
+ * The demo set deliberately mixes languages: Russian, Uzbek and English cards
+ * sitting in one queue is what a Tashkent flower shop actually sees.
  */
 
+/**
+ * Seeds go through the production composition service rather than a local
+ * copy of it — otherwise the demo data drifts away from what a real order
+ * produces, which is precisely when demo data stops being useful.
+ */
 function compose(templateId: string, input: StoryInput) {
-  const template = resolveTemplate(templateId);
-  return {
-    version: 1,
-    templateId: template.id,
-    recipient: { name: input.recipientName, relationship: input.relationship },
-    sender: { name: input.senderName },
-    occasion: String(input.occasion),
-    mood: String(input.mood),
-    locale: 'en',
-    sections: template.compose(input),
-  };
+  return composeConfig(input, templateId);
 }
 
 function order(
@@ -46,6 +43,7 @@ export function seedOrders(): Order[] {
     recipientName: 'Alina',
     senderName: 'Firdavs',
     relationship: 'girlfriend',
+    locale: 'ru',
     occasion: 'love',
     mood: 'romantic',
     story:
@@ -68,6 +66,7 @@ export function seedOrders(): Order[] {
     recipientName: 'Marta',
     senderName: 'Kasia',
     relationship: 'friend',
+    locale: 'ru',
     occasion: 'birthday',
     mood: 'warm',
     story:
@@ -84,6 +83,7 @@ export function seedOrders(): Order[] {
     recipientName: 'Mama',
     senderName: 'Firdavs',
     relationship: 'mom',
+    locale: 'ru',
     occasion: 'for-mom',
     mood: 'warm',
     story:
@@ -101,6 +101,7 @@ export function seedOrders(): Order[] {
       code: '8FJ29K',
       customer: { name: 'Firdavs', email: 'firdavs@example.com', shop: 'Fleur Atelier' },
       recipient: { name: 'Alina', relationship: 'girlfriend' },
+      locale: 'ru',
       occasion: 'love',
       mood: 'romantic',
       message: alinaStory.story,
@@ -120,6 +121,7 @@ export function seedOrders(): Order[] {
       code: 'QW47HD',
       customer: { name: 'Kasia Nowak', email: 'kasia@example.com', shop: 'Fleur Atelier' },
       recipient: { name: 'Marta', relationship: 'friend' },
+      locale: 'ru',
       occasion: 'birthday',
       mood: 'warm',
       message: martaStory.story,
@@ -138,6 +140,7 @@ export function seedOrders(): Order[] {
       code: 'RT52MP',
       customer: { name: 'Firdavs', email: 'firdavs@example.com', shop: 'Botanica' },
       recipient: { name: 'Mama', relationship: 'mom' },
+      locale: 'ru',
       occasion: 'for-mom',
       mood: 'warm',
       message: momStory.story,
@@ -157,6 +160,7 @@ export function seedOrders(): Order[] {
       code: 'KD83VN',
       customer: { name: 'Emi Tanaka', shop: 'Botanica' },
       recipient: { name: 'Haruto', relationship: 'someone-special' },
+      locale: 'uz',
       occasion: 'just-because',
       mood: 'minimal',
       message: 'No occasion. I saw the branch in the window and thought of you.',
@@ -171,6 +175,7 @@ export function seedOrders(): Order[] {
         recipientName: 'Haruto',
         senderName: 'Emi',
         relationship: 'someone-special',
+        locale: 'uz',
         occasion: 'just-because',
         mood: 'minimal',
         story: 'No occasion. I saw the branch in the window and thought of you.',
@@ -183,6 +188,7 @@ export function seedOrders(): Order[] {
       code: 'PF61XC',
       customer: { name: 'Sofia Ruiz', shop: 'Maison Verte' },
       recipient: { name: 'Daniel', relationship: 'husband' },
+      locale: 'en',
       occasion: 'anniversary',
       mood: 'elegant',
       message: 'Ten years. I would like the card to feel like the good hotel we could not afford in 2016.',
@@ -197,6 +203,7 @@ export function seedOrders(): Order[] {
         recipientName: 'Daniel',
         senderName: 'Sofia',
         relationship: 'husband',
+        locale: 'en',
         occasion: 'anniversary',
         mood: 'elegant',
         story: 'Ten years. I would like the card to feel like the good hotel we could not afford in 2016.',
@@ -214,6 +221,7 @@ export function seedOrders(): Order[] {
       code: 'ZH94BT',
       customer: { name: 'Tomás Silva', shop: 'Maison Verte' },
       recipient: { name: 'Lena', relationship: 'family' },
+      locale: 'uz',
       occasion: 'celebration',
       mood: 'warm',
       message: 'She finished the degree. Nobody in our family has done that before.',
@@ -228,6 +236,7 @@ export function seedOrders(): Order[] {
         recipientName: 'Lena',
         senderName: 'Tomás',
         relationship: 'family',
+        locale: 'uz',
         occasion: 'celebration',
         mood: 'warm',
         story: 'She finished the degree. Nobody in our family has done that before.',

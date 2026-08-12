@@ -1,11 +1,11 @@
-import { COVER_HEADLINE, copyFor } from './copy';
+﻿import { cardStrings, copyFor, coverHeadline, openPrompt } from './copy';
 import type { CardSection, SectionKind } from './schema';
 import type { StoryInput } from './template';
 
 /**
  * Composition helpers shared by every template.
  *
- * Templates differ in *which* beats they play and *how* those beats look —
+ * Templates differ in *which* beats they play and *how* those beats look ??
  * not in how the customer's raw input is turned into content. That derivation
  * lives here, once.
  */
@@ -42,7 +42,7 @@ export function firstName(name: string): string {
 export function letterBody(input: StoryInput): string {
   const written = input.story?.trim();
   if (written && written.length > 0) return written;
-  return copyFor(input.occasion).fallbackLetter(firstName(input.recipientName));
+  return copyFor(input.occasion, input.locale).fallbackLetter(firstName(input.recipientName));
 }
 
 export function hasPhotos(input: StoryInput): boolean {
@@ -67,7 +67,7 @@ export function memoryItems(input: StoryInput) {
 }
 
 /**
- * The canonical arc. Six of six launch templates are variations on this —
+ * The canonical arc. Six of six launch templates are variations on this ??
  * they reorder it, drop beats, or swap variants, but the emotional shape
  * (arrive → open → hear → see → remember → be told → be signed off) holds.
  */
@@ -80,7 +80,8 @@ export function standardArc(
     exclude?: SectionKind[];
   } = {},
 ): CardSection[] {
-  const copy = copyFor(input.occasion);
+  const copy = copyFor(input.occasion, input.locale);
+  const strings = cardStrings(input.locale);
   const recipient = firstName(input.recipientName);
   const moments = timelineEntries(input);
   const memories = memoryItems(input);
@@ -90,13 +91,13 @@ export function standardArc(
     {
       type: 'cover',
       recipientName: recipient,
-      headline: COVER_HEADLINE,
+      headline: coverHeadline(input.locale),
       subline: undefined,
-      hint: 'Scroll gently',
+      hint: strings.scrollGently,
     },
     {
       type: 'envelope',
-      prompt: options.openPrompt ?? 'Open it',
+      prompt: options.openPrompt ?? openPrompt(options.envelopeVariant, input.locale),
       variant: options.envelopeVariant,
       note: undefined,
     },
@@ -128,7 +129,7 @@ export function standardArc(
   }
 
   if ((input.wishes?.length ?? 0) > 0) {
-    drafts.push({ type: 'wishes', title: 'A few wishes', items: input.wishes ?? [] });
+    drafts.push({ type: 'wishes', title: strings.wishesTitle, items: input.wishes ?? [] });
   }
 
   drafts.push(

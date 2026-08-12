@@ -2,7 +2,9 @@ import Link from 'next/link';
 import { Motif } from '@/components/cards/primitives/Motif';
 import { Reveal, RevealGroup } from '@/components/ui/Reveal';
 import { SectionHeading } from './SectionHeading';
-import { OCCASIONS, type Occasion, type OccasionId } from '@/lib/card/taxonomy';
+import { type OccasionId } from '@/lib/card/taxonomy';
+import type { Dictionary } from '@/lib/i18n/types';
+import { localisedOccasions, type LocalisedOccasion } from '@/lib/i18n/localise';
 import { getPalette, moodyColors, type PaletteId } from '@/lib/design/palettes';
 import { photoPlaceholder } from '@/lib/utils/placeholder';
 import { cn } from '@/lib/utils/cn';
@@ -29,7 +31,7 @@ const FEELING_PALETTE: Record<OccasionId, PaletteId> = {
   'just-because': 'washi',
 };
 
-const occasion = (id: OccasionId): Occasion => OCCASIONS.find((o) => o.id === id)!;
+
 
 const ROWS: { height: string; items: { id: OccasionId; span: string }[] }[] = [
   {
@@ -54,14 +56,17 @@ const ROWS: { height: string; items: { id: OccasionId; span: string }[] }[] = [
   },
 ];
 
-export function FeelingSection() {
+export function FeelingSection({ dict }: { dict: Dictionary }) {
+  const occasions = localisedOccasions(dict);
+  const byId = new Map(occasions.map((entry) => [entry.id, entry]));
+
   return (
     <section className="relative px-[var(--spacing-gutter)] py-[var(--spacing-section)]">
       <div className="mx-auto w-full max-w-[86rem]">
         <SectionHeading
-          eyebrow="Step one"
-          title="Choose a feeling."
-          lead="Not a layout, not a font. Start with what you actually want them to feel when the screen lights up."
+          eyebrow={dict.ui.feeling.eyebrow}
+          title={dict.ui.feeling.title}
+          lead={dict.ui.feeling.lead}
         />
 
         <div className="mt-16 space-y-4 lg:space-y-6">
@@ -73,7 +78,7 @@ export function FeelingSection() {
             >
               {row.items.map((item) => (
                 <Reveal key={item.id} preset="fade" className={cn(item.span, row.height)}>
-                  <FeelingCard occasion={occasion(item.id)} />
+                  <FeelingCard occasion={byId.get(item.id)!} exploreLabel={dict.ui.feeling.explore} />
                 </Reveal>
               ))}
             </RevealGroup>
@@ -84,7 +89,7 @@ export function FeelingSection() {
   );
 }
 
-function FeelingCard({ occasion }: { occasion: Occasion }) {
+function FeelingCard({ occasion, exploreLabel }: { occasion: LocalisedOccasion; exploreLabel: string }) {
   const palette = getPalette(FEELING_PALETTE[occasion.id] ?? 'duskRose');
 
   // Under-exposed: these carry white type across the full bleed.
@@ -126,7 +131,7 @@ function FeelingCard({ occasion }: { occasion: Occasion }) {
       </div>
 
       <span className="eyebrow absolute right-5 bottom-5 hidden items-center gap-1.5 text-paper/0 transition-colors duration-500 group-hover:text-paper/85 sm:flex">
-        Explore
+        {exploreLabel}
         <svg viewBox="0 0 16 16" fill="none" className="h-3 w-3" aria-hidden="true">
           <path
             d="M2 8h11M9 4l4 4-4 4"

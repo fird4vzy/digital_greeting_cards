@@ -16,6 +16,8 @@ const draftSchema = z.object({
   recipient: z.object({ name: z.string().min(1), relationship: z.string().min(1) }),
   occasion: z.string().min(1),
   mood: z.string().min(1),
+  /** Language the card is written in — see lib/i18n/config.ts. */
+  locale: z.string().default('ru'),
   message: z.string().default(''),
   photos: z.array(photoSchema).max(30).default([]),
   moments: z

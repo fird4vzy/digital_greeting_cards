@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useMemo, useState } from 'react';
 import { Blossom, Motif } from '@/components/cards/primitives/Motif';
-import { COVER_HEADLINE, copyFor } from '@/lib/card/copy';
+import { copyFor, coverHeadline } from '@/lib/card/copy';
 import { demoStory } from '@/lib/card/demo';
 import type { TemplateSummary } from '@/lib/card/template';
 import { getPalette, paletteVars } from '@/lib/design/palettes';
@@ -40,11 +40,14 @@ export function TemplateStage({
   still = false,
   /** Override the demo story, e.g. to preview what a customer just wrote. */
   content,
+  /** Language of the *preview content*, so a Russian visitor sees Russian. */
+  locale = 'ru',
   className,
 }: {
   template: TemplateSummary;
   still?: boolean;
   content?: StageContent;
+  locale?: string;
   className?: string;
 }) {
   const palette = getPalette(template.paletteId);
@@ -53,15 +56,22 @@ export function TemplateStage({
   // miniature never tells a different story than the card it opens.
   // Memoised because building it also generates the placeholder imagery.
   const demoDefaults = useMemo(() => {
-    const story = demoStory(template.id);
+    const story = demoStory(template.id, locale);
+    const copy = copyFor(story.occasion, locale);
+    const paragraphs = story.story.trim()
+      ? story.story.split(/\n\s*\n/)
+      : copy.fallbackLetter(story.recipientName).split(/\n\s*\n/);
+
     return {
       name: story.recipientName,
-      letter: story.story.split(/\n\s*\n/)[0] ?? '',
-      final: copyFor(story.occasion).finalHeadline,
+      // The first paragraph of a fallback letter is the salutation; the
+      // second is where the writing actually starts.
+      letter: (paragraphs.length > 1 ? paragraphs[1] : paragraphs[0]) ?? '',
+      final: copy.finalHeadline,
       from: story.senderName,
       photos: story.photos.slice(0, 3).map((photo) => photo.url),
     };
-  }, [template.id]);
+  }, [template.id, locale]);
 
   const demo = content ?? demoDefaults;
 
@@ -88,7 +98,7 @@ export function TemplateStage({
       />
       <p className="font-display text-[2.35rem] leading-[0.95] tracking-[-0.03em]">{demo.name},</p>
       <p className="mt-3 font-display text-[1.05rem] italic leading-snug opacity-70">
-        {COVER_HEADLINE}
+        {coverHeadline(locale)}
       </p>
     </div>,
 

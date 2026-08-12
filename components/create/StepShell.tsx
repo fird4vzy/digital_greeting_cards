@@ -24,9 +24,10 @@ export function StepShell({
   children,
   onBack,
   onNext,
-  nextLabel = 'Continue',
+  nextLabel,
   canContinue = true,
   skip,
+  strings,
 }: {
   index: number;
   total: number;
@@ -39,6 +40,7 @@ export function StepShell({
   nextLabel?: string;
   canContinue?: boolean;
   skip?: { label: string; onSkip: () => void };
+  strings: { back: string; continue: string; progress: string };
 }) {
   const { reduced } = useMotionPrefs();
 

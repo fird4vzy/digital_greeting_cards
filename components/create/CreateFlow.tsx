@@ -10,8 +10,15 @@ import { TemplateStage } from '@/components/marketing/TemplateStage';
 import { Button } from '@/components/ui/Button';
 import type { Photo } from '@/lib/card/schema';
 import { copyFor } from '@/lib/card/copy';
-import { MOODS, OCCASIONS, RECIPIENTS } from '@/lib/card/taxonomy';
-import type { TemplateSummary } from '@/lib/card/template';
+import type { Locale } from '@/lib/i18n/config';
+import { t } from '@/lib/i18n';
+import {
+  localisedMoods,
+  localisedOccasions,
+  localisedRecipients,
+  type LocalisedTemplate,
+} from '@/lib/i18n/localise';
+import type { Dictionary } from '@/lib/i18n/types';
 import { getPalette } from '@/lib/design/palettes';
 import { cn } from '@/lib/utils/cn';
 
@@ -48,6 +55,9 @@ type Draft = {
   story: string;
   photos: Photo[];
   templateId: string;
+  /** The language the card is written in. Defaults to the browsing language,
+   *  but they are genuinely independent choices — see the language step. */
+  locale: string;
 };
 
 const EMPTY: Draft = {
@@ -59,6 +69,7 @@ const EMPTY: Draft = {
   story: '',
   photos: [],
   templateId: '',
+  locale: '',
 };
 
 const STORAGE_KEY = 'mtab:draft:v1';
@@ -66,10 +77,18 @@ const STORAGE_KEY = 'mtab:draft:v1';
 export function CreateFlow({
   templates,
   initialTemplate,
+  locale,
+  dict,
 }: {
-  templates: TemplateSummary[];
+  templates: LocalisedTemplate[];
   initialTemplate?: string;
+  locale: Locale;
+  dict: Dictionary;
 }) {
+  const copy = dict.ui.create;
+  const recipients = localisedRecipients(dict);
+  const occasions = localisedOccasions(dict);
+  const moods = localisedMoods(dict);
   const [step, setStep] = useState(0);
   const [draft, setDraft] = useState<Draft>(EMPTY);
   const [restored, setRestored] = useState(false);
@@ -86,11 +105,15 @@ export function CreateFlow({
     } catch {
       // Private mode or a corrupt entry — start clean rather than fail.
     }
-    if (initialTemplate) {
-      setDraft((current) => ({ ...current, templateId: initialTemplate }));
-    }
+    setDraft((current) => ({
+      ...current,
+      ...(initialTemplate ? { templateId: initialTemplate } : {}),
+      // A restored draft keeps whatever language it was started in; a fresh
+      // one inherits the language they are browsing in.
+      locale: current.locale || locale,
+    }));
     setRestored(true);
-  }, [initialTemplate]);
+  }, [initialTemplate, locale]);
 
   useEffect(() => {
     if (!restored) return;
@@ -137,6 +160,7 @@ export function CreateFlow({
           recipient: { name: draft.recipientName || 'You', relationship: draft.recipientId || 'someone-special' },
           occasion: draft.occasion || 'just-because',
           mood: draft.mood || 'warm',
+          locale: draft.locale || locale,
           message: draft.story,
           photos: draft.photos,
           moments: [],
@@ -166,15 +190,19 @@ export function CreateFlow({
     return <PublishedCard code={published.code} url={published.url} recipient={draft.recipientName} />;
   }
 
+  const cardLocale = draft.locale || locale;
+  const cardCopy = copyFor(draft.occasion || 'just-because', cardLocale);
+
   const stage = activeTemplate ? (
-    <PhoneFrame label="Preview" className="max-w-[17rem]">
+    <PhoneFrame label={copy.steps.preview.eyebrow} className="max-w-[17rem]">
       <TemplateStage
         template={activeTemplate}
+        locale={cardLocale}
         content={{
-          name: draft.recipientName || 'Your person',
-          letter: draft.story.split(/\n\s*\n/)[0] || copyFor(draft.occasion).intro,
-          final: copyFor(draft.occasion).finalHeadline,
-          from: draft.senderName || 'You',
+          name: draft.recipientName || '—',
+          letter: draft.story.split(/\n\s*\n/)[0] || cardCopy.intro,
+          final: cardCopy.finalHeadline,
+          from: draft.senderName || '—',
           photos: draft.photos.slice(0, 3).map((photo) => photo.url),
         }}
       />
@@ -191,13 +219,14 @@ export function CreateFlow({
             key="recipient"
             index={0}
             total={STEPS.length}
-            eyebrow="To begin"
-            question="Who is this for?"
+            strings={{ back: copy.back, continue: copy.continue, progress: copy.progress }}
+            eyebrow={copy.steps.recipient.eyebrow}
+            question={copy.steps.recipient.question}
             onNext={next}
             canContinue={Boolean(draft.recipientId && draft.recipientName.trim())}
           >
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {RECIPIENTS.map((recipient) => (
+              {recipients.map((recipient) => (
                 <Choice
                   key={recipient.id}
                   title={recipient.label}
@@ -214,14 +243,14 @@ export function CreateFlow({
 
             <div className="mt-10 grid gap-5 sm:grid-cols-2">
               <Field
-                label="Their name"
+                label={copy.steps.recipient.theirName}
                 value={draft.recipientName}
                 onChange={(value) => patch({ recipientName: value })}
                 placeholder="Alina"
                 autoFocus
               />
               <Field
-                label="Your name"
+                label={copy.steps.recipient.yourName}
                 value={draft.senderName}
                 onChange={(value) => patch({ senderName: value })}
                 placeholder="Firdavs"
@@ -235,15 +264,16 @@ export function CreateFlow({
             key="occasion"
             index={1}
             total={STEPS.length}
-            eyebrow="The reason"
-            question="What's the occasion?"
-            hint="If there isn't one, that is a perfectly good answer."
+            strings={{ back: copy.back, continue: copy.continue, progress: copy.progress }}
+            eyebrow={copy.steps.occasion.eyebrow}
+            question={copy.steps.occasion.question}
+            hint={copy.steps.occasion.hint}
             onBack={back}
             onNext={next}
             canContinue={Boolean(draft.occasion)}
           >
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {OCCASIONS.map((occasion) => (
+              {occasions.map((occasion) => (
                 <Choice
                   key={occasion.id}
                   title={occasion.label}
@@ -261,14 +291,15 @@ export function CreateFlow({
             key="mood"
             index={2}
             total={STEPS.length}
-            eyebrow="The feeling"
-            question="How should it feel?"
+            strings={{ back: copy.back, continue: copy.continue, progress: copy.progress }}
+            eyebrow={copy.steps.mood.eyebrow}
+            question={copy.steps.mood.question}
             onBack={back}
             onNext={next}
             canContinue={Boolean(draft.mood)}
           >
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {MOODS.map((mood) => (
+              {moods.map((mood) => (
                 <Choice
                   key={mood.id}
                   title={mood.label}
@@ -286,13 +317,14 @@ export function CreateFlow({
             key="story"
             index={3}
             total={STEPS.length}
-            eyebrow="The important part"
-            question="Tell us the story."
-            hint="Write it badly if you have to — specifics beat polish. The date, the argument, the flower they mentioned once."
+            strings={{ back: copy.back, continue: copy.continue, progress: copy.progress }}
+            eyebrow={copy.steps.story.eyebrow}
+            question={copy.steps.story.question}
+            hint={copy.steps.story.hint}
             onBack={back}
             onNext={next}
             canContinue
-            skip={{ label: 'I need help writing it', onSkip: next }}
+            skip={{ label: copy.steps.story.needHelp, onSkip: next }}
           >
             <label className="block">
               <span className="sr-only">Your story</span>
@@ -301,14 +333,14 @@ export function CreateFlow({
                 onChange={(event) => patch({ story: event.target.value })}
                 rows={10}
                 autoFocus
-                placeholder="Tell us about them, your story, or what you want to say..."
+                placeholder={copy.steps.story.placeholder}
                 className="w-full resize-none rounded-[1rem] border border-line-strong bg-white/60 p-6 font-sans text-body leading-[1.8] text-ink outline-none transition-colors duration-400 placeholder:text-ink-faint focus:border-ink focus:bg-white"
               />
             </label>
             <p className="mt-3 text-caption text-ink-faint">
               {draft.story.trim().length > 0
-                ? `${draft.story.trim().split(/\s+/).length} words. Blank lines become new paragraphs.`
-                : 'Leave it empty and we will write something honest and short for you.'}
+                ? t(copy.steps.story.wordCount, { count: draft.story.trim().split(/\s+/).length })
+                : copy.steps.story.emptyHint}
             </p>
           </StepShell>
         )}
@@ -318,13 +350,14 @@ export function CreateFlow({
             key="photos"
             index={4}
             total={STEPS.length}
-            eyebrow="If you have them"
-            question="Add a few photographs."
-            hint="Three or four is usually better than twenty. They are resized on your device before anything is sent."
+            strings={{ back: copy.back, continue: copy.continue, progress: copy.progress }}
+            eyebrow={copy.steps.photos.eyebrow}
+            question={copy.steps.photos.question}
+            hint={copy.steps.photos.hint}
             onBack={back}
             onNext={next}
             canContinue
-            skip={{ label: 'No photos', onSkip: () => { patch({ photos: [] }); next(); } }}
+            skip={{ label: copy.steps.photos.skip, onSkip: () => { patch({ photos: [] }); next(); } }}
           >
             <PhotoStep photos={draft.photos} onChange={(photos) => patch({ photos })} />
           </StepShell>
@@ -335,13 +368,10 @@ export function CreateFlow({
             key="template"
             index={5}
             total={STEPS.length}
-            eyebrow="The shape of it"
-            question="Choose a story."
-            hint={
-              suggested
-                ? `Based on your answers we would pick ${suggested.name}. You can overrule us.`
-                : undefined
-            }
+            strings={{ back: copy.back, continue: copy.continue, progress: copy.progress }}
+            eyebrow={copy.steps.template.eyebrow}
+            question={copy.steps.template.question}
+            hint={suggested ? t(copy.steps.template.hint, { name: suggested.name }) : undefined}
             onBack={back}
             onNext={next}
             canContinue
@@ -391,7 +421,7 @@ export function CreateFlow({
                           selected ? 'text-paper/50' : 'text-accent',
                         )}
                       >
-                        Suggested for you
+                        {copy.steps.template.suggested}
                       </span>
                     ) : null}
                   </button>
@@ -406,21 +436,22 @@ export function CreateFlow({
             key="preview"
             index={6}
             total={STEPS.length}
-            eyebrow="Nearly there"
-            question="Here it is."
-            hint="A miniature of the real card, playing its own beats. The published version fills the whole screen."
+            strings={{ back: copy.back, continue: copy.continue, progress: copy.progress }}
+            eyebrow={copy.steps.preview.eyebrow}
+            question={copy.steps.preview.question}
+            hint={copy.steps.preview.hint}
             onBack={back}
             onNext={next}
-            nextLabel="Looks right"
+            nextLabel={copy.steps.preview.looksRight}
             canContinue
           >
             <div className="flex flex-col items-center gap-8">
               {stage}
               <dl className="w-full max-w-[26rem] space-y-2.5 text-caption">
-                <Summary label="For">{draft.recipientName || '—'}</Summary>
-                <Summary label="From">{draft.senderName || '—'}</Summary>
-                <Summary label="Template">{activeTemplate?.name ?? '—'}</Summary>
-                <Summary label="Photographs">{draft.photos.length || 'None'}</Summary>
+                <Summary label={copy.steps.preview.for}>{draft.recipientName || '—'}</Summary>
+                <Summary label={copy.steps.preview.from}>{draft.senderName || '—'}</Summary>
+                <Summary label={copy.steps.preview.template}>{activeTemplate?.name ?? '—'}</Summary>
+                <Summary label={copy.steps.preview.photos}>{draft.photos.length || copy.steps.preview.none}</Summary>
               </dl>
             </div>
           </StepShell>
@@ -431,16 +462,15 @@ export function CreateFlow({
             key="publish"
             index={7}
             total={STEPS.length}
-            eyebrow="The last step"
-            question="Publish it."
-            hint="You get a link and a code. The shop prints the code onto a small card and ties it to the flowers."
+            strings={{ back: copy.back, continue: copy.continue, progress: copy.progress }}
+            eyebrow={copy.steps.publish.eyebrow}
+            question={copy.steps.publish.question}
+            hint={copy.steps.publish.hint}
             onBack={back}
           >
             <div className="rounded-[1.25rem] border border-line-strong bg-white/60 p-7">
               <p className="text-body text-ink-soft">
-                Publishing creates a private page for{' '}
-                <span className="text-ink">{draft.recipientName || 'them'}</span> that only someone
-                with the code can open. It is never indexed by search engines.
+                {t(copy.steps.publish.explain, { name: draft.recipientName || '—' })}
               </p>
 
               {error ? (
@@ -450,7 +480,7 @@ export function CreateFlow({
               ) : null}
 
               <Button onClick={publish} disabled={publishing} size="lg" className="mt-7 w-full sm:w-auto">
-                {publishing ? 'Publishing…' : 'Publish the card'}
+                {publishing ? copy.steps.publish.working : copy.steps.publish.action}
               </Button>
             </div>
           </StepShell>

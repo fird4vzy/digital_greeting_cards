@@ -1,34 +1,34 @@
 import Link from 'next/link';
-import { SITE } from '@/lib/site';
+import type { Dictionary } from '@/lib/i18n/types';
 import { Wordmark } from './Wordmark';
 
-const columns = [
-  {
-    title: 'Product',
-    links: [
-      { href: '/templates', label: 'Templates' },
-      { href: '/create', label: 'Create a card' },
-      { href: '/c/8FJ29K', label: 'See a real card' },
-    ],
-  },
-  {
-    title: 'For flower shops',
-    links: [
-      { href: '/admin', label: 'Shop dashboard' },
-      { href: '/admin/orders', label: 'Orders' },
-      { href: '/c/8FJ29K/qr', label: 'Printable QR card' },
-    ],
-  },
-];
+export function Footer({ strings }: { strings: Dictionary['ui']['footer'] }) {
+  const columns = [
+    {
+      title: strings.product,
+      links: [
+        { href: '/templates', label: strings.links.templates },
+        { href: '/create', label: strings.links.create },
+        { href: '/c/8FJ29K', label: strings.links.seeCard },
+      ],
+    },
+    {
+      title: strings.forShops,
+      links: [
+        { href: '/admin', label: strings.links.dashboard },
+        { href: '/admin/orders', label: strings.links.orders },
+        { href: '/c/8FJ29K/qr', label: strings.links.printable },
+      ],
+    },
+  ];
 
-export function Footer() {
   return (
     <footer className="relative border-t border-line bg-paper px-[var(--spacing-gutter)] py-16">
       <div className="mx-auto grid w-full max-w-[86rem] gap-12 sm:grid-cols-[1.4fr_1fr_1fr]">
         <div>
           <Wordmark />
           <p className="mt-6 max-w-[26ch] text-caption leading-relaxed text-ink-muted">
-            {SITE.promise}
+            {strings.promise}
           </p>
         </div>
 
@@ -52,10 +52,8 @@ export function Footer() {
       </div>
 
       <div className="mx-auto mt-14 flex w-full max-w-[86rem] flex-col gap-3 border-t border-line pt-7 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-caption text-ink-faint">
-          © {new Date().getFullYear()} {SITE.name}
-        </p>
-        <p className="font-display text-caption italic text-ink-muted">{SITE.tagline}</p>
+        <p className="text-caption text-ink-faint">© {new Date().getFullYear()} More than a bouquet</p>
+        <p className="font-display text-caption italic text-ink-muted">{strings.tagline}</p>
       </div>
     </footer>
   );

@@ -57,11 +57,23 @@ Short sentences. Concrete over abstract. No exclamation marks. Never use the wor
 If the brief is thin, write something honest and short rather than padding it out.`;
 }
 
-export function plannerUserPrompt(brief: string, hints?: Record<string, string | undefined>): string {
+const LANGUAGE_NAMES: Record<string, string> = {
+  ru: 'Russian',
+  uz: 'Uzbek (Latin script)',
+  en: 'English',
+};
+
+export function plannerUserPrompt(
+  brief: string,
+  hints?: Record<string, string | undefined>,
+  locale = 'ru',
+): string {
   const known = Object.entries(hints ?? {})
     .filter(([, value]) => value)
     .map(([key, value]) => `${key}: ${value}`)
     .join('\n');
+
+  const language = LANGUAGE_NAMES[locale] ?? LANGUAGE_NAMES.ru;
 
   return [
     'Customer brief:',
@@ -69,7 +81,11 @@ export function plannerUserPrompt(brief: string, hints?: Record<string, string |
     brief.trim(),
     '"""',
     known ? `\nAlready known from the order form:\n${known}` : '',
-    '\nReturn the card configuration.',
+    // The brief may be written in any language; the card's language is a
+    // separate decision the customer already made. Say so explicitly, or the
+    // model mirrors the brief instead.
+    `\nWrite every piece of card content — letter, quote, final message, titles — in ${language}, regardless of the language the brief is written in.`,
+    'Return the card configuration.',
   ]
     .filter(Boolean)
     .join('\n');

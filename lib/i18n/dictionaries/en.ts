@@ -1,0 +1,401 @@
+import type { Dictionary } from '../types';
+
+/**
+ * English — the source dictionary.
+ *
+ * House style, which the other locales follow: short sentences, concrete over
+ * abstract, no exclamation marks. Never "cherish", never "special moments",
+ * never "journey". Warmth comes from detail, not from adjectives.
+ */
+export const en: Dictionary = {
+  ui: {
+    nav: {
+      templates: 'Templates',
+      howItWorks: 'How it works',
+      createCard: 'Create a card',
+      viewSite: 'View site',
+    },
+
+    hero: {
+      eyebrow: 'A digital card for a real bouquet',
+      line1: 'Some feelings',
+      line2: 'deserve more',
+      line3: 'than a message.',
+      sub: 'Create a little digital world for someone special.',
+      ctaPrimary: 'Create something beautiful',
+      ctaSecondary: 'Explore templates',
+      scroll: 'Scroll',
+    },
+
+    feeling: {
+      eyebrow: 'Step one',
+      title: 'Choose a feeling.',
+      lead: 'Not a layout, not a font. Start with what you actually want them to feel when the screen lights up.',
+      explore: 'Explore',
+    },
+
+    story: {
+      eyebrow: 'Step two',
+      title: 'Choose a story.',
+      lead: 'Six ways to say it. Each one is a real experience with its own pace, palette and motion — not a colour swap.',
+      previewPrefix: 'Preview',
+      allTemplates: 'All templates',
+      livePreview: 'Live preview — no video, no mockup.',
+    },
+
+    memories: {
+      eyebrow: 'Step three',
+      title: 'Add your memories.',
+      lead: 'A name, a message, photographs, the dates that only mean something to the two of you. We turn them into the card; you just have to remember them.',
+      labels: {
+        name: 'Their name',
+        date: 'A date',
+        detail: 'Something only you would know',
+        message: 'The message',
+        memory: 'A memory',
+        photos: 'Photographs',
+      },
+      samples: {
+        name: 'Alina',
+        date: 'March 2023 — the coffee argument',
+        detail: 'She said peonies look like they are mid-sentence.',
+        message:
+          'I have started this eleven times. Every version sounded either too small or too much, so here is the plain one.',
+        memory: 'The train we missed. Best four hours of that year.',
+      },
+    },
+
+    bouquet: {
+      eyebrow: 'The bridge',
+      title: 'Attach it to a bouquet.',
+      lead: 'The flowers arrive the way they always have. The card is the part they keep.',
+      steps: [
+        { title: 'The bouquet', body: 'Chosen at the shop, the way it has always been done.' },
+        { title: 'The card', body: 'A small printed card tied to the stems. One line, one code.' },
+        { title: 'The scan', body: 'They lift their phone before they have even found a vase.' },
+        { title: 'The world', body: 'A little world, made just for them, opening one screen at a time.' },
+      ],
+      note: 'The QR is only the doorway. Nobody remembers a doorway.',
+    },
+
+    closing: {
+      title: 'More than a bouquet.',
+      promise: 'Your bouquet says I care. Your digital card tells them why.',
+      ctaPrimary: 'Create something beautiful',
+      ctaSecondary: 'Open a finished card',
+    },
+
+    footer: {
+      promise: 'Your bouquet says I care. Your digital card tells them why.',
+      tagline: 'A little world, made just for them.',
+      product: 'Product',
+      forShops: 'For flower shops',
+      links: {
+        templates: 'Templates',
+        create: 'Create a card',
+        seeCard: 'See a real card',
+        dashboard: 'Shop dashboard',
+        orders: 'Orders',
+        printable: 'Printable QR card',
+      },
+    },
+
+    templates: {
+      eyebrow: 'The library',
+      title: 'Choose a story.',
+      lead: 'Every template below is playing itself — the same components, palette and motion the finished card will use. Nothing here is a mockup.',
+      everything: 'Everything',
+      countLine: '{count} templates suited to {feeling}.',
+      openPreview: 'Open full preview',
+      mood: 'Mood',
+      motion: 'Motion',
+      suits: 'Suits',
+      sections: 'Sections',
+      preview: 'Preview',
+      useThis: 'Use this',
+      back: 'Back to templates',
+    },
+
+    create: {
+      progress: 'Step {current} of {total}',
+      back: 'Back',
+      continue: 'Continue',
+      steps: {
+        recipient: {
+          eyebrow: 'To begin',
+          question: 'Who is this for?',
+          theirName: 'Their name',
+          yourName: 'Your name',
+        },
+        occasion: {
+          eyebrow: 'The reason',
+          question: "What's the occasion?",
+          hint: "If there isn't one, that is a perfectly good answer.",
+        },
+        mood: { eyebrow: 'The feeling', question: 'How should it feel?' },
+        story: {
+          eyebrow: 'The important part',
+          question: 'Tell us the story.',
+          hint: 'Write it badly if you have to — specifics beat polish. The date, the argument, the flower they mentioned once.',
+          placeholder: 'Tell us about them, your story, or what you want to say...',
+          needHelp: 'I need help writing it',
+          wordCount: '{count} words. Blank lines become new paragraphs.',
+          emptyHint: 'Leave it empty and we will write something honest and short for you.',
+        },
+        photos: {
+          eyebrow: 'If you have them',
+          question: 'Add a few photographs.',
+          hint: 'Three or four is usually better than twenty. They are resized on your device before anything is sent.',
+          skip: 'No photos',
+          drop: 'Drop photographs here, or choose them from your device.',
+          choose: 'Choose photos',
+          preparing: 'Preparing…',
+          enough: 'That is plenty',
+          count: '{count} photographs, shown in the order you added them.',
+          remove: 'Remove photograph {index}',
+        },
+        template: {
+          eyebrow: 'The shape of it',
+          question: 'Choose a story.',
+          hint: 'Based on your answers we would pick {name}. You can overrule us.',
+          suggested: 'Suggested for you',
+        },
+        language: {
+          label: 'Language of the card',
+          hint: 'The language it will be written in — not the language you are browsing in.',
+        },
+        preview: {
+          eyebrow: 'Nearly there',
+          question: 'Here it is.',
+          hint: 'A miniature of the real card, playing its own beats. The published version fills the whole screen.',
+          looksRight: 'Looks right',
+          for: 'For',
+          from: 'From',
+          template: 'Template',
+          photos: 'Photographs',
+          none: 'None',
+        },
+        publish: {
+          eyebrow: 'The last step',
+          question: 'Publish it.',
+          hint: 'You get a link and a code. The shop prints the code onto a small card and ties it to the flowers.',
+          explain:
+            'Publishing creates a private page for {name} that only someone with the code can open. It is never indexed by search engines.',
+          action: 'Publish the card',
+          working: 'Publishing…',
+        },
+      },
+      done: {
+        title: "It's ready for {name}.",
+        lead: 'Give the code to the flower shop. They print it onto a small card and tie it to the stems — and the card stays private until someone scans it.',
+        codeLabel: 'The code',
+        copyLink: 'Copy the link',
+        copied: 'Link copied',
+        openCard: 'Open the card',
+        printQr: 'Print the QR card for the bouquet',
+      },
+    },
+
+    qr: {
+      title: 'The card for the bouquet.',
+      lead: 'Print at 100% on matte card stock, cut to the marks, and tie it to the stems. For {recipient}, from {sender}.',
+      print: 'Print the card',
+      copyLink: 'Copy card link',
+      copied: 'Copied',
+    },
+
+    notFound: {
+      title: "This card isn't here.",
+      lead: 'Either the code was read slightly wrong, or the card is still being finished by the shop. Both are fixable.',
+      hint: 'Codes are six characters and never contain the letter O or the number 0.',
+      back: 'Back to the start',
+      makeOwn: 'Make one of your own',
+    },
+
+    card: { madeWith: 'Made with' },
+
+    localeSwitcher: { label: 'Language' },
+  },
+
+  content: {
+    coverHeadline: 'there’s something waiting for you…',
+
+    card: {
+      scrollGently: 'Scroll gently',
+      open: 'Open it',
+      pullRibbon: 'Pull the ribbon',
+      unfold: 'Unfold',
+      wishesTitle: 'A few wishes',
+      defaultWishes: [
+        'A slow morning',
+        'Something you did not plan',
+        'People who show up',
+        'One very good meal',
+      ],
+    },
+
+    occasions: {
+      love: { label: 'Love', line: 'For the person you think about first.' },
+      birthday: { label: 'Birthday', line: 'A whole year of them, worth celebrating.' },
+      'for-mom': { label: 'For Mom', line: 'The words that never quite fit in a card.' },
+      anniversary: { label: 'Anniversary', line: 'Everything you have built, in one place.' },
+      friendship: { label: 'Friendship', line: 'For the ones who stayed.' },
+      celebration: { label: 'Celebration', line: 'Something good happened. Say it properly.' },
+      'just-because': { label: 'Just Because', line: 'No reason. That is the reason.' },
+    },
+
+    moods: {
+      romantic: { label: 'Romantic', line: 'Low light, slow reveals, one candle.' },
+      warm: { label: 'Warm', line: 'Like a kitchen in the morning.' },
+      cute: { label: 'Cute', line: 'Light-footed and a little playful.' },
+      elegant: { label: 'Elegant', line: 'Restrained. Every detail deliberate.' },
+      funny: { label: 'Funny', line: 'They will laugh before they cry.' },
+      minimal: { label: 'Minimal', line: 'Few words. A lot of air.' },
+      dreamy: { label: 'Dreamy', line: 'Soft focus, drifting petals.' },
+    },
+
+    recipients: {
+      girlfriend: 'Girlfriend',
+      boyfriend: 'Boyfriend',
+      wife: 'Wife',
+      husband: 'Husband',
+      mom: 'Mom',
+      dad: 'Dad',
+      friend: 'Friend',
+      family: 'Family',
+      'someone-special': 'Someone special',
+    },
+
+    templates: {
+      romantic: {
+        name: 'Nocturne',
+        tagline: 'Low light, slow reveals, one long letter.',
+        description:
+          'A card that behaves like the end of a good evening. The story opens in near-darkness, a single glass heart holds the light, and the letter is revealed one paragraph at a time as they scroll. Built for the message you have been rehearsing for a while.',
+        animationStyle: 'Long fades, drifting petals, paragraph-by-paragraph reveal',
+      },
+      birthday: {
+        name: 'Golden Hour',
+        tagline: 'Celebratory, warm, and completely free of balloons.',
+        description:
+          'Birthday cards usually shout. This one raises a glass. Warm champagne paper, photographs arranged like they were just laid on a table, and a wish list that unfolds line by line. Ends on a single sentence about the person, not the date.',
+        animationStyle: 'Rising embers, tilted photographs, line-by-line wishes',
+      },
+      mom: {
+        name: 'Kitchen Light',
+        tagline: 'Unhurried, generous, and slightly sunlit.',
+        description:
+          'Built for the things that never fit into a phone call. Warm linen surfaces, a letter set large enough to read slowly, and a quiet ledger of the things she gave you. No cursive fonts, no floral borders — it takes her seriously.',
+        animationStyle: 'Soft light drift, large type, gentle sequential reveals',
+      },
+      anniversary: {
+        name: 'Ten Thousand Mornings',
+        tagline: 'Architectural, quiet, built around a timeline.',
+        description:
+          'An anniversary is a long record, so this template makes the timeline the spine of the story. Midnight surfaces, brass detailing and an arched cover give it the weight of something printed rather than posted. The letter sits in the middle, framed like a plaque.',
+        animationStyle: 'Architectural wipes, timeline threading, restrained parallax',
+      },
+      memories: {
+        name: 'The Archive',
+        tagline: 'Photograph-led. The pictures do the talking.',
+        description:
+          'For the card that is really a small exhibition. Archival paper, captions set like museum labels, and a horizontal filmstrip you scrub through with a thumb. No 3D, no effects — it loads instantly on any phone and puts every pixel into the photographs.',
+        animationStyle: 'Filmstrip scrubbing, museum captions, near-zero effects',
+      },
+      sakura: {
+        name: 'Hanami',
+        tagline: 'Washi paper, sumi ink, one branch of blossom.',
+        description:
+          'Borrowed from Japanese print composition rather than Japanese decoration: enormous margins, a deliberately off-centre column, and a single sakura branch that sheds petals as you read. The quietest template in the library, and the one that ages best.',
+        animationStyle: 'Falling sakura, asymmetric columns, ink-wash transitions',
+      },
+    },
+
+    copy: {
+      love: {
+        intro: 'There are things that are too big for a text message.',
+        quote: 'I did not fall for you all at once. I keep falling, quietly, on ordinary Tuesdays.',
+        galleryTitle: 'Us, mostly unposed',
+        timelineTitle: 'How we got here',
+        memoriesTitle: 'Small things I kept',
+        finalHeadline: 'Some people make ordinary days feel a little less ordinary.',
+        finalText: 'You are the reason I keep noticing them.',
+        signOff: 'With love,',
+        fallbackLetter:
+          '{name},\n\nI am not always good at saying this out loud, so I am writing it down instead.\n\nYou make the ordinary parts of my life better. Not in a dramatic way — in the quiet way, the one you only notice when you imagine it missing.\n\nI wanted you to have something you could keep.',
+      },
+      birthday: {
+        intro: 'A whole year of you. That deserves more than a message.',
+        quote: 'The world got noticeably better the year you turned up in it.',
+        galleryTitle: 'This year, in pieces',
+        timelineTitle: 'The year, roughly',
+        memoriesTitle: 'Reasons to celebrate you',
+        finalHeadline: 'Here is to another year of you being exactly who you are.',
+        finalText: 'No notes. No edits. Just more of it.',
+        signOff: 'Happy birthday,',
+        fallbackLetter:
+          'Happy birthday, {name}.\n\nI could have sent a message. It felt too small for the occasion.\n\nSo instead: a whole year of you happened, and it made things better for everyone standing near you. That is worth saying properly.\n\nHave the day you actually want.',
+      },
+      'for-mom': {
+        intro: 'There are things that never quite fit into a phone call.',
+        quote: 'Everything soft in me, I learned from you.',
+        galleryTitle: 'Us, over the years',
+        timelineTitle: 'Things you gave me',
+        memoriesTitle: 'What I remember',
+        finalHeadline: 'Thank you. For all of it, including the parts I never noticed.',
+        finalText: 'I notice them now.',
+        signOff: 'With love,',
+        fallbackLetter:
+          '{name},\n\nI do not say this often enough, and a phone call never seems like the right place for it.\n\nSo much of how I move through the world came from you. The patience especially — I am still working on that one.\n\nThank you. For the enormous things, and for the thousand small ones I only understood later.',
+      },
+      anniversary: {
+        intro: 'Years, measured in ordinary mornings.',
+        quote: 'Given the choice again, and again after that — you.',
+        galleryTitle: 'The evidence',
+        timelineTitle: 'The years so far',
+        memoriesTitle: 'Things worth keeping',
+        finalHeadline: 'Still you. Still this. Still glad.',
+        finalText: 'Here is to the next stretch of ordinary mornings.',
+        signOff: 'Always,',
+        fallbackLetter:
+          '{name},\n\nAnother year. It went quickly, which I am told is a good sign.\n\nWhat I keep coming back to is not the big occasions but the ordinary evenings — the ones that would be unremarkable with anyone else.\n\nI would choose this again. I do, most days, without thinking about it.',
+      },
+      friendship: {
+        intro: 'Some people just stay. You are one of them.',
+        quote: 'Not everyone stays. You never made it a question.',
+        galleryTitle: 'Exhibits A through Z',
+        timelineTitle: 'A brief history',
+        memoriesTitle: 'Things I have not forgotten',
+        finalHeadline: 'Thank you for being easy to love and hard to lose.',
+        finalText: 'You already know. Here it is in writing anyway.',
+        signOff: 'Yours,',
+        fallbackLetter:
+          '{name},\n\nThis is not an occasion card. It is more of a receipt.\n\nYou have shown up for a lot of things that were not convenient, and never once made it feel like a favour. That is rarer than you think.\n\nAnyway. Flowers seemed like the right amount of dramatic.',
+      },
+      celebration: {
+        intro: 'You did the thing. Properly, and against the odds.',
+        quote: 'Nobody saw the early mornings. I did.',
+        galleryTitle: 'How it looked',
+        timelineTitle: 'The long way round',
+        memoriesTitle: 'What it took',
+        finalHeadline: 'Whatever comes next, you have already proved the point.',
+        finalText: 'Take the win. Properly, for once.',
+        signOff: 'So proud of you,',
+        fallbackLetter:
+          '{name},\n\nCongratulations. Genuinely.\n\nMost people will see the result. I saw the part before it — the unglamorous stretch where it was not obvious this would work, and you kept going anyway.\n\nThat is the part worth celebrating.',
+      },
+      'just-because': {
+        intro: 'No occasion. Just a Tuesday, and you on my mind.',
+        quote: 'Some days you do not need a reason. This is one of those days.',
+        galleryTitle: 'Nothing in particular',
+        timelineTitle: 'Assorted evidence',
+        memoriesTitle: 'Small things',
+        finalHeadline: 'No reason. That is the whole reason.',
+        finalText: 'Hope it landed on a good day.',
+        signOff: 'Thinking of you,',
+        fallbackLetter:
+          '{name},\n\nThere is no occasion attached to this. Nothing happened, nothing is coming up.\n\nI just thought about you at an ordinary moment on an ordinary day and decided that was reason enough.\n\nThat is the whole message.',
+      },
+    },
+  },
+};

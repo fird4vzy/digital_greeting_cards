@@ -1,4 +1,4 @@
-import type { PaletteId } from '@/lib/design/palettes';
+﻿import type { PaletteId } from '@/lib/design/palettes';
 import type { CardSection, Photo, SectionKind } from './schema';
 import type { MoodId, OccasionId } from './taxonomy';
 
@@ -26,6 +26,12 @@ export type StoryInput = {
   recipientName: string;
   senderName: string;
   relationship: string;
+  /**
+   * The language the *card* is written in — not the language the customer is
+   * browsing the site in. Baked into the CardConfig at compose time, so the
+   * card keeps its voice wherever it is later opened.
+   */
+  locale: string;
   occasion: OccasionId | string;
   mood: MoodId | string;
   /** Free text the customer wrote in "Tell us the story". */

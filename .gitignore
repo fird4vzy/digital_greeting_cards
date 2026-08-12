@@ -20,3 +20,11 @@ tsconfig.tsbuildinfo
 
 # local file-backed store used when no DATABASE_URL is configured
 .data/
+
+# local handoff artefacts, not part of the project
+*.bundle
+*.tar.gz
+*.jsonl.gz
+dev.log
+dev.err.log
+LOCALSETUP.md

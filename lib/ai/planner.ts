@@ -1,4 +1,4 @@
-import { copyFor } from '@/lib/card/copy';
+﻿import { copyFor } from '@/lib/card/copy';
 import type { Photo } from '@/lib/card/schema';
 import type { StoryInput } from '@/lib/card/template';
 import { MOODS, OCCASIONS, RECIPIENTS, type MoodId, type OccasionId, type RecipientId } from '@/lib/card/taxonomy';
@@ -23,6 +23,8 @@ import { CARD_PLAN_JSON_SCHEMA, cardPlanSchema, type CardPlan } from './schema';
 
 export type PlannerInput = {
   brief: string;
+  /** Language the card should be written in. */
+  locale?: string;
   hints?: {
     recipientName?: string;
     senderName?: string;
@@ -86,10 +88,14 @@ function guessRecipient(text: string, occasion: OccasionId): RecipientId {
 
 /** Pulls a plausible name out of "for Alina", "my girlfriend Alina", etc. */
 function guessName(text: string): string {
+  // Unicode property escapes rather than a Latin character range: the briefs
+  // this reads are as likely to say "для Алины" or "Nodira uchun" as
+  // "for Alina", and an ASCII range silently matches none of them.
   const patterns = [
-    /\bfor\s+([A-Z][a-zà-ÿ]+)/,
-    /\b(?:girlfriend|boyfriend|wife|husband|friend|mom|mum|mother|dad|father)\s+(?:is\s+)?(?:called\s+|named\s+)?([A-Z][a-zà-ÿ]+)/,
-    /\b([A-Z][a-zà-ÿ]+)(?:'s| is)\s+(?:birthday|turning)/,
+    /\b(?:for|для|dlya)\s+(\p{Lu}\p{Ll}+)/u,
+    /(\p{Lu}\p{Ll}+)\s+uchun\b/u,
+    /\b(?:girlfriend|boyfriend|wife|husband|friend|mom|mum|mother|dad|father|девушк\p{Ll}*|жен\p{Ll}*|подруг\p{Ll}*|мам\p{Ll}*)\s+(?:is\s+)?(?:called\s+|named\s+|по имени\s+)?(\p{Lu}\p{Ll}+)/u,
+    /\b(\p{Lu}\p{Ll}+)(?:'s| is)\s+(?:birthday|turning)/u,
   ];
 
   for (const pattern of patterns) {
@@ -102,7 +108,7 @@ function guessName(text: string): string {
 export const heuristicPlanner: CardPlanner = {
   id: 'heuristic',
 
-  async plan({ brief, hints }: PlannerInput): Promise<PlannerResult> {
+  async plan({ brief, hints, locale = 'ru' }: PlannerInput): Promise<PlannerResult> {
     const text = brief ?? '';
 
     const occasion = (hints?.occasion as OccasionId) ?? matchFirst(text, OCCASION_HINTS, 'just-because');
@@ -111,7 +117,7 @@ export const heuristicPlanner: CardPlanner = {
     const recipientName = hints?.recipientName?.trim() || guessName(text) || 'You';
     const senderName = hints?.senderName?.trim() || 'Me';
 
-    const copy = copyFor(occasion);
+    const copy = copyFor(occasion, locale);
     const template = recommendTemplate({ occasion, mood, photos: [], moments: [] });
 
     const plan: CardPlan = {
@@ -166,7 +172,9 @@ export const claudePlanner: CardPlanner = {
       betas: ['server-side-fallback-2026-07-01'],
       fallbacks: 'default',
       system: plannerSystemPrompt(),
-      messages: [{ role: 'user', content: plannerUserPrompt(input.brief, input.hints) }],
+      messages: [
+        { role: 'user', content: plannerUserPrompt(input.brief, input.hints, input.locale ?? 'ru') },
+      ],
     });
 
     if (response.stop_reason === 'refusal') {
@@ -225,8 +233,9 @@ export async function planCard(input: PlannerInput): Promise<PlannerResult> {
 }
 
 /** Bridges an AI plan into the same input the manual creation flow produces. */
-export function planToStoryInput(plan: CardPlan, photos: Photo[] = []): StoryInput {
+export function planToStoryInput(plan: CardPlan, photos: Photo[] = [], locale = 'ru'): StoryInput {
   return {
+    locale,
     recipientName: plan.recipientName,
     senderName: plan.senderName,
     relationship: plan.recipient,
