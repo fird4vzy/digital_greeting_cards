@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { regenerateCard, saveOrderNotes, setOrderStatus } from '../../actions';
+import { regenerateCard, saveOrderNotes, setOrderStatus } from '../../../actions';
 import { StatusPill } from '@/components/admin/StatusPill';
 import { CopyButton } from '@/components/admin/CopyButton';
 import { getOrder } from '@/lib/db';

@@ -56,6 +56,7 @@ Worth visiting:
 | `/create` | The eight-question creation flow |
 | `/c/8FJ29K` | A published card |
 | `/c/8FJ29K/qr` | The printable tag the shop ties to the flowers |
+| `/admin/login` | The way in — one shared password |
 | `/admin` | The shop-side queue |
 
 ```bash
@@ -203,7 +204,7 @@ Three environment variables decide whether the deployment is real or a demo:
 | Variable | Consequence if unset |
 |---|---|
 | `DATABASE_URL` | Serverless filesystems are read-only, so the file store degrades to memory. The site works, every order placed is lost. |
-| `ADMIN_PASSWORD` | `/admin` refuses every request with a 503. Deliberate — see `lib/auth/admin.ts`. |
+| `ADMIN_PASSWORD` | `/admin/login` says it is not configured and lets nobody through. Deliberate — see `lib/auth/admin.ts`. |
 | `NEXT_PUBLIC_SITE_URL` | QR codes and share links are generated against the request's own origin. |
 
 `NEXT_PUBLIC_SITE_URL` deserves more care than the other two. It is baked into
@@ -242,12 +243,13 @@ mid-checkout must always end up with a card.
 
 Honest list of what a v1 does not have:
 
-- **The admin has one shared password, not accounts.** `/admin` is gated by
-  HTTP Basic auth in middleware against `ADMIN_PASSWORD` (`lib/auth/admin.ts`),
-  which is enough to keep the order queue off the open internet. It is not an
-  identity layer: there are no per-operator sessions and no per-shop ownership
-  check, so any operator can act on any shop's order. `app/admin/actions.ts` is
-  where that check belongs.
+- **The admin has one shared password, not accounts.** `/admin/login` exchanges
+  `ADMIN_PASSWORD` for a signed session cookie (`lib/auth/admin.ts`), which is
+  enough to keep the order queue off the open internet. It is not an identity
+  layer: one credential is shared by everyone, so the app can tell that a
+  caller is an operator but never which one, and there is no per-shop ownership
+  check — any signed-in operator can act on any shop's order.
+  `app/admin/actions.ts` is where that check belongs.
 - **Photos are stored as data URLs** in the order record. They are downscaled
   and re-encoded on the device first, which keeps them small, but object
   storage is the right home — `lib/utils/image.ts` is the one function that

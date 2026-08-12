@@ -1,43 +1,53 @@
 /**
  * Admin access control.
  *
- * The admin surface has no identity layer — no users, no sessions, no per-shop
- * ownership. What it has is a single shared secret in `ADMIN_PASSWORD`, checked
- * over HTTP Basic auth in middleware. That is deliberately the smallest thing
- * that stops `/admin` being world-writable the moment the site is public; it is
- * not the auth this product eventually needs. See the note in
- * `app/admin/actions.ts` for what real auth has to cover.
+ * One shared password in `ADMIN_PASSWORD`, exchanged at `/admin/login` for a
+ * signed session cookie. This is not an identity layer — no accounts, no
+ * per-shop ownership — it establishes that the caller is *an* operator, never
+ * *which* operator. See the note in `app/admin/actions.ts`.
  *
- * Basic auth was chosen over a login form because it needs no session store, no
- * cookie plumbing and no login route, and because the browser's own credential
- * prompt is one less surface to get wrong. It is only as private as the
- * transport, which on a real deployment is HTTPS.
+ * **Why a form and not HTTP Basic.** Basic auth needs no session store and no
+ * login route, which is why it was here first, but the credential prompt it
+ * raises is the browser's, not the product's: an unstyled system dialog that
+ * reads as an error rather than as a way in, with no way to sign out short of
+ * closing the browser. A shop owner opening the order queue every morning
+ * should see the shop's own page.
+ *
+ * **The session.** `<exp>.<hmac>`, signed with a key derived from the
+ * password. Nothing is stored server-side: the cookie carries its own expiry
+ * and the signature makes it unforgeable, which suits a deployment that may be
+ * several serverless instances with nothing shared between them. Changing
+ * `ADMIN_PASSWORD` changes the key and so invalidates every session already
+ * issued — the closest thing to "log everyone out" available without a store.
  *
  * **Fail closed.** With `ADMIN_PASSWORD` unset, production refuses every admin
- * request rather than waving it through — a forgotten env var must never be the
+ * request rather than waving it through; a forgotten env var must never be the
  * difference between a locked and an open order queue. Local development is
  * exempt so `npm run dev` still needs no setup.
  */
 
-/**
- * Realm string shown in the browser's credential prompt.
- *
- * ASCII only, and not by preference: header values are ByteStrings, so a
- * non-Latin-1 character here (an em dash, say) throws when the header is set
- * and turns every 401 into a 500.
- */
-const REALM = 'More Than a Bouquet admin';
+export const ADMIN_SESSION_COOKIE = 'mtab_admin';
 
-export type AdminAuthResult =
-  | { ok: true }
-  | { ok: false; reason: 'unconfigured' | 'missing' | 'invalid' };
+/**
+ * Twelve hours: long enough to cover a shop's day without a second login,
+ * short enough that a browser left open on a counter does not stay a way in
+ * indefinitely.
+ */
+const SESSION_TTL_MS = 12 * 60 * 60 * 1000;
+
+const encoder = new TextEncoder();
+
+/** True when a password is configured, or when dev is standing in for one. */
+export function isAdminConfigured(): boolean {
+  return Boolean(process.env.ADMIN_PASSWORD) || process.env.NODE_ENV !== 'production';
+}
 
 /**
  * Compares two strings without leaking their common prefix through timing.
  *
- * Hand-rolled because Edge middleware has no `crypto.timingSafeEqual`. Lengths
- * are folded into the accumulator rather than short-circuiting on them, so the
- * comparison runs over a fixed number of code units for any given `expected`.
+ * Hand-rolled because the Edge runtime has no `crypto.timingSafeEqual`.
+ * Lengths are folded into the accumulator rather than short-circuiting on
+ * them, so the comparison runs over a fixed number of code units.
  */
 function constantTimeEqual(a: string, b: string): boolean {
   let diff = a.length ^ b.length;
@@ -50,58 +60,67 @@ function constantTimeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-/** Pulls the password out of an `Authorization: Basic …` header. */
-function readBasicPassword(header: string | null): string | null {
-  if (!header) return null;
-
-  const [scheme, encoded] = header.split(' ');
-  if (scheme?.toLowerCase() !== 'basic' || !encoded) return null;
-
-  let decoded: string;
-  try {
-    decoded = atob(encoded);
-  } catch {
-    // Malformed base64 — indistinguishable from a wrong password, treat as one.
-    return null;
-  }
-
-  // "user:password". The username is ignored: there is only one credential and
-  // asking the operator to also remember a username buys nothing.
-  const separator = decoded.indexOf(':');
-  return separator === -1 ? null : decoded.slice(separator + 1);
-}
-
-export function checkAdminAuth(authorization: string | null): AdminAuthResult {
+export function verifyAdminPassword(supplied: string): boolean {
   const expected = process.env.ADMIN_PASSWORD;
 
-  if (!expected) {
-    // Unset in dev is a convenience; unset in production is a misconfiguration.
-    return process.env.NODE_ENV === 'production'
-      ? { ok: false, reason: 'unconfigured' }
-      : { ok: true };
-  }
+  // Dev with no password set: any non-empty value opens the door, matching the
+  // "clean checkout needs no setup" rule. Production has no such branch.
+  if (!expected) return process.env.NODE_ENV !== 'production' && supplied.length > 0;
 
-  const supplied = readBasicPassword(authorization);
-  if (supplied === null) return { ok: false, reason: 'missing' };
-
-  return constantTimeEqual(supplied, expected) ? { ok: true } : { ok: false, reason: 'invalid' };
+  return constantTimeEqual(supplied, expected);
 }
 
-/** The response to send when {@link checkAdminAuth} rejects a request. */
-export function adminAuthResponse(reason: 'unconfigured' | 'missing' | 'invalid'): Response {
-  if (reason === 'unconfigured') {
-    // No prompt: no password can succeed, so asking for one is a dead end.
-    return new Response('Admin is not configured. Set ADMIN_PASSWORD.', {
-      status: 503,
-      headers: { 'content-type': 'text/plain; charset=utf-8' },
-    });
-  }
+function toBase64Url(bytes: Uint8Array): string {
+  let binary = '';
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '');
+}
 
-  return new Response('Authentication required.', {
-    status: 401,
-    headers: {
-      'www-authenticate': `Basic realm="${REALM}", charset="UTF-8"`,
-      'content-type': 'text/plain; charset=utf-8',
-    },
-  });
+async function sign(payload: string): Promise<string> {
+  // The password doubles as the signing key. A separate SESSION_SECRET would
+  // be one more variable to set and forget, and rotating the password ought to
+  // invalidate sessions anyway.
+  const secret = process.env.ADMIN_PASSWORD ?? 'development-only-unset-password';
+
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+
+  const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(payload));
+  return toBase64Url(new Uint8Array(signature));
+}
+
+/** Mints a session for a caller who has already proved the password. */
+export async function createAdminSession(): Promise<{ value: string; maxAge: number }> {
+  const expiry = Date.now() + SESSION_TTL_MS;
+  const payload = `v1.${expiry}`;
+
+  return {
+    value: `${payload}.${await sign(payload)}`,
+    maxAge: Math.floor(SESSION_TTL_MS / 1000),
+  };
+}
+
+export async function verifyAdminSession(token: string | undefined): Promise<boolean> {
+  if (!token) return false;
+
+  const separator = token.lastIndexOf('.');
+  if (separator === -1) return false;
+
+  const payload = token.slice(0, separator);
+  const signature = token.slice(separator + 1);
+
+  const [version, expiry] = payload.split('.');
+  if (version !== 'v1') return false;
+
+  // Checked before the signature so an expired-but-valid token cannot be
+  // replayed; the comparison itself is still constant-time.
+  const expiresAt = Number(expiry);
+  if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) return false;
+
+  return constantTimeEqual(signature, await sign(payload));
 }

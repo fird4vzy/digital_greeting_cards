@@ -1,6 +1,8 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
+import { ADMIN_SESSION_COOKIE, verifyAdminSession } from '@/lib/auth/admin';
 import { composeConfigForOrder } from '@/lib/card/service';
 import { getOrder, updateOrder } from '@/lib/db';
 import { ORDER_STATUSES, type OrderStatus } from '@/lib/db/types';
@@ -8,15 +10,29 @@ import { ORDER_STATUSES, type OrderStatus } from '@/lib/db/types';
 /**
  * Admin mutations.
  *
- * ⚠️ These carry no identity. A shared password in middleware
- * (`lib/auth/admin.ts`) is all that stands in front of them: it establishes
- * that the caller is *an* operator, never *which* operator. So there is still
- * no per-shop ownership check — any authenticated caller can act on any shop's
- * order. Every action below is where that check belongs once orders have an
- * owner; they are the only writes the admin can perform.
+ * ⚠️ These carry no identity. A shared password (`lib/auth/admin.ts`) is all
+ * that stands in front of them: it establishes that the caller is *an*
+ * operator, never *which* operator. So there is still no per-shop ownership
+ * check — any signed-in caller can act on any shop's order. Every action below
+ * is where that check belongs once orders have an owner; they are the only
+ * writes the admin can perform.
+ *
+ * Each one re-verifies the session rather than trusting the proxy. A server
+ * action is a POST endpoint that anyone can call directly once they know its
+ * id — reachable without ever rendering the layout that guards the page it
+ * lives on — so routing is the wrong place to make a mutation safe.
  */
 
+async function requireAdmin(): Promise<void> {
+  if (!(await verifyAdminSession((await cookies()).get(ADMIN_SESSION_COOKIE)?.value))) {
+    throw new Error('Not authenticated');
+  }
+}
+
 export async function setOrderStatus(id: string, status: string) {
+  await requireAdmin();
+
+
   if (!ORDER_STATUSES.includes(status as OrderStatus)) return;
 
   const order = await getOrder(id);
@@ -35,6 +51,8 @@ export async function setOrderStatus(id: string, status: string) {
 
 /** Recomposes the card from the order's current fields and template. */
 export async function regenerateCard(id: string, templateId?: string) {
+  await requireAdmin();
+
   const order = await getOrder(id);
   if (!order) return;
 
@@ -51,6 +69,8 @@ export async function regenerateCard(id: string, templateId?: string) {
 }
 
 export async function saveOrderNotes(id: string, notes: string) {
+  await requireAdmin();
+
   await updateOrder(id, { notes });
   revalidatePath(`/admin/orders/${id}`);
 }
