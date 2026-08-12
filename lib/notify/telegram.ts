@@ -10,8 +10,9 @@ import type { Order } from '@/lib/db/types';
  * register. Notifications only ever go out, so none of that is needed.
  *
  * Configure with `TELEGRAM_BOT_TOKEN` (from @BotFather) and `TELEGRAM_CHAT_ID`
- * (the group or person to notify). With either unset this does nothing, which
- * keeps `npm run dev` and every preview deployment quiet.
+ * (the group or person to notify). With *neither* set this does nothing, which
+ * keeps `npm run dev` and every preview deployment quiet. With only one set it
+ * complains — see below.
  *
  * **Never let this fail an order.** The customer has already written something
  * personal and pressed the button; a telegram outage, a revoked token or a
@@ -59,10 +60,40 @@ function buildMessage(order: Order, adminUrl: string): string {
   return lines.join('\n');
 }
 
+/**
+ * Warn once per process, not once per order.
+ *
+ * A misconfigured deployment takes orders continuously; logging on every one
+ * buries the message in its own repetition.
+ */
+let warnedAboutConfig = false;
+
 export async function notifyNewOrder(order: Order, origin: string): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
-  if (!token || !chatId) return;
+
+  if (!token && !chatId) {
+    // Neither set: notifications are deliberately off. This is the normal
+    // state of `npm run dev` and of every preview deployment.
+    return;
+  }
+
+  if (!token || !chatId) {
+    // One set and not the other is not a decision, it is a half-finished
+    // setup — and it looks identical to a working one from the outside: the
+    // order is accepted, the customer sees success, and the shop is simply
+    // never told. Say so loudly, or it stays broken until someone notices
+    // an order nobody worked on.
+    if (!warnedAboutConfig) {
+      warnedAboutConfig = true;
+      const missing = !token ? 'TELEGRAM_BOT_TOKEN' : 'TELEGRAM_CHAT_ID';
+      console.error(
+        `[telegram] ${missing} is not set, so no order notification will ever be sent. ` +
+          'Set both variables and redeploy — environment variables only reach a new build.',
+      );
+    }
+    return;
+  }
 
   const text = buildMessage(order, `${origin}/admin/orders/${order.id}`);
 

@@ -38,10 +38,13 @@ as `NEW`, and stored its brief.
    @BotFather, then put the new one into Vercel. An earlier token was also
    committed to the public `fird4vzy/telegram-bot-docker` repository and
    revoked; that file is still in that repository's git history.
-2. **`TELEGRAM_CHAT_ID` is missing**, so order notifications are silently not
-   sent — `notifyNewOrder` returns early unless both variables are present.
-   The quickest way to the value is messaging @userinfobot. For a group, the
-   bot has to be a member of it, and the id is negative.
+2. **`TELEGRAM_CHAT_ID` is missing**, so no order notification is sent. The
+   quickest way to the value is messaging @userinfobot. For a group, the bot
+   has to be a member of it, and the id is negative.
+   `notifyNewOrder` no longer fails silently: with *neither* variable set it
+   stays quiet (that is `npm run dev` and every preview), but with only one
+   set it logs an error naming the missing one, once per process. Until the
+   variable is added, that line is in the Vercel runtime logs on every order.
 3. **Redeploy after setting it.** Environment variables only reach a new build.
 4. **Two test orders are on production** and should be deleted from the
    dashboard: `RWNPJV`, and whichever the first Telegram test creates. Both are
@@ -90,6 +93,10 @@ long version.
   other languages. See `templates/README.md`.
 - **Adding a column or an order status needs a migration**, not a re-run of
   `schema.sql` — the live database already has the schema.
+- **`npm install` after every pull, not just on a fresh clone.** `pg` was added
+  as a dependency partway through; pulling onto a machine with older
+  `node_modules` fails the build with a module-not-found pointing at
+  `lib/db/postgres.ts`, which looks like a code fault and is not one.
 
 ---
 
