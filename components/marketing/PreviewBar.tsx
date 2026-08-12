@@ -17,10 +17,12 @@ export function PreviewBar({
   templateId,
   templateName,
   tagline,
+  strings,
 }: {
   templateId: string;
   templateName: string;
   tagline: string;
+  strings: { back: string; preview: string; useThis: string };
 }) {
   const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
@@ -46,7 +48,7 @@ export function PreviewBar({
         <Link
           href="/templates"
           className="shrink-0 text-paper/50 transition-colors hover:text-paper"
-          aria-label="Back to templates"
+          aria-label={strings.back}
         >
           <svg viewBox="0 0 16 16" fill="none" className="h-4 w-4">
             <path
@@ -64,13 +66,13 @@ export function PreviewBar({
           <p className="hidden truncate text-[0.75rem] text-paper/50 sm:block">{tagline}</p>
         </div>
 
-        <span className="eyebrow hidden shrink-0 text-paper/35 md:block">Preview</span>
+        <span className="eyebrow hidden shrink-0 text-paper/35 md:block">{strings.preview}</span>
 
         <Link
           href={`/create?template=${templateId}`}
           className="group inline-flex h-9 shrink-0 items-center gap-2 rounded-full bg-paper px-4 text-[0.8125rem] font-medium text-ink transition-colors duration-400 hover:bg-white"
         >
-          Use this
+          {strings.useThis}
           <ArrowGlyph />
         </Link>
       </div>

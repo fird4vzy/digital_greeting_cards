@@ -23,7 +23,7 @@ export async function BouquetSection({
 
   const art = [
     <BouquetArt key="bouquet" />,
-    <QrCardArt key="card" qr={qr} code={demoCode} />,
+    <QrCardArt key="card" qr={qr} code={demoCode} tagLine={dict.content.card.tagLine} />,
     <ScanArt key="scan" />,
     <WorldArt key="world" />,
   ];
@@ -128,14 +128,14 @@ function BouquetArt() {
   );
 }
 
-function QrCardArt({ qr, code }: { qr: string; code: string }) {
+function QrCardArt({ qr, code, tagLine }: { qr: string; code: string; tagLine: string }) {
   return (
     <div
       className="flex h-[9.5rem] w-[7rem] flex-col items-center justify-between rounded-[0.5rem] border border-paper/25 p-3"
       style={{ rotate: '-4deg' }}
     >
       <span className="text-center font-display text-[0.62rem] leading-tight text-paper/70">
-        There&rsquo;s a little something extra for you.
+        {tagLine}
       </span>
       <span className="block h-14 w-14 [&_svg]:h-full [&_svg]:w-full" dangerouslySetInnerHTML={{ __html: qr }} />
       <span className="eyebrow text-[0.5rem] text-paper/40">{code}</span>

@@ -341,6 +341,8 @@ export type Dictionary = {
       scrollGently: string;
       /** The one line printed on the physical hang tag. */
       tagLine: string;
+      /** Labels the letter beat in the miniature template preview. */
+      letterLabel: string;
       open: string;
       pullRibbon: string;
       unfold: string;

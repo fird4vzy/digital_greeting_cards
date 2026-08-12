@@ -6,6 +6,7 @@ import { ArrowGlyph, Button, ButtonLink } from '@/components/ui/Button';
 import { Blossom } from '@/components/cards/primitives/Motif';
 import { easing } from '@/lib/design/motion';
 import { useMotionPrefs } from '@/lib/hooks/useMotionPrefs';
+import type { Dictionary } from '@/lib/i18n/types';
 
 /**
  * The moment after publishing.
@@ -17,10 +18,12 @@ export function PublishedCard({
   code,
   url,
   recipient,
+  strings,
 }: {
   code: string;
   url: string;
   recipient: string;
+  strings: Dictionary['ui']['create']['done'];
 }) {
   const { reduced } = useMotionPrefs();
   const [copied, setCopied] = useState(false);
@@ -48,16 +51,15 @@ export function PublishedCard({
       </motion.span>
 
       <h1 className="mt-8 font-display text-display-sm leading-[1.04] tracking-[-0.03em] text-ink">
-        It&rsquo;s ready{recipient ? ` for ${recipient}` : ''}.
+        {/* The name sits inside the sentence, not appended to it: Russian
+            needs it after "Готово для", Uzbek before its own postposition. */}
+        {strings.title.replace('{name}', recipient)}
       </h1>
 
-      <p className="mt-5 max-w-[42ch] text-body-lg text-pretty text-ink-soft">
-        Give the code to the flower shop. They print it onto a small card and tie it to the
-        stems — and the card stays private until someone scans it.
-      </p>
+      <p className="mt-5 max-w-[42ch] text-body-lg text-pretty text-ink-soft">{strings.lead}</p>
 
       <div className="mt-12 w-full rounded-[1.25rem] border border-line-strong bg-white/70 p-7">
-        <span className="eyebrow block text-ink-muted">The code</span>
+        <span className="eyebrow block text-ink-muted">{strings.codeLabel}</span>
         <p className="mt-3 font-display text-[clamp(2.5rem,2rem+3vw,3.75rem)] leading-none tracking-[0.08em] text-ink tabular-nums">
           {code}
         </p>
@@ -73,10 +75,10 @@ export function PublishedCard({
               }
             }}
           >
-            {copied ? 'Link copied' : 'Copy the link'}
+            {copied ? strings.copied : strings.copyLink}
           </Button>
           <ButtonLink href={`/c/${code}`} variant="secondary">
-            Open the card
+            {strings.openCard}
             <ArrowGlyph />
           </ButtonLink>
         </div>
@@ -85,7 +87,7 @@ export function PublishedCard({
       </div>
 
       <ButtonLink href={`/c/${code}/qr`} variant="ghost" className="mt-8">
-        Print the QR card for the bouquet
+        {strings.printQr}
       </ButtonLink>
     </motion.section>
   );

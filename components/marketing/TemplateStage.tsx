@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useMemo, useState } from 'react';
 import { Blossom, Motif } from '@/components/cards/primitives/Motif';
-import { copyFor, coverHeadline } from '@/lib/card/copy';
+import { cardStrings, copyFor, coverHeadline } from '@/lib/card/copy';
 import { demoStory } from '@/lib/card/demo';
 import type { TemplateSummary } from '@/lib/card/template';
 import { getPalette, paletteVars } from '@/lib/design/palettes';
@@ -104,7 +104,7 @@ export function TemplateStage({
 
     // 2 — the letter
     <div key="letter" className="flex h-full flex-col justify-center px-7">
-      <span className="eyebrow mb-4 opacity-45">The letter</span>
+      <span className="eyebrow mb-4 opacity-45">{cardStrings(locale).letterLabel}</span>
       <p className="text-[0.9rem] leading-[1.75] opacity-85">{demo.letter}</p>
     </div>,
 

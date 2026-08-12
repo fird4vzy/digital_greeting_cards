@@ -68,7 +68,7 @@ export function StepShell({
       <div className="mt-14 flex flex-wrap items-center gap-3">
         {onBack ? (
           <Button variant="ghost" onClick={onBack} className="-ml-2">
-            Back
+            {strings.back}
           </Button>
         ) : null}
 
@@ -87,8 +87,12 @@ export function StepShell({
         </div>
       </div>
 
+      {/* Uzbek puts the total before the current step, so the whole sentence
+          is one dictionary string with slots rather than assembled here. */}
       <p className="mt-6 text-caption text-ink-faint">
-        Step {index + 1} of {total}
+        {strings.progress
+          .replace('{current}', String(index + 1))
+          .replace('{total}', String(total))}
       </p>
     </motion.section>
   );

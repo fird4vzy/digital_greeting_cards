@@ -4,6 +4,8 @@ import { CardRenderer } from '@/components/cards/CardRenderer';
 import { PreviewBar } from '@/components/marketing/PreviewBar';
 import { demoConfig } from '@/lib/card/demo';
 import { getPalette } from '@/lib/design/palettes';
+import { localiseTemplate } from '@/lib/i18n/localise';
+import { getI18n } from '@/lib/i18n/server';
 import { getTemplate, listTemplates } from '@/templates';
 
 type Props = { params: Promise<{ slug: string }> };
@@ -14,8 +16,11 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const template = getTemplate(slug);
-  if (!template) return { title: 'Template not found' };
+  const raw = getTemplate(slug);
+  if (!raw) return {};
+
+  const { dict } = await getI18n();
+  const template = localiseTemplate(raw, dict);
 
   return {
     title: `${template.name} — ${template.tagline}`,
@@ -40,12 +45,21 @@ export async function generateViewport({ params }: Props): Promise<Viewport> {
  */
 export default async function TemplatePreviewPage({ params }: Props) {
   const { slug } = await params;
-  const template = getTemplate(slug);
-  if (!template) notFound();
+  const raw = getTemplate(slug);
+  if (!raw) notFound();
+
+  const { dict } = await getI18n();
+  const template = localiseTemplate(raw, dict);
+  const t = dict.ui.templates;
 
   return (
     <main>
-      <PreviewBar templateId={template.id} templateName={template.name} tagline={template.tagline} />
+      <PreviewBar
+        templateId={template.id}
+        templateName={template.name}
+        tagline={template.tagline}
+        strings={{ back: t.back, preview: t.preview, useThis: t.useThis }}
+      />
       <CardRenderer config={demoConfig(template.id)} />
     </main>
   );

@@ -187,7 +187,14 @@ export function CreateFlow({
   }, [draft, activeTemplate]);
 
   if (published) {
-    return <PublishedCard code={published.code} url={published.url} recipient={draft.recipientName} />;
+    return (
+      <PublishedCard
+        code={published.code}
+        url={published.url}
+        recipient={draft.recipientName}
+        strings={copy.done}
+      />
+    );
   }
 
   const cardLocale = draft.locale || locale;
@@ -327,7 +334,7 @@ export function CreateFlow({
             skip={{ label: copy.steps.story.needHelp, onSkip: next }}
           >
             <label className="block">
-              <span className="sr-only">Your story</span>
+              <span className="sr-only">{copy.steps.story.question}</span>
               <textarea
                 value={draft.story}
                 onChange={(event) => patch({ story: event.target.value })}
@@ -359,7 +366,11 @@ export function CreateFlow({
             canContinue
             skip={{ label: copy.steps.photos.skip, onSkip: () => { patch({ photos: [] }); next(); } }}
           >
-            <PhotoStep photos={draft.photos} onChange={(photos) => patch({ photos })} />
+            <PhotoStep
+              photos={draft.photos}
+              onChange={(photos) => patch({ photos })}
+              strings={copy.steps.photos}
+            />
           </StepShell>
         )}
 

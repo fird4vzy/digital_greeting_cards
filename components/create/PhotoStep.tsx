@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import type { Photo } from '@/lib/card/schema';
+import type { Dictionary } from '@/lib/i18n/types';
 import { prepareImage } from '@/lib/utils/image';
 import { cn } from '@/lib/utils/cn';
 
@@ -18,9 +19,11 @@ const MAX_PHOTOS = 12;
 export function PhotoStep({
   photos,
   onChange,
+  strings,
 }: {
   photos: Photo[];
   onChange: (photos: Photo[]) => void;
+  strings: Dictionary['ui']['create']['steps']['photos'];
 }) {
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -70,9 +73,7 @@ export function PhotoStep({
           </g>
         </svg>
 
-        <p className="text-caption text-ink-muted">
-          Drop photographs here, or choose them from your device.
-        </p>
+        <p className="text-caption text-ink-muted">{strings.drop}</p>
 
         <input
           ref={input}
@@ -91,7 +92,7 @@ export function PhotoStep({
           onClick={() => input.current?.click()}
           disabled={busy || photos.length >= MAX_PHOTOS}
         >
-          {busy ? 'Preparing…' : photos.length >= MAX_PHOTOS ? 'That is plenty' : 'Choose photos'}
+          {busy ? strings.preparing : photos.length >= MAX_PHOTOS ? strings.enough : strings.choose}
         </Button>
       </div>
 
@@ -104,14 +105,14 @@ export function PhotoStep({
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={photo.url}
-                    alt={`Photograph ${index + 1}`}
+                    alt=""
                     className="h-full w-full object-cover"
                   />
                 </span>
                 <button
                   type="button"
                   onClick={() => onChange(photos.filter((candidate) => candidate.id !== photo.id))}
-                  aria-label={`Remove photograph ${index + 1}`}
+                  aria-label={strings.remove.replace('{index}', String(index + 1))}
                   className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-noir/70 text-paper opacity-0 backdrop-blur transition-opacity duration-300 group-hover:opacity-100 focus-visible:opacity-100"
                 >
                   <svg viewBox="0 0 16 16" className="h-3 w-3" fill="none">
@@ -123,8 +124,7 @@ export function PhotoStep({
           </div>
 
           <p className="mt-4 text-caption text-ink-faint">
-            {photos.length} photograph{photos.length === 1 ? '' : 's'}, shown in the order you
-            added them.
+            {strings.count.replace('{count}', String(photos.length))}
           </p>
         </>
       ) : null}

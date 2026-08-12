@@ -57,7 +57,9 @@ export function Wordmark({
   if (!href) return content;
 
   return (
-    <Link href={href} aria-label="More than a bouquet — home">
+    // Labelled with the brand alone: a name needs no translation, and "home"
+    // would have been the one English word left in a Russian page's a11y tree.
+    <Link href={href} aria-label="More than a bouquet">
       {content}
     </Link>
   );
