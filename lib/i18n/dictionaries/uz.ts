@@ -358,6 +358,7 @@ export const uz: Dictionary = {
 
     card: {
       scrollGently: 'Sekin suring',
+      tagLine: 'Seni yana bir narsa kutyapti.',
       open: 'Och',
       pullRibbon: 'Tasmani torting',
       unfold: 'Yoying',

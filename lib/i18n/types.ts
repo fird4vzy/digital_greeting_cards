@@ -335,6 +335,8 @@ export type Dictionary = {
     /** Built-in strings rendered inside a card. */
     card: {
       scrollGently: string;
+      /** The one line printed on the physical hang tag. */
+      tagLine: string;
       open: string;
       pullRibbon: string;
       unfold: string;

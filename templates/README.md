@@ -64,10 +64,12 @@ The next template gets it for free.
 ## Rules that are easy to break by accident
 
 - **Never put a user-visible string in a template file.** Card copy comes from
-  the dictionaries in `lib/i18n/`, keyed by the *card's* locale. Templates once
-  passed a literal `openPrompt: 'Open it'`, which shadowed the localised value
-  and printed English on every Russian and Uzbek card; the option no longer
-  exists. A template that wants different wording adds a dictionary key.
+  the dictionaries in `lib/i18n/`, keyed by the *card's* locale — reach it with
+  `cardStrings(input.locale)`. This rule was broken twice in the same file: a
+  literal `openPrompt: 'Open it'` and a hardcoded fallback wish list, both
+  word-for-word copies of the English dictionary entries, so both looked
+  correct in English and printed English onto every Russian and Uzbek card.
+  Anything a customer or recipient reads belongs in a dictionary.
 - **No gendered wording** anywhere in card copy. The sender and the recipient
   are both of unknown gender, and Russian has no neutral past tense — see the
   note at the top of [`lib/i18n/dictionaries/ru.ts`](../lib/i18n/dictionaries/ru.ts).

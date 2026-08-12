@@ -353,6 +353,7 @@ export const en: Dictionary = {
 
     card: {
       scrollGently: 'Scroll gently',
+      tagLine: 'There is a little something extra for you.',
       open: 'Open it',
       pullRibbon: 'Pull the ribbon',
       unfold: 'Unfold',

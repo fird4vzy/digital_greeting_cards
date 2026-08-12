@@ -386,6 +386,7 @@ export const ru: Dictionary = {
 
     card: {
       scrollGently: 'Листай медленно',
+      tagLine: 'Тебя ждёт кое-что ещё.',
       open: 'Открой',
       pullRibbon: 'Потяни за ленту',
       unfold: 'Разверни',

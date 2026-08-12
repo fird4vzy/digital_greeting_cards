@@ -1,4 +1,5 @@
 import { applyVariants, standardArc } from '@/lib/card/compose';
+import { cardStrings } from '@/lib/card/copy';
 import type { TemplateDefinition } from '@/lib/card/template';
 
 /**
@@ -42,10 +43,13 @@ export const birthdayTemplate: TemplateDefinition = {
     closing: 'signature',
   },
   compose(input) {
+    // The customer's own wishes win; the fallback comes from the card's
+    // dictionary, never from this file. Hardcoding it here printed English
+    // wishes onto Russian cards while a translated list sat unused.
     const wishes =
       input.wishes && input.wishes.length > 0
         ? input.wishes
-        : ['A slow morning', 'Something you did not plan', 'People who show up', 'One very good meal'];
+        : cardStrings(input.locale).defaultWishes;
 
     const sections = standardArc({ ...input, wishes }, { envelopeVariant: 'ribbon' });
     return applyVariants(sections, this.sectionVariants);

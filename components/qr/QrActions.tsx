@@ -3,8 +3,19 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 
-/** Print and copy, the two things a shop actually does on this page. */
-export function QrActions({ url }: { url: string }) {
+/**
+ * Print and copy, the two things a shop actually does on this page.
+ *
+ * A client component, so its labels arrive as props rather than pulling the
+ * server-side dictionary into the bundle.
+ */
+export function QrActions({
+  url,
+  labels,
+}: {
+  url: string;
+  labels: { print: string; copyLink: string; copied: string };
+}) {
   const [copied, setCopied] = useState(false);
 
   const copy = async () => {
@@ -20,9 +31,9 @@ export function QrActions({ url }: { url: string }) {
 
   return (
     <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-      <Button onClick={() => window.print()}>Print the card</Button>
+      <Button onClick={() => window.print()}>{labels.print}</Button>
       <Button variant="secondary" onClick={copy}>
-        {copied ? 'Copied' : 'Copy card link'}
+        {copied ? labels.copied : labels.copyLink}
       </Button>
     </div>
   );

@@ -2,14 +2,20 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Wordmark } from '@/components/site/Wordmark';
 import { QrActions } from '@/components/qr/QrActions';
+import { cardStrings } from '@/lib/card/copy';
 import { getOrderByCode } from '@/lib/db';
+import { getI18n } from '@/lib/i18n/server';
 import { cardUrl, qrSvg } from '@/lib/qr';
 import { siteOrigin } from '@/lib/site-origin';
 
-export const metadata: Metadata = {
-  title: 'Printable card',
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { dict } = await getI18n();
+
+  return {
+    title: dict.ui.qr.title,
+    robots: { index: false, follow: false },
+  };
+}
 
 type Props = { params: Promise<{ code: string }> };
 
@@ -20,11 +26,21 @@ type Props = { params: Promise<{ code: string }> };
  * Sized as a 55 × 85 mm hang tag in real millimetres so a shop can print it at
  * 100% and cut to the crop marks. Everything that is not the tag is marked
  * `print-hide`, so ⌘P produces the card and nothing else.
+ *
+ * **Two languages on one page.** The instructions are for the florist, so they
+ * follow the operator's locale. The tag is read by the recipient standing over
+ * a bouquet, so its one line follows the *card's* locale — the same split the
+ * rest of the product makes, and the reason a Russian card cannot end up with
+ * an English tag tied to it.
  */
 export default async function QrCardPage({ params }: Props) {
   const { code } = await params;
   const order = await getOrderByCode(code);
   if (!order) notFound();
+
+  const { dict } = await getI18n();
+  const t = dict.ui.qr;
+  const tag = cardStrings(order.locale);
 
   const origin = await siteOrigin();
   const url = cardUrl(origin, order.code);
@@ -35,14 +51,18 @@ export default async function QrCardPage({ params }: Props) {
       <div className="print-hide mx-auto mb-12 max-w-[36rem] text-center">
         <Wordmark href="/" />
         <h1 className="mt-8 font-display text-display-sm leading-[1.05] tracking-[-0.025em] text-ink">
-          The card for the bouquet.
+          {t.title}
         </h1>
         <p className="mt-5 text-body text-pretty text-ink-soft">
-          Print at 100% on matte card stock, cut to the marks, and tie it to the stems.
-          For {order.recipient.name}, from {order.customer.name}.
+          {t.lead
+            .replace('{recipient}', order.recipient.name)
+            .replace('{sender}', order.customer.name)}
         </p>
 
-        <QrActions url={url} />
+        <QrActions
+          url={url}
+          labels={{ print: t.print, copyLink: t.copyLink, copied: t.copied }}
+        />
       </div>
 
       {/* The tag itself — real millimetres, so scale is honest at print time. */}
@@ -72,7 +92,7 @@ export default async function QrCardPage({ params }: Props) {
             className="text-center font-display leading-[1.25] text-ink"
             style={{ fontSize: '4.1mm', maxWidth: '40mm' }}
           >
-            There&rsquo;s a little something extra for you.
+            {tag.tagLine}
           </p>
         </div>
 
