@@ -2,10 +2,15 @@ import Link from 'next/link';
 import { CopyButton } from '@/components/admin/CopyButton';
 import { listOrders, toPublishedCard } from '@/lib/db';
 import { siteOrigin } from '@/lib/site-origin';
-import { occasionLabel } from '@/lib/card/taxonomy';
+import { getI18n } from '@/lib/i18n/server';
+import { localiseTemplate, occasionLabel } from '@/lib/i18n/localise';
+import { plural } from '@/lib/i18n/plural';
 import { resolveTemplate } from '@/templates';
 
-export const metadata = { title: 'Cards' };
+export async function generateMetadata() {
+  const { dict } = await getI18n();
+  return { title: dict.admin.nav.cards };
+}
 
 /**
  * Published cards.
@@ -15,6 +20,9 @@ export const metadata = { title: 'Cards' };
  * up saying the code on their tag does not work.
  */
 export default async function CardsPage() {
+  const { locale, dict } = await getI18n();
+  const t = dict.admin.cards;
+
   const origin = await siteOrigin();
   const orders = await listOrders({ status: 'PUBLISHED' });
   const cards = orders.map((order) => ({ order, card: toPublishedCard(order, origin) }));
@@ -23,17 +31,16 @@ export default async function CardsPage() {
     <>
       <header className="mb-10">
         <h1 className="font-display text-display-sm leading-none tracking-[-0.025em] text-ink">
-          Cards
+          {t.title}
         </h1>
         <p className="mt-3 text-caption text-ink-muted">
-          {cards.length} live card{cards.length === 1 ? '' : 's'}. Each one is private and never
-          indexed.
+          {plural(cards.length, t.count, locale)} {t.neverIndexed}
         </p>
       </header>
 
       {cards.length === 0 ? (
         <p className="rounded-[1rem] border border-line bg-white/50 p-10 text-center text-caption text-ink-muted">
-          Nothing published yet.
+          {t.none}
         </p>
       ) : (
         <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -46,7 +53,7 @@ export default async function CardsPage() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={`/api/qr/${card.code}?size=256`}
-                  alt={`QR code for ${card.code}`}
+                  alt={`${t.qrAlt} ${card.code}`}
                   width={72}
                   height={72}
                   className="h-[72px] w-[72px] shrink-0"
@@ -56,10 +63,10 @@ export default async function CardsPage() {
                     {card.recipientName}
                   </p>
                   <p className="mt-2 text-caption text-ink-muted">
-                    from {card.senderName} · {occasionLabel(card.occasion)}
+                    {t.from} {card.senderName} · {occasionLabel(card.occasion, dict)}
                   </p>
                   <p className="mt-1 text-caption text-ink-faint">
-                    {resolveTemplate(card.templateId).name}
+                    {localiseTemplate(resolveTemplate(card.templateId), dict).name}
                   </p>
                 </div>
               </div>
@@ -74,22 +81,22 @@ export default async function CardsPage() {
                   href={`/c/${card.code}`}
                   className="rounded-[0.5rem] border border-line-strong px-3 py-2 text-center text-caption text-ink transition-colors hover:border-ink hover:bg-ink hover:text-paper"
                 >
-                  Open
+                  {t.open}
                 </Link>
                 <Link
                   href={`/c/${card.code}/qr`}
                   className="rounded-[0.5rem] border border-line-strong px-3 py-2 text-center text-caption text-ink transition-colors hover:border-ink hover:bg-ink hover:text-paper"
                 >
-                  Print
+                  {t.print}
                 </Link>
                 <div className="col-span-2">
-                  <CopyButton value={card.url} label="Copy link" />
+                  <CopyButton value={card.url} label={t.copyLink} copiedLabel={t.copied} />
                 </div>
                 <Link
                   href={`/admin/orders/${order.id}`}
                   className="col-span-2 text-center text-caption text-ink-muted hover:text-ink"
                 >
-                  Open the order
+                  {t.openOrder}
                 </Link>
               </div>
             </li>

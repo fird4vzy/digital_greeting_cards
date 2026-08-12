@@ -1,14 +1,19 @@
 import Link from 'next/link';
 import { listOrders } from '@/lib/db';
 import { getPalette } from '@/lib/design/palettes';
-import { occasionLabel } from '@/lib/card/taxonomy';
+import { getI18n } from '@/lib/i18n/server';
+import { localiseTemplates, occasionLabel } from '@/lib/i18n/localise';
+import { plural } from '@/lib/i18n/plural';
 import { listTemplateSummaries } from '@/templates';
 
 // The dashboard reflects a live queue; prerendering it at build time would
 // show an operator whatever the data looked like when the image was built.
 export const dynamic = 'force-dynamic';
 
-export const metadata = { title: 'Templates' };
+export async function generateMetadata() {
+  const { dict } = await getI18n();
+  return { title: dict.admin.nav.templates };
+}
 
 /**
  * The registry, as the shop sees it.
@@ -18,7 +23,10 @@ export const metadata = { title: 'Templates' };
  * adding a template file makes it appear, with no admin work at all.
  */
 export default async function AdminTemplatesPage() {
-  const templates = listTemplateSummaries();
+  const { locale, dict } = await getI18n();
+  const t = dict.admin.templates;
+
+  const templates = localiseTemplates(listTemplateSummaries(), dict);
   const orders = await listOrders();
 
   const usage = templates.map((template) => ({
@@ -30,11 +38,10 @@ export default async function AdminTemplatesPage() {
     <>
       <header className="mb-10">
         <h1 className="font-display text-display-sm leading-none tracking-[-0.025em] text-ink">
-          Templates
+          {t.title}
         </h1>
         <p className="mt-3 max-w-[60ch] text-caption text-ink-muted">
-          {templates.length} registered. Templates live in the codebase — this list is generated
-          from the registry, so it is never out of date. Adding one is a single file.
+          {plural(templates.length, t.lead, locale)}
         </p>
       </header>
 
@@ -61,25 +68,29 @@ export default async function AdminTemplatesPage() {
               </div>
 
               <dl className="grid grid-cols-1 gap-x-8 gap-y-2 text-caption sm:grid-cols-2">
-                <Row label="ID">
+                <Row label={t.rows.id}>
                   <code className="text-ink">{template.id}</code>
                 </Row>
-                <Row label="Scene">{template.scene === 'none' ? 'No 3D' : template.scene}</Row>
-                <Row label="Suits">{template.occasions.map(occasionLabel).join(', ')}</Row>
-                <Row label="Moods">{template.moods.join(', ')}</Row>
-                <Row label="Motion">{template.animationStyle}</Row>
-                <Row label="Sections">{template.supportedSections.join(', ')}</Row>
+                <Row label={t.rows.scene}>
+                  {template.scene === 'none' ? t.noScene : template.scene}
+                </Row>
+                <Row label={t.rows.suits}>
+                  {template.occasions.map((id) => occasionLabel(id, dict)).join(', ')}
+                </Row>
+                <Row label={t.rows.moods}>{template.moods.join(', ')}</Row>
+                <Row label={t.rows.motion}>{template.animationStyle}</Row>
+                <Row label={t.rows.sections}>{template.supportedSections.join(', ')}</Row>
               </dl>
 
               <div className="flex flex-col items-start gap-3 lg:items-end">
                 <span className="text-caption text-ink-muted tabular-nums">
-                  {count} order{count === 1 ? '' : 's'}
+                  {plural(count, t.usage, locale)}
                 </span>
                 <Link
                   href={`/templates/${template.id}`}
                   className="rounded-full border border-line-strong px-4 py-1.5 text-caption text-ink transition-colors hover:border-ink hover:bg-ink hover:text-paper"
                 >
-                  Preview
+                  {t.preview}
                 </Link>
               </div>
             </li>

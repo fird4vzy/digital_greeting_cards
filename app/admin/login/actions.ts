@@ -8,6 +8,7 @@ import {
   isAdminConfigured,
   verifyAdminPassword,
 } from '@/lib/auth/admin';
+import { getI18n } from '@/lib/i18n/server';
 
 export type LoginState = { error?: string };
 
@@ -18,17 +19,20 @@ export type LoginState = { error?: string };
  * a caller could probe for, and the only signal on success is the redirect.
  */
 export async function signIn(_state: LoginState, formData: FormData): Promise<LoginState> {
+  const { dict } = await getI18n();
+  const t = dict.admin.login;
+
   if (!isAdminConfigured()) {
-    return { error: 'Вход не настроен: не задан ADMIN_PASSWORD.' };
+    return { error: t.errorUnconfigured };
   }
 
   const password = formData.get('password');
   if (typeof password !== 'string' || password.length === 0) {
-    return { error: 'Введите пароль.' };
+    return { error: t.errorEmpty };
   }
 
   if (!verifyAdminPassword(password)) {
-    return { error: 'Неверный пароль.' };
+    return { error: t.errorWrong };
   }
 
   const session = await createAdminSession();

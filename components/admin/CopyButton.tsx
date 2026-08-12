@@ -2,7 +2,20 @@
 
 import { useEffect, useState } from 'react';
 
-export function CopyButton({ value, label = 'Copy URL' }: { value: string; label?: string }) {
+/**
+ * A client component, so its two strings arrive as props: the dictionary is
+ * server-side, and shipping one to the browser to translate a button would be
+ * a poor trade.
+ */
+export function CopyButton({
+  value,
+  label,
+  copiedLabel,
+}: {
+  value: string;
+  label: string;
+  copiedLabel: string;
+}) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -24,7 +37,7 @@ export function CopyButton({ value, label = 'Copy URL' }: { value: string; label
       }}
       className="block w-full rounded-[0.5rem] border border-line-strong px-4 py-2 text-center text-caption text-ink transition-colors hover:border-ink hover:bg-ink hover:text-paper"
     >
-      {copied ? 'Copied' : label}
+      {copied ? copiedLabel : label}
     </button>
   );
 }

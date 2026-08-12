@@ -3,13 +3,24 @@
 import { useActionState } from 'react';
 import { signIn, type LoginState } from './actions';
 
-export function LoginForm() {
+export type LoginLabels = {
+  password: string;
+  submit: string;
+  pending: string;
+};
+
+/**
+ * The error text comes back from the server action already translated — it
+ * knows the locale, and sending three error strings down for the one that
+ * might be shown would be wasteful.
+ */
+export function LoginForm({ labels }: { labels: LoginLabels }) {
   const [state, formAction, pending] = useActionState<LoginState, FormData>(signIn, {});
 
   return (
     <form action={formAction} className="mt-10">
       <label htmlFor="password" className="block text-caption text-ink-muted">
-        Пароль
+        {labels.password}
       </label>
 
       <input
@@ -36,7 +47,7 @@ export function LoginForm() {
         disabled={pending}
         className="mt-6 h-12 w-full rounded-full bg-ink text-caption text-paper transition-opacity duration-300 hover:opacity-90 disabled:opacity-50"
       >
-        {pending ? 'Проверяем…' : 'Войти'}
+        {pending ? labels.pending : labels.submit}
       </button>
     </form>
   );

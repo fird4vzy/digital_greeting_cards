@@ -4,15 +4,26 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils/cn';
 
-const links = [
-  { href: '/admin', label: 'Overview', exact: true },
-  { href: '/admin/orders', label: 'Orders' },
-  { href: '/admin/cards', label: 'Cards' },
-  { href: '/admin/templates', label: 'Templates' },
-];
+/**
+ * A client component — it needs the current path to mark the active tab — so
+ * its labels arrive as a prop rather than from the server-side dictionary.
+ */
+export type AdminNavLabels = {
+  overview: string;
+  orders: string;
+  cards: string;
+  templates: string;
+};
 
-export function AdminNav() {
+export function AdminNav({ labels }: { labels: AdminNavLabels }) {
   const pathname = usePathname();
+
+  const links = [
+    { href: '/admin', label: labels.overview, exact: true },
+    { href: '/admin/orders', label: labels.orders },
+    { href: '/admin/cards', label: labels.cards },
+    { href: '/admin/templates', label: labels.templates },
+  ];
 
   return (
     <nav className="flex items-center gap-1 overflow-x-auto">

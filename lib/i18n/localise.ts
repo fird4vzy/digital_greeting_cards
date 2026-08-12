@@ -1,6 +1,7 @@
 import type { MoodId, OccasionId, RecipientId } from '@/lib/card/taxonomy';
 import { MOODS, OCCASIONS, RECIPIENTS } from '@/lib/card/taxonomy';
 import type { TemplateSummary } from '@/lib/card/template';
+import { STATUS_META, type OrderStatus } from '@/lib/db/types';
 import type { Dictionary, TemplateStrings } from './types';
 
 /**
@@ -78,4 +79,24 @@ export function localiseTemplates(
   dictionary: Dictionary,
 ): LocalisedTemplate[] {
   return templates.map((template) => localiseTemplate(template, dictionary));
+}
+
+export type LocalisedStatus = { label: string; hint: string; tone: string };
+
+/**
+ * An order status, translated.
+ *
+ * `STATUS_META` keeps what is structural — which statuses exist and the colour
+ * each one carries — and the dictionary supplies the words, the same division
+ * the taxonomy and template registry use above.
+ */
+export function localisedStatus(status: OrderStatus, dictionary: Dictionary): LocalisedStatus {
+  const meta = STATUS_META[status];
+  const strings = dictionary.admin.status[status];
+
+  return {
+    label: strings?.label ?? meta.label,
+    hint: strings?.hint ?? meta.hint,
+    tone: meta.tone,
+  };
 }

@@ -1,8 +1,22 @@
-import { STATUS_META, type OrderStatus } from '@/lib/db/types';
+import type { OrderStatus } from '@/lib/db/types';
+import { localisedStatus } from '@/lib/i18n/localise';
+import { getI18n } from '@/lib/i18n/server';
 import { cn } from '@/lib/utils/cn';
 
-export function StatusPill({ status, className }: { status: OrderStatus; className?: string }) {
-  const meta = STATUS_META[status];
+/**
+ * Reads the dictionary itself rather than taking one as a prop: the pill is
+ * dropped into rows and headers all over the admin, and threading a dictionary
+ * through every one of those call sites would be noise.
+ */
+export async function StatusPill({
+  status,
+  className,
+}: {
+  status: OrderStatus;
+  className?: string;
+}) {
+  const { dict } = await getI18n();
+  const meta = localisedStatus(status, dict);
 
   return (
     <span

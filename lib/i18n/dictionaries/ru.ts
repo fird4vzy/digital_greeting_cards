@@ -223,6 +223,164 @@ export const ru: Dictionary = {
     localeSwitcher: { label: 'Язык' },
   },
 
+  admin: {
+    title: 'Кабинет салона',
+
+    nav: {
+      overview: 'Сводка',
+      orders: 'Заказы',
+      cards: 'Открытки',
+      templates: 'Шаблоны',
+      viewSite: 'На сайт',
+      signOut: 'Выйти',
+    },
+
+    login: {
+      lead: 'Очередь заказов и опубликованные открытки.',
+      password: 'Пароль',
+      submit: 'Войти',
+      pending: 'Проверяем…',
+      errorEmpty: 'Введите пароль.',
+      errorWrong: 'Неверный пароль.',
+      errorUnconfigured: 'Вход не настроен: не задан ADMIN_PASSWORD.',
+      unconfigured:
+        'Вход не настроен. Задайте переменную окружения ADMIN_PASSWORD и пересоберите приложение.',
+    },
+
+    status: {
+      NEW: { label: 'Новый', hint: 'Только что пришёл из салона' },
+      PROCESSING: { label: 'В работе', hint: 'Пишется и собирается' },
+      REVIEW: { label: 'На проверке', hint: 'Ждёт, пока человек перечитает' },
+      READY: { label: 'Готов', hint: 'Одобрен, но ещё не опубликован' },
+      PUBLISHED: { label: 'Опубликован', hint: 'Живой и прикреплён к букету' },
+    },
+
+    overview: {
+      title: 'Сегодня',
+      count: {
+        one: '{count} заказ в системе.',
+        few: '{count} заказа в системе.',
+        many: '{count} заказов в системе.',
+        other: '{count} заказа в системе.',
+      },
+      needsPerson: 'Нужен человек',
+      allOrders: 'Все заказы',
+      nothingWaiting: 'Ничего не ждёт. Все заказы разобраны.',
+    },
+
+    orders: {
+      title: 'Заказы',
+      shown: {
+        one: 'показан {count}',
+        few: 'показано {count}',
+        many: 'показано {count}',
+        other: 'показано {count}',
+      },
+      searchPlaceholder: 'Имя, код, салон…',
+      search: 'Найти',
+      all: 'Все',
+      noMatch: 'Ничего не найдено.',
+      from: 'от',
+      columns: {
+        recipient: 'Получатель',
+        for: 'Кто это',
+        occasion: 'Повод',
+        template: 'Шаблон',
+        shop: 'Салон',
+        created: 'Создан',
+        status: 'Статус',
+        code: 'Код',
+      },
+    },
+
+    cards: {
+      title: 'Открытки',
+      count: {
+        one: '{count} живая открытка.',
+        few: '{count} живые открытки.',
+        many: '{count} живых открыток.',
+        other: '{count} живой открытки.',
+      },
+      neverIndexed: 'Каждая приватна и закрыта от поисковиков.',
+      none: 'Пока ничего не опубликовано.',
+      from: 'от',
+      open: 'Открыть',
+      print: 'Печать',
+      copyLink: 'Скопировать ссылку',
+      copied: 'Скопировано',
+      openOrder: 'Открыть заказ',
+      qrAlt: 'QR-код открытки',
+    },
+
+    templates: {
+      title: 'Шаблоны',
+      lead: {
+        one: '{count} шаблон. Шаблоны живут в коде — этот список собран из реестра, поэтому он не может устареть. Добавить новый — это один файл.',
+        few: '{count} шаблона. Шаблоны живут в коде — этот список собран из реестра, поэтому он не может устареть. Добавить новый — это один файл.',
+        many: '{count} шаблонов. Шаблоны живут в коде — этот список собран из реестра, поэтому он не может устареть. Добавить новый — это один файл.',
+        other:
+          '{count} шаблона. Шаблоны живут в коде — этот список собран из реестра, поэтому он не может устареть. Добавить новый — это один файл.',
+      },
+      rows: {
+        id: 'ID',
+        scene: 'Сцена',
+        suits: 'Поводы',
+        moods: 'Настроения',
+        motion: 'Движение',
+        sections: 'Блоки',
+      },
+      noScene: 'Без 3D',
+      usage: {
+        one: '{count} заказ',
+        few: '{count} заказа',
+        many: '{count} заказов',
+        other: '{count} заказа',
+      },
+      preview: 'Посмотреть',
+    },
+
+    order: {
+      back: '← Заказы',
+      from: 'от',
+      sectionOrder: 'Заказ',
+      sectionMessage: 'Что написал заказчик',
+      sectionPhotos: 'Фотографии',
+      sectionDetails: 'Что ещё указали',
+      sectionNotes: 'Заметки салона',
+      fields: {
+        orderId: 'ID заказа',
+        customer: 'Заказчик',
+        recipient: 'Получатель',
+        shop: 'Салон',
+        template: 'Шаблон',
+        created: 'Создан',
+        published: 'Опубликован',
+        card: 'Открытка',
+      },
+      direct: 'Напрямую',
+      notPublished: 'Ещё нет',
+      composed: {
+        one: 'собран {count} блок',
+        few: 'собрано {count} блока',
+        many: 'собрано {count} блоков',
+        other: 'собрано {count} блока',
+      },
+      notComposed: 'Ещё не собрана',
+      noMessage: 'Ничего не написано — шаблон подставит честный запасной текст.',
+      notesPlaceholder: 'Время самовывоза, упаковка, всё, что нужно знать следующему.',
+      saveNotes: 'Сохранить заметки',
+      panelStatus: 'Статус',
+      panelCard: 'Открытка',
+      panelQr: 'QR',
+      generate: 'Собрать открытку',
+      previewCard: 'Посмотреть открытку',
+      previewTemplate: 'Посмотреть шаблон',
+      printable: 'Бирка на печать',
+      copyUrl: 'Скопировать ссылку',
+      qrAlt: 'QR-код открытки',
+    },
+  },
+
   content: {
     coverHeadline: 'тебя кое-что ждёт…',
 

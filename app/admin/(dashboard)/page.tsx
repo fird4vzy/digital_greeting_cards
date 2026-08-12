@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { StatusPill } from '@/components/admin/StatusPill';
 import { listOrders } from '@/lib/db';
-import { ORDER_STATUSES, STATUS_META, type OrderStatus } from '@/lib/db/types';
-import { occasionLabel } from '@/lib/card/taxonomy';
+import { ORDER_STATUSES, type OrderStatus } from '@/lib/db/types';
+import { getI18n } from '@/lib/i18n/server';
+import { localiseTemplate, localisedStatus, occasionLabel } from '@/lib/i18n/localise';
+import { plural } from '@/lib/i18n/plural';
 import { resolveTemplate } from '@/templates';
 
 // The dashboard reflects a live queue; prerendering it at build time would
@@ -10,6 +12,8 @@ import { resolveTemplate } from '@/templates';
 export const dynamic = 'force-dynamic';
 
 export default async function AdminOverview() {
+  const { locale, dict } = await getI18n();
+  const t = dict.admin.overview;
   const orders = await listOrders();
 
   const counts = ORDER_STATUSES.reduce(
@@ -25,50 +29,52 @@ export default async function AdminOverview() {
     <>
       <header className="mb-10">
         <h1 className="font-display text-display-sm leading-none tracking-[-0.025em] text-ink">
-          Today
+          {t.title}
         </h1>
         <p className="mt-3 text-caption text-ink-muted">
-          {orders.length} order{orders.length === 1 ? '' : 's'} in the system.
+          {plural(orders.length, t.count, locale)}
         </p>
       </header>
 
       {/* The queue, as a single row of counts. */}
       <div className="grid grid-cols-2 gap-px overflow-hidden rounded-[1rem] border border-line bg-line sm:grid-cols-5">
-        {ORDER_STATUSES.map((status) => (
-          <Link
-            key={status}
-            href={`/admin/orders?status=${status}`}
-            className="group bg-paper p-5 transition-colors duration-300 hover:bg-white"
-          >
-            <span className="flex items-center gap-2">
-              <span
-                aria-hidden="true"
-                className="block h-1.5 w-1.5 rounded-full"
-                style={{ background: STATUS_META[status].tone }}
-              />
-              <span className="eyebrow text-ink-muted">{STATUS_META[status].label}</span>
-            </span>
-            <p className="mt-4 font-display text-[2.5rem] leading-none tabular-nums text-ink">
-              {counts[status]}
-            </p>
-            <p className="mt-2 text-[0.75rem] leading-snug text-ink-faint">
-              {STATUS_META[status].hint}
-            </p>
-          </Link>
-        ))}
+        {ORDER_STATUSES.map((status) => {
+          const meta = localisedStatus(status, dict);
+
+          return (
+            <Link
+              key={status}
+              href={`/admin/orders?status=${status}`}
+              className="group bg-paper p-5 transition-colors duration-300 hover:bg-white"
+            >
+              <span className="flex items-center gap-2">
+                <span
+                  aria-hidden="true"
+                  className="block h-1.5 w-1.5 rounded-full"
+                  style={{ background: meta.tone }}
+                />
+                <span className="eyebrow text-ink-muted">{meta.label}</span>
+              </span>
+              <p className="mt-4 font-display text-[2.5rem] leading-none tabular-nums text-ink">
+                {counts[status]}
+              </p>
+              <p className="mt-2 text-[0.75rem] leading-snug text-ink-faint">{meta.hint}</p>
+            </Link>
+          );
+        })}
       </div>
 
       <section className="mt-14">
         <div className="flex items-baseline justify-between">
-          <h2 className="font-display text-title leading-none text-ink">Needs a person</h2>
+          <h2 className="font-display text-title leading-none text-ink">{t.needsPerson}</h2>
           <Link href="/admin/orders" className="text-caption text-ink-muted hover:text-ink">
-            All orders
+            {t.allOrders}
           </Link>
         </div>
 
         {needsAttention.length === 0 ? (
           <p className="mt-6 rounded-[1rem] border border-line bg-white/50 p-8 text-center text-caption text-ink-muted">
-            Nothing waiting. Every order has been picked up.
+            {t.nothingWaiting}
           </p>
         ) : (
           <ul className="mt-6 divide-y divide-line border-y border-line">
@@ -82,10 +88,11 @@ export default async function AdminOverview() {
                     {order.recipient.name}
                   </span>
                   <span className="text-caption text-ink-muted">
-                    {occasionLabel(order.occasion)} · {resolveTemplate(order.templateId).name}
+                    {occasionLabel(order.occasion, dict)} ·{' '}
+                    {localiseTemplate(resolveTemplate(order.templateId), dict).name}
                   </span>
                   <span className="text-caption text-ink-faint">
-                    {order.customer.shop ?? 'Direct'}
+                    {order.customer.shop ?? dict.admin.order.direct}
                   </span>
                   <StatusPill status={order.status} className="ml-auto" />
                   <span className="eyebrow w-16 text-right text-ink-faint tabular-nums">

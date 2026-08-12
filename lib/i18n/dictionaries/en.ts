@@ -217,6 +217,137 @@ export const en: Dictionary = {
     localeSwitcher: { label: 'Language' },
   },
 
+  admin: {
+    title: 'Shop dashboard',
+
+    nav: {
+      overview: 'Overview',
+      orders: 'Orders',
+      cards: 'Cards',
+      templates: 'Templates',
+      viewSite: 'View site',
+      signOut: 'Sign out',
+    },
+
+    login: {
+      lead: 'The order queue and the cards already live.',
+      password: 'Password',
+      submit: 'Sign in',
+      pending: 'Checking…',
+      errorEmpty: 'Enter the password.',
+      errorWrong: 'Wrong password.',
+      errorUnconfigured: 'Sign-in is not configured: ADMIN_PASSWORD is unset.',
+      unconfigured:
+        'Sign-in is not configured. Set the ADMIN_PASSWORD environment variable and redeploy.',
+    },
+
+    status: {
+      NEW: { label: 'New', hint: 'Just arrived from the shop' },
+      PROCESSING: { label: 'Processing', hint: 'Being written and composed' },
+      REVIEW: { label: 'Review', hint: 'Waiting on a human read-through' },
+      READY: { label: 'Ready', hint: 'Approved, not yet live' },
+      PUBLISHED: { label: 'Published', hint: 'Live and attached to a bouquet' },
+    },
+
+    overview: {
+      title: 'Today',
+      count: { one: '{count} order in the system.', other: '{count} orders in the system.' },
+      needsPerson: 'Needs a person',
+      allOrders: 'All orders',
+      nothingWaiting: 'Nothing waiting. Every order has been picked up.',
+    },
+
+    orders: {
+      title: 'Orders',
+      shown: { one: '{count} shown', other: '{count} shown' },
+      searchPlaceholder: 'Name, code, shop…',
+      search: 'Search',
+      all: 'All',
+      noMatch: 'No orders match that.',
+      from: 'from',
+      columns: {
+        recipient: 'Recipient',
+        for: 'For',
+        occasion: 'Occasion',
+        template: 'Template',
+        shop: 'Shop',
+        created: 'Created',
+        status: 'Status',
+        code: 'Code',
+      },
+    },
+
+    cards: {
+      title: 'Cards',
+      count: { one: '{count} live card.', other: '{count} live cards.' },
+      neverIndexed: 'Each one is private and never indexed.',
+      none: 'Nothing published yet.',
+      from: 'from',
+      open: 'Open',
+      print: 'Print',
+      copyLink: 'Copy link',
+      copied: 'Copied',
+      openOrder: 'Open the order',
+      qrAlt: 'QR code for the card',
+    },
+
+    templates: {
+      title: 'Templates',
+      lead: {
+        one: '{count} registered. Templates live in the codebase — this list is generated from the registry, so it is never out of date. Adding one is a single file.',
+        other:
+          '{count} registered. Templates live in the codebase — this list is generated from the registry, so it is never out of date. Adding one is a single file.',
+      },
+      rows: {
+        id: 'ID',
+        scene: 'Scene',
+        suits: 'Suits',
+        moods: 'Moods',
+        motion: 'Motion',
+        sections: 'Sections',
+      },
+      noScene: 'No 3D',
+      usage: { one: '{count} order', other: '{count} orders' },
+      preview: 'Preview',
+    },
+
+    order: {
+      back: '← Orders',
+      from: 'from',
+      sectionOrder: 'The order',
+      sectionMessage: 'What the customer wrote',
+      sectionPhotos: 'Photographs',
+      sectionDetails: 'Details supplied',
+      sectionNotes: 'Shop notes',
+      fields: {
+        orderId: 'Order ID',
+        customer: 'Customer',
+        recipient: 'Recipient',
+        shop: 'Shop',
+        template: 'Template',
+        created: 'Created',
+        published: 'Published',
+        card: 'Card',
+      },
+      direct: 'Direct',
+      notPublished: 'Not yet',
+      composed: { one: '{count} section composed', other: '{count} sections composed' },
+      notComposed: 'Not composed yet',
+      noMessage: 'Nothing written — the template will supply an honest fallback letter.',
+      notesPlaceholder: 'Pickup time, packaging, anything the next person needs to know.',
+      saveNotes: 'Save notes',
+      panelStatus: 'Status',
+      panelCard: 'Card',
+      panelQr: 'QR',
+      generate: 'Generate card',
+      previewCard: 'Preview the card',
+      previewTemplate: 'Preview the template',
+      printable: 'Printable card',
+      copyUrl: 'Copy URL',
+      qrAlt: 'QR code for the card',
+    },
+  },
+
   content: {
     coverHeadline: 'there’s something waiting for you…',
 

@@ -96,6 +96,8 @@ lib/
   card/       schema, template types, composition, copy bank, demo stories
   design/     tokens, palettes, motion principles
   db/         repository interface, file store, PostgreSQL adapter, schema.sql
+  i18n/       ru/uz/en dictionaries, negotiation, plural rules
+  auth/       the admin password and session
   ai/         the plan contract, prompt, planners
   hooks/  utils/
 
@@ -190,6 +192,33 @@ with the template library.
 A "card" is not a second table — it is a published order, addressed by its
 short code. `lib/db/types.ts` explains where to split that seam if cards ever
 need their own lifecycle.
+
+---
+
+## Languages
+
+Russian, Uzbek (Latin) and English, as typed dictionaries in `lib/i18n/`. A
+missing string is a compile error rather than an English word surfacing in the
+middle of a Russian page.
+
+Two locales exist and are deliberately separate:
+
+- **The visitor's**, negotiated in `proxy.ts` from a cookie, then
+  `Accept-Language`. It drives the marketing site, the creation flow *and the
+  shop dashboard* — a florist in Tashkent runs the queue in Uzbek.
+- **The card's**, stored on the card itself. A card written in Russian stays
+  Russian on a recipient's English phone, and in an operator's Uzbek admin.
+  This is why `/c/…` is excluded from negotiation entirely.
+
+Counts go through `plural()`, not string concatenation: Russian needs three
+forms of the same noun (1 заказ, 2 заказа, 5 заказов) and picks between them on
+the last digit, so `n === 1 ? '' : 's'` cannot be translated, only replaced.
+`Intl.PluralRules` supplies the rule and the dictionary the wording.
+
+Only human-readable strings live in dictionaries. Structure — which occasions
+exist, which sections a template plays, which statuses an order can hold — stays
+on the definitions, with English on it as a fallback, and translations are
+overlaid at render time by `lib/i18n/localise.ts`.
 
 ---
 

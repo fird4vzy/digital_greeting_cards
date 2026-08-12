@@ -221,6 +221,138 @@ export const uz: Dictionary = {
     localeSwitcher: { label: 'Til' },
   },
 
+  admin: {
+    title: 'Salon kabineti',
+
+    nav: {
+      overview: 'Umumiy',
+      orders: 'Buyurtmalar',
+      cards: 'Otkritkalar',
+      templates: 'Shablonlar',
+      viewSite: 'Saytga',
+      signOut: 'Chiqish',
+    },
+
+    login: {
+      lead: "Buyurtmalar navbati va e'lon qilingan otkritkalar.",
+      password: 'Parol',
+      submit: 'Kirish',
+      pending: 'Tekshirilmoqda…',
+      errorEmpty: 'Parolni kiriting.',
+      errorWrong: "Parol noto'g'ri.",
+      errorUnconfigured: "Kirish sozlanmagan: ADMIN_PASSWORD belgilanmagan.",
+      unconfigured:
+        "Kirish sozlanmagan. ADMIN_PASSWORD muhit o'zgaruvchisini belgilang va qayta yig'ing.",
+    },
+
+    status: {
+      NEW: { label: 'Yangi', hint: 'Salondan endi keldi' },
+      PROCESSING: { label: 'Ishlanmoqda', hint: 'Yozilyapti va yig‘ilyapti' },
+      REVIEW: { label: 'Tekshiruvda', hint: 'Odam qayta o‘qishini kutyapti' },
+      READY: { label: 'Tayyor', hint: "Tasdiqlangan, hali e'lon qilinmagan" },
+      PUBLISHED: { label: "E'lon qilingan", hint: 'Ishlayapti va guldastaga biriktirilgan' },
+    },
+
+    overview: {
+      title: 'Bugun',
+      // Uzbek does not inflect the noun after a numeral, so one form serves.
+      count: { other: 'Tizimda {count} ta buyurtma.' },
+      needsPerson: 'Odam kerak',
+      allOrders: 'Barcha buyurtmalar',
+      nothingWaiting: 'Kutayotgani yo‘q. Hamma buyurtma olingan.',
+    },
+
+    orders: {
+      title: 'Buyurtmalar',
+      shown: { other: '{count} ta ko‘rsatilyapti' },
+      searchPlaceholder: 'Ism, kod, salon…',
+      search: 'Qidirish',
+      all: 'Hammasi',
+      noMatch: 'Hech narsa topilmadi.',
+      from: 'kimdan:',
+      columns: {
+        recipient: 'Kimga',
+        for: 'Kim bo‘ladi',
+        occasion: 'Sabab',
+        template: 'Shablon',
+        shop: 'Salon',
+        created: 'Yaratilgan',
+        status: 'Holat',
+        code: 'Kod',
+      },
+    },
+
+    cards: {
+      title: 'Otkritkalar',
+      count: { other: '{count} ta ishlayotgan otkritka.' },
+      neverIndexed: 'Har biri shaxsiy va qidiruvga chiqmaydi.',
+      none: "Hali hech narsa e'lon qilinmagan.",
+      from: 'kimdan:',
+      open: 'Ochish',
+      print: 'Chop etish',
+      copyLink: 'Havolani nusxalash',
+      copied: 'Nusxalandi',
+      openOrder: 'Buyurtmani ochish',
+      qrAlt: 'Otkritkaning QR kodi',
+    },
+
+    templates: {
+      title: 'Shablonlar',
+      lead: {
+        other:
+          "{count} ta shablon. Shablonlar kod ichida yashaydi — bu ro'yxat reyestrdan yig'iladi, shuning uchun hech qachon eskirmaydi. Yangisini qo'shish — bitta fayl.",
+      },
+      rows: {
+        id: 'ID',
+        scene: 'Sahna',
+        suits: 'Sabablar',
+        moods: 'Kayfiyatlar',
+        motion: 'Harakat',
+        sections: 'Bloklar',
+      },
+      noScene: '3D yo‘q',
+      usage: { other: '{count} ta buyurtma' },
+      preview: 'Ko‘rish',
+    },
+
+    order: {
+      back: '← Buyurtmalar',
+      from: 'kimdan:',
+      sectionOrder: 'Buyurtma',
+      sectionMessage: 'Buyurtmachi nima yozgan',
+      sectionPhotos: 'Suratlar',
+      sectionDetails: 'Yana nima ko‘rsatilgan',
+      sectionNotes: 'Salon eslatmalari',
+      fields: {
+        orderId: 'Buyurtma ID',
+        customer: 'Buyurtmachi',
+        recipient: 'Kimga',
+        shop: 'Salon',
+        template: 'Shablon',
+        created: 'Yaratilgan',
+        published: "E'lon qilingan",
+        card: 'Otkritka',
+      },
+      direct: 'To‘g‘ridan-to‘g‘ri',
+      notPublished: 'Hali yo‘q',
+      composed: { other: '{count} ta blok yig‘ilgan' },
+      notComposed: 'Hali yig‘ilmagan',
+      noMessage: 'Hech narsa yozilmagan — shablon halol zaxira matnni qo‘yadi.',
+      notesPlaceholder:
+        'Olib ketish vaqti, qadoq, keyingi odam bilishi kerak bo‘lgan hamma narsa.',
+      saveNotes: 'Eslatmalarni saqlash',
+      panelStatus: 'Holat',
+      panelCard: 'Otkritka',
+      panelQr: 'QR',
+      generate: 'Otkritkani yig‘ish',
+      previewCard: 'Otkritkani ko‘rish',
+      previewTemplate: 'Shablonni ko‘rish',
+      printable: 'Chop etish uchun yorliq',
+      copyUrl: 'Havolani nusxalash',
+      qrAlt: 'Otkritkaning QR kodi',
+    },
+  },
+
   content: {
     coverHeadline: 'seni bir narsa kutyapti…',
 

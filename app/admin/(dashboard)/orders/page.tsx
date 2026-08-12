@@ -1,16 +1,29 @@
 import Link from 'next/link';
 import { StatusPill } from '@/components/admin/StatusPill';
 import { listOrders } from '@/lib/db';
-import { ORDER_STATUSES, STATUS_META, type OrderStatus } from '@/lib/db/types';
-import { occasionLabel, recipientLabel } from '@/lib/card/taxonomy';
+import { ORDER_STATUSES, type OrderStatus } from '@/lib/db/types';
+import { getI18n } from '@/lib/i18n/server';
+import {
+  localiseTemplate,
+  localisedStatus,
+  occasionLabel,
+  recipientLabel,
+} from '@/lib/i18n/localise';
+import { plural } from '@/lib/i18n/plural';
 import { resolveTemplate } from '@/templates';
 import { cn } from '@/lib/utils/cn';
 
-export const metadata = { title: 'Orders' };
+export async function generateMetadata() {
+  const { dict } = await getI18n();
+  return { title: dict.admin.nav.orders };
+}
 
 type Props = { searchParams: Promise<{ status?: string; q?: string }> };
 
 export default async function OrdersPage({ searchParams }: Props) {
+  const { locale, dict } = await getI18n();
+  const t = dict.admin.orders;
+
   const { status, q } = await searchParams;
   const active = ORDER_STATUSES.includes(status as OrderStatus) ? (status as OrderStatus) : undefined;
 
@@ -21,10 +34,11 @@ export default async function OrdersPage({ searchParams }: Props) {
       <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-display-sm leading-none tracking-[-0.025em] text-ink">
-            Orders
+            {t.title}
           </h1>
           <p className="mt-3 text-caption text-ink-muted">
-            {orders.length} shown{active ? ` · ${STATUS_META[active].label}` : ''}
+            {plural(orders.length, t.shown, locale)}
+            {active ? ` · ${localisedStatus(active, dict).label}` : ''}
           </p>
         </div>
 
@@ -34,21 +48,21 @@ export default async function OrdersPage({ searchParams }: Props) {
           <input
             name="q"
             defaultValue={q ?? ''}
-            placeholder="Name, code, shop…"
+            placeholder={t.searchPlaceholder}
             className="h-9 w-56 rounded-full border border-line-strong bg-white/60 px-4 text-caption text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-ink"
           />
           <button
             type="submit"
             className="h-9 rounded-full border border-line-strong px-4 text-caption text-ink-soft transition-colors hover:border-ink hover:text-ink"
           >
-            Search
+            {t.search}
           </button>
         </form>
       </header>
 
       <div className="flex flex-wrap gap-2">
         <FilterLink href="/admin/orders" active={!active}>
-          All
+          {t.all}
         </FilterLink>
         {ORDER_STATUSES.map((value) => (
           <FilterLink
@@ -56,27 +70,34 @@ export default async function OrdersPage({ searchParams }: Props) {
             href={`/admin/orders?status=${value}`}
             active={active === value}
           >
-            {STATUS_META[value].label}
+            {localisedStatus(value, dict).label}
           </FilterLink>
         ))}
       </div>
 
       {orders.length === 0 ? (
         <p className="mt-10 rounded-[1rem] border border-line bg-white/50 p-10 text-center text-caption text-ink-muted">
-          No orders match that.
+          {t.noMatch}
         </p>
       ) : (
         <div className="mt-8 overflow-x-auto">
           <table className="w-full min-w-[54rem] border-collapse text-left">
             <thead>
               <tr className="border-b border-line-strong">
-                {['Recipient', 'For', 'Occasion', 'Template', 'Shop', 'Created', 'Status', 'Code'].map(
-                  (heading) => (
-                    <th key={heading} className="eyebrow pb-3 pr-4 font-medium text-ink-faint">
-                      {heading}
-                    </th>
-                  ),
-                )}
+                {[
+                  t.columns.recipient,
+                  t.columns.for,
+                  t.columns.occasion,
+                  t.columns.template,
+                  t.columns.shop,
+                  t.columns.created,
+                  t.columns.status,
+                  t.columns.code,
+                ].map((heading) => (
+                  <th key={heading} className="eyebrow pb-3 pr-4 font-medium text-ink-faint">
+                    {heading}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -93,23 +114,23 @@ export default async function OrdersPage({ searchParams }: Props) {
                       {order.recipient.name}
                     </Link>
                     <span className="mt-1 block text-[0.75rem] text-ink-faint">
-                      from {order.customer.name}
+                      {t.from} {order.customer.name}
                     </span>
                   </td>
                   <td className="py-4 pr-4 text-caption text-ink-soft">
-                    {recipientLabel(order.recipient.relationship)}
+                    {recipientLabel(order.recipient.relationship, dict)}
                   </td>
                   <td className="py-4 pr-4 text-caption text-ink-soft">
-                    {occasionLabel(order.occasion)}
+                    {occasionLabel(order.occasion, dict)}
                   </td>
                   <td className="py-4 pr-4 text-caption text-ink-soft">
-                    {resolveTemplate(order.templateId).name}
+                    {localiseTemplate(resolveTemplate(order.templateId), dict).name}
                   </td>
                   <td className="py-4 pr-4 text-caption text-ink-muted">
                     {order.customer.shop ?? '—'}
                   </td>
                   <td className="py-4 pr-4 text-caption text-ink-muted tabular-nums">
-                    {new Date(order.createdAt).toLocaleDateString('en-GB', {
+                    {new Date(order.createdAt).toLocaleDateString(locale, {
                       day: '2-digit',
                       month: 'short',
                     })}

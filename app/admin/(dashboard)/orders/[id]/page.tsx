@@ -4,8 +4,17 @@ import { regenerateCard, saveOrderNotes, setOrderStatus } from '../../../actions
 import { StatusPill } from '@/components/admin/StatusPill';
 import { CopyButton } from '@/components/admin/CopyButton';
 import { getOrder } from '@/lib/db';
-import { ORDER_STATUSES, STATUS_META } from '@/lib/db/types';
-import { moodLabel, occasionLabel, recipientLabel } from '@/lib/card/taxonomy';
+import { ORDER_STATUSES } from '@/lib/db/types';
+import { getI18n } from '@/lib/i18n/server';
+import {
+  localiseTemplate,
+  localiseTemplates,
+  localisedStatus,
+  moodLabel,
+  occasionLabel,
+  recipientLabel,
+} from '@/lib/i18n/localise';
+import { plural } from '@/lib/i18n/plural';
 import { cardUrl } from '@/lib/qr';
 import { siteOrigin } from '@/lib/site-origin';
 import { listTemplates, resolveTemplate } from '@/templates';
@@ -14,18 +23,24 @@ import { paragraphs } from '@/lib/card/schema';
 type Props = { params: Promise<{ id: string }> };
 
 export default async function OrderDetail({ params }: Props) {
+  const { locale, dict } = await getI18n();
+  const t = dict.admin.order;
+
   const { id } = await params;
   const order = await getOrder(id);
   if (!order) notFound();
 
   const origin = await siteOrigin();
   const url = cardUrl(origin, order.code);
-  const template = resolveTemplate(order.templateId);
+  const template = localiseTemplate(resolveTemplate(order.templateId), dict);
+
+  const dateTime = (value: string) =>
+    new Date(value).toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' });
 
   return (
     <>
       <Link href="/admin/orders" className="text-caption text-ink-muted hover:text-ink">
-        ← Orders
+        {t.back}
       </Link>
 
       <header className="mt-6 flex flex-wrap items-end justify-between gap-5 border-b border-line pb-8">
@@ -34,7 +49,8 @@ export default async function OrderDetail({ params }: Props) {
             {order.recipient.name}
           </h1>
           <p className="mt-3 text-caption text-ink-muted">
-            {occasionLabel(order.occasion)} · {moodLabel(order.mood)} · from {order.customer.name}
+            {occasionLabel(order.occasion, dict)} · {moodLabel(order.mood, dict)} · {t.from}{' '}
+            {order.customer.name}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -46,44 +62,34 @@ export default async function OrderDetail({ params }: Props) {
       <div className="mt-10 grid gap-12 lg:grid-cols-[1fr_20rem] lg:items-start">
         <div className="space-y-12">
           <section>
-            <h2 className="eyebrow mb-5 text-ink-muted">The order</h2>
+            <h2 className="eyebrow mb-5 text-ink-muted">{t.sectionOrder}</h2>
             <dl className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
-              <Detail label="Order ID">{order.id}</Detail>
-              <Detail label="Customer">
+              <Detail label={t.fields.orderId}>{order.id}</Detail>
+              <Detail label={t.fields.customer}>
                 {order.customer.name}
                 {order.customer.email ? (
                   <span className="block text-ink-muted">{order.customer.email}</span>
                 ) : null}
               </Detail>
-              <Detail label="Recipient">
-                {order.recipient.name} · {recipientLabel(order.recipient.relationship)}
+              <Detail label={t.fields.recipient}>
+                {order.recipient.name} · {recipientLabel(order.recipient.relationship, dict)}
               </Detail>
-              <Detail label="Shop">{order.customer.shop ?? 'Direct'}</Detail>
-              <Detail label="Template">{template.name}</Detail>
-              <Detail label="Created">
-                {new Date(order.createdAt).toLocaleString('en-GB', {
-                  dateStyle: 'medium',
-                  timeStyle: 'short',
-                })}
+              <Detail label={t.fields.shop}>{order.customer.shop ?? t.direct}</Detail>
+              <Detail label={t.fields.template}>{template.name}</Detail>
+              <Detail label={t.fields.created}>{dateTime(order.createdAt)}</Detail>
+              <Detail label={t.fields.published}>
+                {order.publishedAt ? dateTime(order.publishedAt) : t.notPublished}
               </Detail>
-              <Detail label="Published">
-                {order.publishedAt
-                  ? new Date(order.publishedAt).toLocaleString('en-GB', {
-                      dateStyle: 'medium',
-                      timeStyle: 'short',
-                    })
-                  : 'Not yet'}
-              </Detail>
-              <Detail label="Card">
+              <Detail label={t.fields.card}>
                 {order.config
-                  ? `${order.config.sections.length} sections composed`
-                  : 'Not composed yet'}
+                  ? plural(order.config.sections.length, t.composed, locale)
+                  : t.notComposed}
               </Detail>
             </dl>
           </section>
 
           <section>
-            <h2 className="eyebrow mb-5 text-ink-muted">What the customer wrote</h2>
+            <h2 className="eyebrow mb-5 text-ink-muted">{t.sectionMessage}</h2>
             <div className="space-y-4 rounded-[1rem] border border-line bg-white/60 p-6">
               {paragraphs(order.message).length > 0 ? (
                 paragraphs(order.message).map((block, index) => (
@@ -92,9 +98,7 @@ export default async function OrderDetail({ params }: Props) {
                   </p>
                 ))
               ) : (
-                <p className="text-caption italic text-ink-faint">
-                  Nothing written — the template will supply an honest fallback letter.
-                </p>
+                <p className="text-caption italic text-ink-faint">{t.noMessage}</p>
               )}
             </div>
           </section>
@@ -102,7 +106,7 @@ export default async function OrderDetail({ params }: Props) {
           {order.photos.length > 0 ? (
             <section>
               <h2 className="eyebrow mb-5 text-ink-muted">
-                Photographs ({order.photos.length})
+                {t.sectionPhotos} ({order.photos.length})
               </h2>
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
                 {order.photos.map((photo) => (
@@ -121,7 +125,7 @@ export default async function OrderDetail({ params }: Props) {
 
           {(order.moments.length > 0 || order.memories.length > 0) && (
             <section>
-              <h2 className="eyebrow mb-5 text-ink-muted">Details supplied</h2>
+              <h2 className="eyebrow mb-5 text-ink-muted">{t.sectionDetails}</h2>
               <ul className="divide-y divide-line border-y border-line">
                 {order.moments.map((moment, index) => (
                   <li key={`moment-${index}`} className="flex gap-5 py-3.5">
@@ -143,21 +147,21 @@ export default async function OrderDetail({ params }: Props) {
           )}
 
           <section>
-            <h2 className="eyebrow mb-5 text-ink-muted">Shop notes</h2>
+            <h2 className="eyebrow mb-5 text-ink-muted">{t.sectionNotes}</h2>
             <form action={saveNotes} className="rounded-[1rem] border border-line bg-white/60 p-5">
               <input type="hidden" name="id" value={order.id} />
               <textarea
                 name="notes"
                 rows={3}
                 defaultValue={order.notes ?? ''}
-                placeholder="Pickup time, packaging, anything the next person needs to know."
+                placeholder={t.notesPlaceholder}
                 className="w-full resize-none bg-transparent text-body text-ink outline-none placeholder:text-ink-faint"
               />
               <button
                 type="submit"
                 className="mt-3 rounded-full border border-line-strong px-4 py-1.5 text-caption text-ink-soft transition-colors hover:border-ink hover:text-ink"
               >
-                Save notes
+                {t.saveNotes}
               </button>
             </form>
           </section>
@@ -165,7 +169,7 @@ export default async function OrderDetail({ params }: Props) {
 
         {/* Actions rail */}
         <aside className="space-y-6 lg:sticky lg:top-24">
-          <Panel title="Status">
+          <Panel title={t.panelStatus}>
             <div className="flex flex-wrap gap-2">
               {ORDER_STATUSES.map((status) => (
                 <form key={status} action={changeStatus}>
@@ -176,14 +180,14 @@ export default async function OrderDetail({ params }: Props) {
                     disabled={order.status === status}
                     className="rounded-full border border-line-strong px-3.5 py-1.5 text-caption text-ink-soft transition-colors hover:border-ink hover:text-ink disabled:border-ink disabled:bg-ink disabled:text-paper"
                   >
-                    {STATUS_META[status].label}
+                    {localisedStatus(status, dict).label}
                   </button>
                 </form>
               ))}
             </div>
           </Panel>
 
-          <Panel title="Card">
+          <Panel title={t.panelCard}>
             <div className="space-y-2.5">
               <form action={regenerate}>
                 <input type="hidden" name="id" value={order.id} />
@@ -192,37 +196,35 @@ export default async function OrderDetail({ params }: Props) {
                   defaultValue={order.templateId}
                   className="mb-2.5 h-9 w-full rounded-[0.5rem] border border-line-strong bg-white px-3 text-caption text-ink outline-none focus:border-ink"
                 >
-                  {listTemplates().map((option) => (
+                  {localiseTemplates(listTemplates(), dict).map((option) => (
                     <option key={option.id} value={option.id}>
                       {option.name}
                     </option>
                   ))}
                 </select>
-                <ActionButton type="submit">Generate card</ActionButton>
+                <ActionButton type="submit">{t.generate}</ActionButton>
               </form>
 
               <ActionLink href={`/c/${order.code}`} disabled={order.status !== 'PUBLISHED'}>
-                Preview the card
+                {t.previewCard}
               </ActionLink>
-              <ActionLink href={`/templates/${order.templateId}`}>
-                Preview the template
-              </ActionLink>
+              <ActionLink href={`/templates/${order.templateId}`}>{t.previewTemplate}</ActionLink>
             </div>
           </Panel>
 
-          <Panel title="QR">
+          <Panel title={t.panelQr}>
             <div className="flex items-center gap-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={`/api/qr/${order.code}?size=256`}
-                alt={`QR code for card ${order.code}`}
+                alt={`${t.qrAlt} ${order.code}`}
                 width={80}
                 height={80}
                 className="h-20 w-20 shrink-0"
               />
               <div className="min-w-0 flex-1 space-y-2">
-                <ActionLink href={`/c/${order.code}/qr`}>Printable card</ActionLink>
-                <CopyButton value={url} />
+                <ActionLink href={`/c/${order.code}/qr`}>{t.printable}</ActionLink>
+                <CopyButton value={url} label={t.copyUrl} copiedLabel={dict.admin.cards.copied} />
               </div>
             </div>
             <p className="mt-4 break-all text-[0.7rem] leading-relaxed text-ink-faint">{url}</p>

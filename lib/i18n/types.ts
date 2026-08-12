@@ -15,6 +15,22 @@ import type { MoodId, OccasionId, RecipientId } from '@/lib/card/taxonomy';
  *             English.
  */
 
+/**
+ * A count-dependent string, in CLDR plural categories.
+ *
+ * Russian needs three forms for a plain noun — 1 заказ, 2 заказа, 5 заказов —
+ * so `${n} order${n === 1 ? '' : 's'}` cannot be translated, only replaced.
+ * `plural()` in `./plural.ts` picks the form with `Intl.PluralRules`; a locale
+ * that does not use a category simply omits it, which is why only `other` is
+ * required. Uzbek uses `other` alone.
+ */
+export type PluralForms = {
+  one?: string;
+  few?: string;
+  many?: string;
+  other: string;
+};
+
 export type OccasionCopyStrings = {
   intro: string;
   quote: string;
@@ -185,6 +201,132 @@ export type Dictionary = {
     notFound: { title: string; lead: string; hint: string; back: string; makeOwn: string };
     card: { madeWith: string };
     localeSwitcher: { label: string };
+  };
+
+  /**
+   * The shop dashboard.
+   *
+   * Follows the operator's chosen locale like the rest of `ui` — it is the
+   * language the florist works in, and has nothing to do with the language a
+   * card is written in. A Tashkent shop can run the queue in Uzbek all day and
+   * still publish Russian cards.
+   */
+  admin: {
+    /** The dashboard's own name — heading on the login page, browser tab. */
+    title: string;
+    nav: {
+      overview: string;
+      orders: string;
+      cards: string;
+      templates: string;
+      viewSite: string;
+      signOut: string;
+    };
+    login: {
+      lead: string;
+      password: string;
+      submit: string;
+      pending: string;
+      errorEmpty: string;
+      errorWrong: string;
+      errorUnconfigured: string;
+      /** Shown in place of the form when no password is configured at all. */
+      unconfigured: string;
+    };
+    /** Overlaid onto STATUS_META, which keeps the structure and the colour. */
+    status: Record<'NEW' | 'PROCESSING' | 'REVIEW' | 'READY' | 'PUBLISHED', {
+      label: string;
+      hint: string;
+    }>;
+    overview: {
+      title: string;
+      count: PluralForms;
+      needsPerson: string;
+      allOrders: string;
+      nothingWaiting: string;
+    };
+    orders: {
+      title: string;
+      shown: PluralForms;
+      searchPlaceholder: string;
+      search: string;
+      all: string;
+      noMatch: string;
+      from: string;
+      columns: {
+        recipient: string;
+        for: string;
+        occasion: string;
+        template: string;
+        shop: string;
+        created: string;
+        status: string;
+        code: string;
+      };
+    };
+    cards: {
+      title: string;
+      count: PluralForms;
+      neverIndexed: string;
+      none: string;
+      from: string;
+      open: string;
+      print: string;
+      copyLink: string;
+      copied: string;
+      openOrder: string;
+      qrAlt: string;
+    };
+    templates: {
+      title: string;
+      lead: PluralForms;
+      rows: {
+        id: string;
+        scene: string;
+        suits: string;
+        moods: string;
+        motion: string;
+        sections: string;
+      };
+      noScene: string;
+      usage: PluralForms;
+      preview: string;
+    };
+    order: {
+      back: string;
+      from: string;
+      sectionOrder: string;
+      sectionMessage: string;
+      sectionPhotos: string;
+      sectionDetails: string;
+      sectionNotes: string;
+      fields: {
+        orderId: string;
+        customer: string;
+        recipient: string;
+        shop: string;
+        template: string;
+        created: string;
+        published: string;
+        card: string;
+      };
+      direct: string;
+      notPublished: string;
+      composed: PluralForms;
+      notComposed: string;
+      noMessage: string;
+      notesPlaceholder: string;
+      saveNotes: string;
+      panelStatus: string;
+      panelCard: string;
+      panelQr: string;
+      generate: string;
+      previewCard: string;
+      previewTemplate: string;
+      printable: string;
+      copyUrl: string;
+      qrAlt: string;
+    };
   };
 
   content: {
