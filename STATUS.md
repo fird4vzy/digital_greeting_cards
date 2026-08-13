@@ -210,6 +210,39 @@ a student project.
 
 ---
 
+## Tools wired up
+
+**Meshy MCP** is configured globally in `~/.claude.json` as `meshy-mcp-server`
+(`npx -y @meshy-ai/meshy-mcp-server`, key in `MESHY_API_KEY`). Verified on
+13 August: the server starts, the key validates against Meshy's API, and it
+exposes 24 tools. It is a local stdio server, so it only works in Claude Code
+on a machine — not in the browser, and not as a claude.ai "custom connector",
+which wants a hosted https URL that Meshy does not publish.
+
+`meshy_text_to_3d` is the interesting one: a mesh from a description rather
+than a reconstruction from a photograph, which is a different and much better
+proposition for anything this product would want.
+
+**Higgsfield MCP** is connected too, with about 5.5 credits left — enough for
+two images, not for 3D (20) or video (60+).
+
+---
+
+## The 3D layer, and what not to do to it
+
+The hero bloom was rebuilt in code on 13 August rather than replaced with a
+generated model, and the reasoning is worth keeping: it renders in WebGL
+already; what was wrong was flat petals, `meshLambertMaterial` (no specular
+term at all), rings nearly coplanar, and a single sphere for a centre. Curved
+geometry, sheen, the existing in-memory studio map, five staggered rings and a
+crowd of stamens fixed it for zero bytes.
+
+An imported GLB in the *card runtime* remains the thing not to do — the whole
+3D layer's claim is that it downloads nothing and degrades to CSS on a weak
+phone. Marketing pages are a different matter.
+
+---
+
 ## Ideas discussed, not built
 
 - Notifying the **customer** when their card is ready — the VPS bot's
