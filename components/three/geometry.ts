@@ -65,6 +65,57 @@ function cached(key: string, build: () => THREE.BufferGeometry): THREE.BufferGeo
 
 export type PetalKind = 'rose' | 'sakura' | 'mote';
 
+/**
+ * A petal with a curl in it.
+ *
+ * `petalGeometry` returns the flat cut-out, which is right for petals that
+ * tumble past the camera at a distance — the drift and the sakura fall. It is
+ * wrong for the bloom in the hero, which is held still and looked at: flat
+ * petals under any light read as paper cut-outs, and no material fixes a shape
+ * that has no thickness to catch a highlight on.
+ *
+ * So the same outline is tessellated more finely and pushed out of its plane
+ * twice: a cup across the width, and a backward bend along the length. That is
+ * all a real petal does, and it is what gives the surface something for the
+ * light to run along.
+ */
+export function curvedPetalGeometry(cup = 0.34, bend = 0.22): THREE.BufferGeometry {
+  return cached(`petal-curved-${cup}-${bend}`, () => {
+    // 24 segments rather than 8: the curve is only as smooth as the mesh under
+    // it, and this geometry is cached once for every petal in the scene.
+    const geometry = new THREE.ShapeGeometry(petalShape(), 24);
+    geometry.translate(0, -0.45, 0);
+    geometry.scale(0.42, 0.42, 0.42);
+
+    const position = geometry.attributes.position as THREE.BufferAttribute;
+    const xs: number[] = [];
+    const ys: number[] = [];
+    for (let i = 0; i < position.count; i += 1) {
+      xs.push(position.getX(i));
+      ys.push(position.getY(i));
+    }
+    const halfWidth = Math.max(...xs.map(Math.abs)) || 1;
+    const minY = Math.min(...ys);
+    const maxY = Math.max(...ys);
+    const span = maxY - minY || 1;
+
+    for (let i = 0; i < position.count; i += 1) {
+      const x = position.getX(i);
+      const y = position.getY(i);
+      // Across the petal: a parabola, deepest at the edges.
+      const across = (x / halfWidth) ** 2 * cup;
+      // Along it: nothing at the base, most at the tip, so the petal leans
+      // back the way a bloom opens.
+      const along = ((y - minY) / span) ** 2 * bend;
+      position.setZ(i, across + along);
+    }
+
+    position.needsUpdate = true;
+    geometry.computeVertexNormals();
+    return geometry;
+  });
+}
+
 export function petalGeometry(kind: PetalKind): THREE.BufferGeometry {
   return cached(`petal-${kind}`, () => {
     if (kind === 'mote') {
