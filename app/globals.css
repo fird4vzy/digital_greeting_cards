@@ -300,3 +300,28 @@
     background-position: 200% 0;
   }
 }
+
+/* ==========================================================================
+   The Bir dunyo wordmark
+   --------------------------------------------------------------------------
+   On hover the turned corner of the card inside the *d* peels further open —
+   the gesture the product performs, rather than decoration bolted onto it.
+
+   `fill-box` anchors the growth to the fold's own top-left, which is the
+   card's corner: the flap opens *into* the card instead of spiking out past
+   the letter. Anchoring anywhere else does exactly that, so this is not a
+   free choice.
+
+   The global reduced-motion block above already flattens the transition.
+   ========================================================================== */
+
+.wm-fold {
+  transform-box: fill-box;
+  transform-origin: 0% 0%;
+  transition: transform 700ms var(--ease-out-expo);
+}
+
+.wm:hover .wm-fold,
+.wm:focus-visible .wm-fold {
+  transform: scale(1.35);
+}
