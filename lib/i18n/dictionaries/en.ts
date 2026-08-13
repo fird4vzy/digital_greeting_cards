@@ -239,7 +239,7 @@ export const en: Dictionary = {
         lead: 'A bouquet lasts a week. The card they open from the QR on its tag lasts for good — and adds whatever you decide to every sale. Three minutes of an assistant’s time.',
         cta: 'Message us on Telegram',
         secondary: 'See a card',
-        imageAlt: 'A bouquet in kraft paper with a QR tag tied to its stems.',
+        imageAlt: 'A bouquet in kraft paper with a tag on its stems, beside a phone showing the opened card.',
       },
 
       earnings: {
@@ -261,6 +261,15 @@ export const en: Dictionary = {
         title: 'Not a picture, not a video.',
         lead: 'A small website made for one person: their name, a letter, photographs, the dates that mean something only to the two of them. It opens on a phone from the QR on the tag.',
         note: 'The link is not findable in search — only someone with the code can open it.',
+      },
+
+      tag: {
+        eyebrow: 'What you tie on',
+        title: 'This tag.',
+        lead: 'Thick card stock, a brass eyelet, jute string. The only part you hold: everything else lives on the customer’s phone.',
+        hint: 'Drag to turn it',
+        alt: 'The printed Bir dunyo tag: card stock, a brass eyelet and jute string',
+        note: 'It is blank here because that is how it arrives. The name and the code are printed on it for a particular order — every card has a code of its own.',
       },
 
       workflow: {

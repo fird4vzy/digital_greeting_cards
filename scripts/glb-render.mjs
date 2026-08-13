@@ -91,7 +91,7 @@ function encodePng(width, height, rgb) {
 }
 
 async function main() {
-  const [modelPath, prefix, flipArg] = process.argv.slice(2);
+  const [modelPath, prefix, flipArg, sizeArg] = process.argv.slice(2);
   const flip = flipArg === 'flip';
   const { json, bin } = parseGlb(modelPath);
   const prim = json.meshes[0].primitives[0];
@@ -120,7 +120,7 @@ async function main() {
   const centre = [0, 1, 2].map((a) => (lo[a] + hi[a]) / 2);
   const extent = Math.max(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]) || 1;
 
-  const SIZE = 560;
+  const SIZE = Number(sizeArg) || 560;
   const VIEWS = [
     { name: 'front', yaw: 0, pitch: 0 },
     { name: 'three-quarter', yaw: -0.65, pitch: 0.15 },

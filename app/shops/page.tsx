@@ -7,6 +7,7 @@ import { SectionHeading } from '@/components/marketing/SectionHeading';
 import { PhoneFrame } from '@/components/marketing/PhoneFrame';
 import { TemplateStage } from '@/components/marketing/TemplateStage';
 import { EarningsCalculator } from '@/components/shops/EarningsCalculator';
+import { TagShowcase } from '@/components/three/TagShowcase';
 import { ButtonLink } from '@/components/ui/Button';
 import { Reveal } from '@/components/ui/Reveal';
 import { copyFor } from '@/lib/card/copy';
@@ -83,10 +84,10 @@ export default async function ShopsPage() {
           <Reveal preset="fade">
             <div className="mx-auto mt-14 max-w-[62rem] overflow-hidden rounded-[1.5rem] border border-line">
               <Image
-                src="/brand/bouquet-tag.webp"
+                src="/brand/bouquet-phone.webp"
                 alt={t.hero.imageAlt}
-                width={1600}
-                height={1073}
+                width={1200}
+                height={896}
                 priority
                 sizes="(max-width: 62rem) 100vw, 62rem"
                 className="h-auto w-full"
@@ -147,6 +148,25 @@ export default async function ShopsPage() {
                   }}
                 />
               </PhoneFrame>
+            </Reveal>
+          </div>
+        </section>
+
+        {/* 3b — the physical half. The section above is what the customer
+            opens; this is the only part the shop ever touches, and a florist
+            has held a thousand bouquets and never one of these. */}
+        <section className="px-[var(--spacing-gutter)] py-16">
+          <div className="mx-auto max-w-[62rem]">
+            <SectionHeading eyebrow={t.tag.eyebrow} title={t.tag.title} lead={t.tag.lead} />
+
+            <Reveal preset="fade">
+              <div className="mt-10">
+                <TagShowcase strings={{ alt: t.tag.alt, hint: t.tag.hint }} />
+              </div>
+            </Reveal>
+
+            <Reveal preset="fade">
+              <p className="mt-6 max-w-[34rem] text-caption text-ink-muted">{t.tag.note}</p>
             </Reveal>
           </div>
         </section>

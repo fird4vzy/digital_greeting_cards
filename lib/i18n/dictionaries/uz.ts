@@ -243,7 +243,7 @@ export const uz: Dictionary = {
         lead: 'Guldasta bir hafta yashaydi. Yorliqdagi QR orqali ochiladigan otkritka esa abadiy qoladi — va har bir chekka o‘zingiz belgilagancha qo‘shadi. Sotuvchidan uch daqiqa ketadi.',
         cta: 'Telegramga yozish',
         secondary: 'Otkritkani ko‘rish',
-        imageAlt: 'Kraft qog‘ozga o‘ralgan guldasta, poyasiga QR kodli yorliq bog‘langan.',
+        imageAlt: 'Kraft qog‘ozga o‘ralgan guldasta, poyasida yorliq, yonida ochilgan otkritkani ko‘rsatayotgan telefon.',
       },
 
       earnings: {
@@ -265,6 +265,15 @@ export const uz: Dictionary = {
         title: 'Rasm ham, video ham emas.',
         lead: 'Bitta odam uchun yaratilgan kichkina sayt: ism, xat, suratlar, faqat ikkovlariga ma’noli sanalar. Yorliqdagi QR orqali telefondan ochiladi.',
         note: 'Havolani qidiruvdan topib bo‘lmaydi — faqat kodi borgina ocha oladi.',
+      },
+
+      tag: {
+        eyebrow: 'Siz nimani bog‘laysiz',
+        title: 'Mana shu yorliq.',
+        lead: 'Qalin karton, guruch halqa, jut ip. Qo‘lingizda ushlaydigan yagona narsa: qolgani xaridorning telefonida yashaydi.',
+        hint: 'Aylantirish uchun torting',
+        alt: 'Bir dunyo bosma yorlig‘i: karton, guruch halqa va jut ip',
+        note: 'Bu yerda u bo‘sh, chunki shunday holda keladi. Ism va kod har bir buyurtma uchun alohida bosiladi — har bir otkritkaning o‘z kodi bor.',
       },
 
       workflow: {

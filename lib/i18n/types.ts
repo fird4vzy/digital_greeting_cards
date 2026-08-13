@@ -253,6 +253,18 @@ export type Dictionary = {
         free: string;
       };
       product: { eyebrow: string; title: string; lead: string; note: string };
+      /** The physical tag, as a 3D object the florist can turn. */
+      tag: {
+        eyebrow: string;
+        title: string;
+        lead: string;
+        /** Shown over the canvas once it is actually interactive. */
+        hint: string;
+        /** Alt text for the rendered still, which is what most visitors see. */
+        alt: string;
+        /** Why the tag in view carries no name and no code. */
+        note: string;
+      };
       workflow: {
         eyebrow: string;
         title: string;
