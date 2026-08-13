@@ -145,6 +145,24 @@ Nothing is broken. The shop window is one turn behind the machinery.
   the writing. The AI layer is the path to lowering that cost later, and it is
   already constrained so a model cannot damage layout.
 
+### The name: Bir dunyo
+
+Chosen 13 August, from the candidates below. Uzbek for "a whole world" —
+literally the promise the product makes, readable in all three languages, and
+short enough for a domain and an Instagram handle. "More than a bouquet"
+stays as the tagline ("Больше, чем букет").
+
+Not yet done: domain and handle availability unchecked; nothing in the code
+renames yet. The wordmark, the `<title>` suffix, the printed tag's footer line
+and the package name all still say "More than a bouquet", deliberately — the
+rename is one job, not something to dribble through the codebase. The first
+generated brand assets in `public/brand/` already carry the new name on the
+printed tag.
+
+Candidates it beat: **Lola** (tulip, national flower — very local, very
+common), **Konvert** (envelope — understood but generic), **Anor**
+(pomegranate — warm and regional).
+
 ### Not decided
 
 - **Price.** `/shops` is live and every number on it comes from
@@ -158,20 +176,6 @@ Nothing is broken. The shop window is one turn behind the machinery.
   stay an impulse yes, and the majority should stay with the shop — the pitch
   is earnings, not commission. The fastest way to the number is asking a
   florist what *they* would charge.
-- **The name.** "More than a bouquet" is a tagline, not a name: four English
-  words in a Russian- and Uzbek-speaking market, awkward as a domain, worse as
-  an Instagram handle — and Instagram is where Tashkent flower shops live. It
-  should stay as the tagline ("Больше, чем букет" works), with a short name in
-  front of it.
-  Candidates, all readable in three languages and none of them sounding like a
-  QR company or a flower shop (which would compete with the distributor):
-  **Anor** (pomegranate — regional, warm, botanical without being floral;
-  the recommendation), **Lola** (tulip, the national flower — very local but
-  very common), **Bir dunyo** ("a whole world" — literally the promise, but
-  Uzbek-centric), **Konvert** (envelope — understood in both languages,
-  but generic and hard to defend).
-  Domain and handle availability has not been checked.
-
 ### Next, in this order
 
 1. **Close the STATUS items above.** A shop page in front of a product whose

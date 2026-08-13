@@ -238,6 +238,7 @@ export const uz: Dictionary = {
         lead: 'Guldasta bir hafta yashaydi. Yorliqdagi QR orqali ochiladigan otkritka esa abadiy qoladi — va har bir chekka o‘zingiz belgilagancha qo‘shadi. Sotuvchidan uch daqiqa ketadi.',
         cta: 'Telegramga yozish',
         secondary: 'Otkritkani ko‘rish',
+        imageAlt: 'Kraft qog‘ozga o‘ralgan guldasta, poyasiga QR kodli yorliq bog‘langan.',
       },
 
       earnings: {

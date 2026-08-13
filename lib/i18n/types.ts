@@ -227,7 +227,14 @@ export type Dictionary = {
     shops: {
       metaTitle: string;
       metaDescription: string;
-      hero: { eyebrow: string; title: string; lead: string; cta: string; secondary: string };
+      hero: {
+        eyebrow: string;
+        title: string;
+        lead: string;
+        cta: string;
+        secondary: string;
+        imageAlt: string;
+      };
       earnings: {
         eyebrow: string;
         title: string;

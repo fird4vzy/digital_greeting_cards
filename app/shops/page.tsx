@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Footer } from '@/components/site/Footer';
 import { Header } from '@/components/site/Header';
@@ -75,6 +76,23 @@ export default async function ShopsPage() {
               </div>
             </Reveal>
           </div>
+
+          {/* The whole proposition in one frame: flowers, a tag, a code. A
+              florist understands the business from this before reading a
+              word of it, which no paragraph on this page manages. */}
+          <Reveal preset="fade">
+            <div className="mx-auto mt-14 max-w-[62rem] overflow-hidden rounded-[1.5rem] border border-line">
+              <Image
+                src="/brand/bouquet-tag.webp"
+                alt={t.hero.imageAlt}
+                width={1600}
+                height={1073}
+                priority
+                sizes="(max-width: 62rem) 100vw, 62rem"
+                className="h-auto w-full"
+              />
+            </div>
+          </Reveal>
         </section>
 
         {/* 2 — the numbers, on the florist's own figures */}
