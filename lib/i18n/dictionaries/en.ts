@@ -377,6 +377,20 @@ export const en: Dictionary = {
       nothingWaiting: 'Nothing waiting. Every order has been picked up.',
     },
 
+    notifications: {
+      title: 'Order notifications',
+      ready: 'Configured. Send a test to confirm Telegram accepts these values.',
+      off: 'Off — neither variable is set. That is correct on your own machine and on every preview.',
+      partial: 'Half configured: {missing} is not set. Orders arrive and nobody is told.',
+      test: 'Send a test',
+      testing: 'Sending…',
+      sent: 'Delivered. It is in the chat now.',
+      unconfigured: 'Nothing to test: {missing} is not set.',
+      rejected: 'Telegram refused: {detail}',
+      unreachable: 'Telegram could not be reached: {detail}',
+      redeploy: 'Environment variables only reach a new build — redeploy after changing them.',
+    },
+
     orders: {
       title: 'Orders',
       shown: { one: '{count} shown', other: '{count} shown' },

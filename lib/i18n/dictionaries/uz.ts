@@ -382,6 +382,22 @@ export const uz: Dictionary = {
       nothingWaiting: 'Kutayotgani yo‘q. Hamma buyurtma olingan.',
     },
 
+    notifications: {
+      title: 'Buyurtma bildirishnomalari',
+      ready: 'Sozlangan. Telegram bu ma’lumotlarni qabul qilishiga ishonch hosil qilish uchun tekshiruv yuboring.',
+      off: 'O‘chiq — birorta o‘zgaruvchi berilmagan. O‘z kompyuteringizda va har bir previewda shunday bo‘lishi kerak.',
+      partial:
+        'Yarim sozlangan: {missing} berilmagan. Buyurtmalar keladi, lekin hech kim bilmaydi.',
+      test: 'Tekshiruv yuborish',
+      testing: 'Yuborilmoqda…',
+      sent: 'Yetkazildi. Suhbatni oching — xabar allaqachon o‘sha yerda.',
+      unconfigured: 'Tekshirishga hech narsa yo‘q: {missing} berilmagan.',
+      rejected: 'Telegram rad etdi: {detail}',
+      unreachable: 'Telegramga yetib bo‘lmadi: {detail}',
+      redeploy:
+        'O‘zgaruvchilar faqat yangi buildga tushadi — o‘zgartirgandan keyin qayta deploy qiling.',
+    },
+
     orders: {
       title: 'Buyurtmalar',
       shown: { other: '{count} ta ko‘rsatilyapti' },

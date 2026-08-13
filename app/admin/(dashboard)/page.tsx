@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { NotificationCheck } from '@/components/admin/NotificationCheck';
 import { StatusPill } from '@/components/admin/StatusPill';
 import { listOrders } from '@/lib/db';
+import { notificationState } from '@/lib/notify/telegram';
 import { ORDER_STATUSES, type OrderStatus } from '@/lib/db/types';
 import { getI18n } from '@/lib/i18n/server';
 import { localiseTemplate, localisedStatus, occasionLabel } from '@/lib/i18n/localise';
@@ -104,6 +106,10 @@ export default async function AdminOverview() {
           </ul>
         )}
       </section>
+
+      {/* Read on the server: the state is derived from the variables, and
+          neither value ever crosses to the browser. */}
+      <NotificationCheck state={notificationState()} strings={dict.admin.notifications} />
     </>
   );
 }

@@ -22,6 +22,20 @@ import type { Order } from '@/lib/db/types';
 
 const API = 'https://api.telegram.org';
 
+/**
+ * Strips the bot token out of anything on its way to a browser.
+ *
+ * The token is in the request URL, so it can surface inside a thrown fetch
+ * error's message. The admin is behind a password, but a credential that only
+ * ever needs to exist on the server should never be sent to a client at all —
+ * and once it is in a browser it is in devtools, in a screenshot, in a support
+ * chat.
+ */
+function scrub(value: string): string {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  return token ? value.replaceAll(token, '***') : value;
+}
+
 /** Escapes the five characters that would otherwise break Telegram's HTML. */
 function escapeHtml(value: string): string {
   return value
@@ -117,6 +131,98 @@ export async function notifyNewOrder(order: Order, origin: string): Promise<void
       console.error(`[telegram] sendMessage failed: ${response.status} ${detail.slice(0, 200)}`);
     }
   } catch (error) {
-    console.error(`[telegram] could not notify: ${(error as Error).message}`);
+    console.error(`[telegram] could not notify: ${scrub((error as Error).message)}`);
+  }
+}
+
+/** Which of the two variables are missing. Never returns either value. */
+export type NotificationState =
+  /** Neither set: notifications are deliberately off. */
+  | { kind: 'off' }
+  /** One set and not the other — a half-finished setup that looks like a working one. */
+  | { kind: 'partial'; missing: 'TELEGRAM_BOT_TOKEN' | 'TELEGRAM_CHAT_ID' }
+  /** Both set. Says nothing about whether Telegram accepts them — only a send can. */
+  | { kind: 'ready' };
+
+export function notificationState(): NotificationState {
+  const token = Boolean(process.env.TELEGRAM_BOT_TOKEN);
+  const chatId = Boolean(process.env.TELEGRAM_CHAT_ID);
+
+  if (!token && !chatId) return { kind: 'off' };
+  if (!token) return { kind: 'partial', missing: 'TELEGRAM_BOT_TOKEN' };
+  if (!chatId) return { kind: 'partial', missing: 'TELEGRAM_CHAT_ID' };
+  return { kind: 'ready' };
+}
+
+export type TestResult =
+  | { ok: true }
+  | { ok: false; kind: 'unconfigured'; missing: string }
+  /** Telegram answered and refused. `detail` is its own words and the useful part. */
+  | { ok: false; kind: 'rejected'; status: number; detail: string }
+  | { ok: false; kind: 'unreachable'; detail: string };
+
+/**
+ * Sends a message to prove the configuration works, and **reports what went
+ * wrong when it does not**.
+ *
+ * The contract is deliberately the opposite of `notifyNewOrder`, which must
+ * swallow every failure so a Telegram outage cannot turn a customer's finished
+ * card into an error page. That silence is right there and wrong here: it is
+ * the reason a wrong chat id is invisible until somebody notices an order
+ * nobody worked on, and the reason the only previous way to test a deployment
+ * was to place a real order against it — which is how production came to hold
+ * test orders that then had to be cleaned out by hand.
+ *
+ * Telegram's own refusals are the valuable output and are passed through
+ * verbatim: *chat not found* means the id is wrong or the bot was never added
+ * to the group, and *Unauthorized* means the token is revoked or mistyped.
+ * Translating those into something friendlier would throw away the diagnosis.
+ */
+export async function sendTestNotification(origin: string): Promise<TestResult> {
+  const state = notificationState();
+  if (state.kind === 'off') {
+    return { ok: false, kind: 'unconfigured', missing: 'TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID' };
+  }
+  if (state.kind === 'partial') {
+    return { ok: false, kind: 'unconfigured', missing: state.missing };
+  }
+
+  const text = [
+    '<b>Проверка связи</b>',
+    '',
+    'Если это сообщение видно — уведомления о заказах настроены верно.',
+    '',
+    `${origin}/admin`,
+  ].join('\n');
+
+  try {
+    const response = await fetch(`${API}/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: process.env.TELEGRAM_CHAT_ID,
+        text,
+        parse_mode: 'HTML',
+        disable_web_page_preview: true,
+      }),
+      signal: AbortSignal.timeout(8000),
+    });
+
+    if (response.ok) return { ok: true };
+
+    // Telegram answers failures as { ok: false, error_code, description }.
+    const body = await response.text().catch(() => '');
+    let detail = body.slice(0, 300);
+    try {
+      const parsed = JSON.parse(body) as { description?: string };
+      if (parsed.description) detail = parsed.description;
+    } catch {
+      // Not JSON — a proxy or a gateway answered instead. The raw body is
+      // still the most informative thing available.
+    }
+
+    return { ok: false, kind: 'rejected', status: response.status, detail: scrub(detail) };
+  } catch (error) {
+    return { ok: false, kind: 'unreachable', detail: scrub((error as Error).message) };
   }
 }

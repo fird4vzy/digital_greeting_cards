@@ -7,6 +7,8 @@ import { ADMIN_SESSION_COOKIE, verifyAdminSession } from '@/lib/auth/admin';
 import { composeConfigForOrder } from '@/lib/card/service';
 import { getOrder, removeOrder, updateOrder } from '@/lib/db';
 import { ORDER_STATUSES, isDeletable, type OrderStatus } from '@/lib/db/types';
+import { sendTestNotification, type TestResult } from '@/lib/notify/telegram';
+import { siteOrigin } from '@/lib/site-origin';
 
 /**
  * Admin mutations.
@@ -97,4 +99,17 @@ export async function deleteOrder(id: string) {
   // The order's own page no longer exists; sending the operator back to the
   // queue is the only sensible destination.
   redirect('/admin/orders');
+}
+
+/**
+ * Sends a test notification and hands back what Telegram said.
+ *
+ * A mutation only in the sense that it sends something to the outside world;
+ * it touches no order, which is the point. Verifying the setup used to mean
+ * placing a real order against production and then deleting it by hand.
+ */
+export async function testNotifications(): Promise<TestResult> {
+  await requireAdmin();
+
+  return sendTestNotification(await siteOrigin());
 }

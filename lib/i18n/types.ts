@@ -307,6 +307,27 @@ export type Dictionary = {
       allOrders: string;
       nothingWaiting: string;
     };
+    /** The order-notification setup, checkable without placing a real order. */
+    notifications: {
+      title: string;
+      /** Both variables set. Says nothing about whether Telegram accepts them. */
+      ready: string;
+      /** Neither set — the correct state locally and on every preview. */
+      off: string;
+      /** One set and not the other. `{missing}` names the absent variable. */
+      partial: string;
+      test: string;
+      testing: string;
+      sent: string;
+      /** `{missing}` names what to set. */
+      unconfigured: string;
+      /** Telegram answered and refused. `{detail}` is its own wording. */
+      rejected: string;
+      /** Telegram was never reached. `{detail}` is the transport error. */
+      unreachable: string;
+      /** Environment variables only reach a new build. */
+      redeploy: string;
+    };
     orders: {
       title: string;
       shown: PluralForms;

@@ -49,10 +49,20 @@ as `NEW`, and stored its brief.
    stays quiet (that is `npm run dev` and every preview), but with only one
    set it logs an error naming the missing one, once per process. Until the
    variable is added, that line is in the Vercel runtime logs on every order.
+   **The dashboard now checks this for you.** `/admin` carries a notifications
+   panel that reads the configuration server-side — it currently says which
+   variable is missing, by name — and a button that sends a real message and
+   reports Telegram's own refusal. That is the piece that was missing: both
+   variables can look set while the token is revoked or the chat id is wrong,
+   and `notifyNewOrder` must swallow that failure so an outage cannot break a
+   customer's order. *chat not found* means the id is wrong or the bot was
+   never added to the group; *Unauthorized* means the token is dead.
 3. **Redeploy after setting it.** Environment variables only reach a new build.
-4. **Two test orders are on production** and should be deleted from the
-   dashboard: `RWNPJV`, and whichever the first Telegram test creates. Both are
-   unpublished, so the delete button is offered.
+   Then open `/admin` and press the button — no order required.
+4. **One test order is on production** and should be deleted from the
+   dashboard: `RWNPJV`. It is unpublished, so the delete button is offered.
+   Verifying Telegram no longer creates a second one; that is what the panel
+   in item 2 is for, and the pair of junk orders is what prompted it.
 5. **The VPS bot is dead** — it polls with the revoked token. Give it the new
    one or leave it down; nothing here depends on it.
 6. **That VPS publishes PostgreSQL on `5432`** with credentials that are in its
