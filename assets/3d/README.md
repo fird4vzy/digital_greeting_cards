@@ -22,6 +22,7 @@ The one physical object the business makes: the card a shop ties to the stems.
 | `tag.glb` | 6.9 MB | As generated. 104 514 triangles, JPEG textures. What the viewer page shows |
 | `tag-lean.obj` + `.mtl` | 2.9 MB | After remeshing. **21 081 quads** — this is the one to edit |
 | `tag-lean.blend` | 6.9 MB | The same, as a Blender scene |
+| `tag-web.glb` | 2.1 MB | Remeshed and shrunk. Ready for a page |
 
 `tag-lean.glb` is not kept. Remeshing halved the geometry but re-encoded the
 textures from JPEG to PNG, so the file came out at 13 MB — larger than the
@@ -57,6 +58,57 @@ QR belong in the render, composited onto the face — never in the mesh.
 Ask for `obj` or `fbx` when you want quads. glTF stores triangles only, so
 `topology: quad` alongside `target_formats: ["glb"]` is silently ignored — which
 is exactly what happened on the first run here.
+
+### Always run `glb-shrink` before anything sees a GLB
+
+`node scripts/glb-shrink.mjs in.glb out.glb [maxEdge=1024] [quality=82]`
+
+**Remesh re-exports textures as PNG.** That happened on both models, and it is
+the single fact that decides whether any of this can be shipped: remeshing cuts
+geometry honestly and then triples the file, because lossless pictures replace
+lossy ones. The script decodes each embedded image, caps its longest edge and
+re-encodes as JPEG, rebuilding the binary chunk with corrected offsets. Geometry
+is copied through untouched.
+
+| | Generated | Remeshed | Shrunk |
+|---|---|---|---|
+| Bouquet | 44.29 MB | 17.32 MB | **3.80 MB** |
+| Tag | 6.87 MB | 13.04 MB | **2.05 MB** |
+
+The bouquet's textures went 3.37 MB → 14.06 MB → 0.53 MB across those three
+steps while its triangle count fell 1 413 730 → 60 682 and stayed there. Judge a
+GLB by its textures first; the mesh is rarely what makes it heavy.
+
+### concepts/ — four tag designs
+
+Generated after the first tag turned out to be a blank white rectangle with a
+QR pasted on, which is not a design. All four grow out of the mark the brand
+already owns: the bowl of the *d* is a card with a turned corner, and the
+favicon carries a five-petal blossom.
+
+`tagdes-1-fold` is the one to beat — the logo made physical, with the corner
+folded back over the brand's rose. `2-rose` reads from across a room but sets
+the name in a script the brand does not use. `3-arch` is the most tactile and
+the least scannable. `4-band` reverses the QR out of the rose band, and that is
+a functional fault, not a taste one: **a QR must be dark on light.** It is read
+in someone else's shop, in bad light, on the first try.
+
+## bouquet/ — the wrapped bouquet
+
+| File | Size | What it is |
+|---|---|---|
+| `bouquet-ref.png` | 1.0 MB | The design render it was built from |
+| `bouquet-web.glb` | 4.0 MB | Remeshed to 60 682 triangles and shrunk. Ready for a page |
+
+The 44 MB original is **not** kept — it is 1 413 730 triangles, reproducible
+from the reference above, and nothing git should carry.
+
+Worth recording because the prediction was wrong: thin organic geometry was
+supposed to come out as a blob, and that belief talked the attempt out of
+happening twice. It did not. The kraft cone has real creases, the jute bow has
+loops and tails, the stems below the tie are separate, and the roses keep the
+spiral of their petals. At 60 682 triangles — a 23× cut — the silhouette and
+structure survive; only petal crispness goes.
 
 ### What is wrong with it
 
