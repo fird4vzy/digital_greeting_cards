@@ -59,6 +59,27 @@ Ask for `obj` or `fbx` when you want quads. glTF stores triangles only, so
 `topology: quad` alongside `target_formats: ["glb"]` is silently ignored — which
 is exactly what happened on the first run here.
 
+### Two traps when you render one of these yourself
+
+**Do not flip the texture.** glTF puts UV (0,0) at the image's top-left, which
+already matches the row order of a decoded bitmap. `imageOrientation: 'flipY'`
+on `createImageBitmap` — the reflex from ordinary WebGL work — samples the atlas
+upside down. It shipped twice here: the tag's lower half came out filled with
+the atlas's empty black margin, and the bouquet turned into a mush of pink and
+green that read as "strange lighting". Three.js sets `texture.flipY = false` on
+glTF loads for the same reason.
+
+**Linearise the base colour before lighting it.** It is sRGB. Shading it as if
+it were linear and then applying gamma at the end washes every colour toward
+white — `pow(texel, vec3(2.2))` going in, `pow(colour, vec3(1.0/2.2))` coming
+out.
+
+Both were diagnosed by rendering the model twice, each way, with
+`node scripts/glb-render.mjs model.glb out-prefix [flip]` — a software
+rasteriser that needs no browser and no GPU. **Check a model there before
+putting it in front of anyone.** Guessing at which of the model and the viewer
+is wrong is how the atlas got blamed for a bug in the viewer.
+
 ### Always run `glb-shrink` before anything sees a GLB
 
 `node scripts/glb-shrink.mjs in.glb out.glb [maxEdge=1024] [quality=82]`
