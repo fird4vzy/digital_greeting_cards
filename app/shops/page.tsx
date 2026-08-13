@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Footer } from '@/components/site/Footer';
 import { Header } from '@/components/site/Header';
@@ -7,6 +6,7 @@ import { SectionHeading } from '@/components/marketing/SectionHeading';
 import { PhoneFrame } from '@/components/marketing/PhoneFrame';
 import { TemplateStage } from '@/components/marketing/TemplateStage';
 import { EarningsCalculator } from '@/components/shops/EarningsCalculator';
+import { BouquetShowcase } from '@/components/three/BouquetShowcase';
 import { TagShowcase } from '@/components/three/TagShowcase';
 import { ButtonLink } from '@/components/ui/Button';
 import { Reveal } from '@/components/ui/Reveal';
@@ -64,36 +64,31 @@ export default async function ShopsPage() {
 
       <main id="main">
         {/* 1 — what it pays and what it costs in effort, before anything else */}
-        <section className="px-[var(--spacing-gutter)] pb-16 pt-32 sm:pt-40">
-          <div className="mx-auto max-w-[62rem]">
-            <SectionHeading eyebrow={t.hero.eyebrow} title={t.hero.title} lead={t.hero.lead} />
+        <section className="px-[var(--spacing-gutter)] pb-16 pt-28 sm:pt-32">
+          {/* The offer and the object it is about, side by side. A photograph
+              stood on the right until the tag was designed; it could not be
+              re-shot, and it went on showing a plain white rectangle after the
+              rest of the site had moved on. The thing on the right is now
+              assembled from the same component the tag section uses, so it
+              cannot fall out of date again. */}
+          <div className="mx-auto grid max-w-[62rem] items-center gap-10 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
+            <div>
+              <SectionHeading eyebrow={t.hero.eyebrow} title={t.hero.title} lead={t.hero.lead} />
+
+              <Reveal preset="fade">
+                <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+                  <ButtonLink href={telegramUrl}>{t.hero.cta}</ButtonLink>
+                  <ButtonLink href="/templates/romantic" variant="secondary">
+                    {t.hero.secondary}
+                  </ButtonLink>
+                </div>
+              </Reveal>
+            </div>
 
             <Reveal preset="fade">
-              <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-                <ButtonLink href={telegramUrl}>{t.hero.cta}</ButtonLink>
-                <ButtonLink href="/templates/romantic" variant="secondary">
-                  {t.hero.secondary}
-                </ButtonLink>
-              </div>
+              <BouquetShowcase strings={{ alt: t.hero.imageAlt, hint: t.hero.sceneHint }} />
             </Reveal>
           </div>
-
-          {/* The whole proposition in one frame: flowers, a tag, a code. A
-              florist understands the business from this before reading a
-              word of it, which no paragraph on this page manages. */}
-          <Reveal preset="fade">
-            <div className="mx-auto mt-14 max-w-[62rem] overflow-hidden rounded-[1.5rem] border border-line">
-              <Image
-                src="/brand/bouquet-phone.webp"
-                alt={t.hero.imageAlt}
-                width={1200}
-                height={896}
-                priority
-                sizes="(max-width: 62rem) 100vw, 62rem"
-                className="h-auto w-full"
-              />
-            </div>
-          </Reveal>
         </section>
 
         {/* 2 — the numbers, on the florist's own figures */}

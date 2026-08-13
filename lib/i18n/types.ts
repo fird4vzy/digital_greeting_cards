@@ -238,6 +238,8 @@ export type Dictionary = {
         cta: string;
         secondary: string;
         imageAlt: string;
+        /** Shown under the hero object once it is actually interactive. */
+        sceneHint: string;
       };
       earnings: {
         eyebrow: string;

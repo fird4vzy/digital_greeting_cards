@@ -239,7 +239,8 @@ export const en: Dictionary = {
         lead: 'A bouquet lasts a week. The card they open from the QR on its tag lasts for good — and adds whatever you decide to every sale. Three minutes of an assistant’s time.',
         cta: 'Message us on Telegram',
         secondary: 'See a card',
-        imageAlt: 'A bouquet in kraft paper with a tag on its stems, beside a phone showing the opened card.',
+        imageAlt: 'A bouquet in kraft paper with the Bir dunyo tag tied at the wrap.',
+        sceneHint: 'Drag to turn it',
       },
 
       earnings: {
