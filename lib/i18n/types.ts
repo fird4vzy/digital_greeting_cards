@@ -111,6 +111,7 @@ export type Dictionary = {
         templates: string;
         create: string;
         seeCard: string;
+        shops: string;
         dashboard: string;
         orders: string;
         printable: string;
@@ -218,6 +219,39 @@ export type Dictionary = {
       copied: string;
     };
     preview: { draft: string };
+
+    /**
+     * The page written for flower shops, not for their customers. Different
+     * audience, different argument: earnings and effort, not romance.
+     */
+    shops: {
+      metaTitle: string;
+      metaDescription: string;
+      hero: { eyebrow: string; title: string; lead: string; cta: string; secondary: string };
+      earnings: {
+        eyebrow: string;
+        title: string;
+        lead: string;
+        bouquetPrice: string;
+        cardsPerMonth: string;
+        cardPrice: string;
+        perCard: string;
+        perMonth: string;
+        fee: string;
+        feeNote: string;
+        free: string;
+      };
+      product: { eyebrow: string; title: string; lead: string; note: string };
+      workflow: {
+        eyebrow: string;
+        title: string;
+        lead: string;
+        steps: { time: string; title: string; body: string }[];
+        total: string;
+      };
+      objections: { eyebrow: string; title: string; items: { q: string; a: string }[] };
+      contact: { eyebrow: string; title: string; lead: string; cta: string; note: string };
+    };
     notFound: { title: string; lead: string; hint: string; back: string; makeOwn: string };
     card: { madeWith: string };
     localeSwitcher: { label: string };

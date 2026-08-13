@@ -5,7 +5,7 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 13 August 2026, at commit `90e7430`.
+**Last updated:** 13 August 2026, after building `/shops`.
 
 ---
 
@@ -147,7 +147,13 @@ Nothing is broken. The shop window is one turn behind the machinery.
 
 ### Not decided
 
-- **Price.** Needs one conversation with one florist, not a guess. Only the
+- **Price.** `/shops` is live and every number on it comes from
+  `lib/shops/offer.ts`, marked provisional. Change that file and the page
+  follows. The *shape* held up under its own calculator and one correction came
+  out of building it: a flat fee per card collapses at the bottom of the range
+  — beside a 100 000 bouquet the suggested card is 15 000, so a 15 000 fee left
+  the shop earning nothing. It is a share of the card price now (25%), so the
+  shop always keeps the majority at any bouquet size. Needs one conversation with one florist, not a guess. Only the
   shape is known: the add-on should be roughly 10–20% of the bouquet price to
   stay an impulse yes, and the majority should stay with the shop — the pitch
   is earnings, not commission. The fastest way to the number is asking a
@@ -170,10 +176,15 @@ Nothing is broken. The shop window is one turn behind the machinery.
 
 1. **Close the STATUS items above.** A shop page in front of a product whose
    notifications do not work is worthless — the brief never reaches anyone.
-2. **Build `/shops`.** One page, five blocks: earnings and effort up front, a
-   live phone showing a real card, the honest three-step workflow with a real
-   time cost, a price table with actual numbers, and "message us on Telegram"
-   rather than a signup form. First shops close in conversation.
+2. ~~**Build `/shops`.**~~ Done. Six blocks: the offer, an earnings calculator
+   driven by the florist's own bouquet price and volume, the product playing
+   itself in a phone, the three-step workflow with real timings, the five
+   questions shops actually ask, and a Telegram conversation instead of a
+   signup form. Linked from the footer. A price *table* turned into a
+   *calculator* deliberately — a florist wants to know what it adds to their
+   counter, not what a card costs in the abstract.
+   **Before showing it to anyone:** set `telegram` in `lib/shops/offer.ts`; it
+   is still the placeholder `@morethanabouquet`.
 3. **Do not rebuild the homepage yet.** The current landing is what a shop
    sends its customer; it is written for exactly that. Rewriting it for an
    audience nobody has spoken to yet is optimising blind. Talk to five

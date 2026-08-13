@@ -98,6 +98,7 @@ export const uz: Dictionary = {
         templates: 'Shablonlar',
         create: 'Kartochka yaratish',
         seeCard: "Tayyor kartochkani ko'rish",
+        shops: 'Do‘konlarga: bu qancha beradi',
         dashboard: "Do'kon paneli",
         orders: 'Buyurtmalar',
         printable: 'Bosma QR-kartochka',
@@ -225,6 +226,100 @@ export const uz: Dictionary = {
     },
 
     preview: { draft: 'Qoralama. Salon otkritkani hali tayyorlayapti — havolani sovg‘a qilish erta.' },
+
+    shops: {
+      metaTitle: 'Gul do‘konlariga',
+      metaDescription:
+        'Peshtaxtadagi qo‘shimcha savdo: guldastaga raqamli otkritka. Do‘kon katta qismini o‘ziga oladi va faqat e’lon qilingan otkritka uchun to‘laydi.',
+
+      hero: {
+        eyebrow: 'Gul do‘konlariga',
+        title: 'Guldastaga qoladigan narsani qo‘shib soting.',
+        lead: 'Guldasta bir hafta yashaydi. Yorliqdagi QR orqali ochiladigan otkritka esa abadiy qoladi — va har bir chekka o‘zingiz belgilagancha qo‘shadi. Sotuvchidan uch daqiqa ketadi.',
+        cta: 'Telegramga yozish',
+        secondary: 'Otkritkani ko‘rish',
+      },
+
+      earnings: {
+        eyebrow: 'Bu qancha beradi',
+        title: 'O‘z raqamlaringizda hisoblang.',
+        lead: 'Slayderlarni o‘z do‘koningizga moslang. Biz e’lon qilingan otkritkadan belgilangan summani olamiz — qolgani sizniki.',
+        bouquetPrice: 'O‘rtacha guldasta',
+        cardsPerMonth: 'Oyiga otkritka',
+        cardPrice: 'Xaridorga otkritka narxi',
+        perCard: 'Otkritkadan daromadingiz',
+        perMonth: 'Oylik daromadingiz',
+        fee: 'Shu oy uchun bizning ulushimiz — {amount}.',
+        feeNote: 'E’lon qilingan paytda yechiladi, ya’ni siz xaridordan pulni olganingizdan keyin. Na abonent to‘lovi, na oldindan sarmoya.',
+        free: 'Birinchi {count} ta otkritka — bepul, umuman ulushsiz.',
+      },
+
+      product: {
+        eyebrow: 'Xaridor nima oladi',
+        title: 'Rasm ham, video ham emas.',
+        lead: 'Bitta odam uchun yaratilgan kichkina sayt: ism, xat, suratlar, faqat ikkovlariga ma’noli sanalar. Yorliqdagi QR orqali telefondan ochiladi.',
+        note: 'Havolani qidiruvdan topib bo‘lmaydi — faqat kodi borgina ocha oladi.',
+      },
+
+      workflow: {
+        eyebrow: 'Sizda bu qanday ketadi',
+        title: 'Peshtaxtada uch daqiqa.',
+        lead: 'Halol, haqiqiy vaqt bilan. Hech narsa o‘rnatish shart emas — hammasi brauzerda ishlaydi.',
+        steps: [
+          {
+            time: '30 soniya',
+            title: 'Taklif qilish',
+            body: 'Xaridor guldastani tanladi. Telefondan tayyor namunani ko‘rsatasiz: «unga otkritka ham qo‘shaymizmi?»',
+          },
+          {
+            time: '2 daqiqa',
+            title: 'Yozib olish',
+            body: 'U kimga va qanday sabab ekanini aytadi, xohlasa surat yuboradi. Siz buni shaklga kiritasiz — yoki u o‘z telefonidan o‘zi to‘ldiradi.',
+          },
+          {
+            time: '30 soniya',
+            title: 'Berish',
+            body: 'Biz otkritkani yig‘amiz, siz tekshirib e’lon qilasiz. QR yorliqni chop etib poyaga bog‘laysiz.',
+          },
+        ],
+        total: 'Matnni biz yozamiz. Sizdan — xaridorga aytish va «e’lon qilish»ni bosish.',
+      },
+
+      objections: {
+        eyebrow: 'Odatda nima so‘rashadi',
+        title: 'Qisqa va halol.',
+        items: [
+          {
+            q: 'Olishmasa-chi?',
+            a: 'Unda hech narsa yo‘qotmadingiz. Biz faqat e’lon qilingan otkritka uchun pul olamiz, siz esa xaridor to‘laganidan keyin e’lon qilasiz. Oldindan hech narsa to‘lanmaydi.',
+          },
+          {
+            q: 'Sotuvchilarni o‘qitish kerakmi?',
+            a: 'Yo‘q. Shakl — oddiy so‘zlar bilan sakkizta savol, hech qanday sozlama yoki muharrirsiz. Telefonda buyurtma qabul qila oladigan odam uddalaydi.',
+          },
+          {
+            q: 'Matnni kim yozadi?',
+            a: 'Biz. Xaridor o‘z so‘zlari bilan qanday chiqsa shunday aytadi — biz undan otkritka yig‘amiz va e’lon qilishdan oldin sizga ko‘rsatamiz.',
+          },
+          {
+            q: 'Xaridor hech narsa aytmasa-chi?',
+            a: 'Otkritka baribir chiqadi. Har bir shablonning sababga mos zaxira matni bor — bo‘sh ham, quruq ham bo‘lmaydi.',
+          },
+          {
+            q: 'Menga o‘z saytim kerakmi?',
+            a: 'Yo‘q. Hammasi havola orqali ochiladi va istalgan telefonda ishlaydi. O‘rnatadigan va sozlaydigan narsa yo‘q.',
+          },
+        ],
+      },
+
+      contact: {
+        eyebrow: 'Boshlash',
+        title: 'Keling, bitta guldastada sinab ko‘ramiz.',
+        lead: 'Telegramga yozing — jonli otkritkani ko‘rsatamiz, sizga kirish ochamiz, birinchi otkritkalarni bepul qilamiz. Shartnomasiz va oldindan to‘lovsiz.',
+        cta: 'Telegramga yozish',
+        note: 'O‘sha kuni javob beramiz.',
+      },
+    },
 
     notFound: {
       title: "Bu kartochka bu yerda yo'q.",

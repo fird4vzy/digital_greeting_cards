@@ -94,6 +94,7 @@ export const en: Dictionary = {
         templates: 'Templates',
         create: 'Create a card',
         seeCard: 'See a real card',
+        shops: 'For shops: what it pays',
         dashboard: 'Shop dashboard',
         orders: 'Orders',
         printable: 'Printable QR card',
@@ -221,6 +222,100 @@ export const en: Dictionary = {
     },
 
     preview: { draft: 'A draft. The shop is still working on this card — too early to give the link away.' },
+
+    shops: {
+      metaTitle: 'For flower shops',
+      metaDescription:
+        'A counter upsell: a digital card for the bouquet. The shop keeps most of it and pays only for a card it publishes.',
+
+      hero: {
+        eyebrow: 'For flower shops',
+        title: 'Sell the part they keep.',
+        lead: 'A bouquet lasts a week. The card they open from the QR on its tag lasts for good — and adds whatever you decide to every sale. Three minutes of an assistant’s time.',
+        cta: 'Message us on Telegram',
+        secondary: 'See a card',
+      },
+
+      earnings: {
+        eyebrow: 'What it pays',
+        title: 'Work it out on your own numbers.',
+        lead: 'Move the sliders to match your shop. We take a fixed amount per published card; the rest is yours.',
+        bouquetPrice: 'Average bouquet',
+        cardsPerMonth: 'Cards per month',
+        cardPrice: 'What you charge for a card',
+        perCard: 'You keep, per card',
+        perMonth: 'You keep, per month',
+        fee: 'Our share this month — {amount}.',
+        feeNote: 'Charged when you publish, which is after you have taken the customer’s money. No subscription, nothing paid up front.',
+        free: 'The first {count} cards are free — no share at all.',
+      },
+
+      product: {
+        eyebrow: 'What the customer gets',
+        title: 'Not a picture, not a video.',
+        lead: 'A small website made for one person: their name, a letter, photographs, the dates that mean something only to the two of them. It opens on a phone from the QR on the tag.',
+        note: 'The link is not findable in search — only someone with the code can open it.',
+      },
+
+      workflow: {
+        eyebrow: 'What it looks like for you',
+        title: 'Three minutes at the counter.',
+        lead: 'Honestly, with the real timings. Nothing to install — it all runs in a browser.',
+        steps: [
+          {
+            time: '30 seconds',
+            title: 'Offer it',
+            body: 'They have chosen a bouquet. You show a finished example on your phone: “shall we add a card to it?”',
+          },
+          {
+            time: '2 minutes',
+            title: 'Take it down',
+            body: 'They say who it is for and why, and send photographs if they have them. You put it into the form — or they fill it in on their own phone.',
+          },
+          {
+            time: '30 seconds',
+            title: 'Hand it over',
+            body: 'We compose the card, you read it and publish. Print the QR tag and tie it to the stems.',
+          },
+        ],
+        total: 'We write the card. You tell the customer about it and press publish.',
+      },
+
+      objections: {
+        eyebrow: 'What shops ask',
+        title: 'Short answers.',
+        items: [
+          {
+            q: 'What if nobody buys it?',
+            a: 'Then you have lost nothing. We charge only for a published card, and you publish after the customer has paid. Nothing is due up front.',
+          },
+          {
+            q: 'Do I have to train my staff?',
+            a: 'No. The form is eight questions in plain words — no settings, no editor. Anyone who can take an order over the phone can do it.',
+          },
+          {
+            q: 'Who writes the card?',
+            a: 'We do. The customer says it however it comes out, we turn it into a card, and you read it before it goes live.',
+          },
+          {
+            q: 'What if the customer says nothing?',
+            a: 'The card still works. Every template has an honest fallback letter for the occasion — never blank, never generic.',
+          },
+          {
+            q: 'Do I need a website of my own?',
+            a: 'No. Everything opens from a link and works on any phone. There is nothing to install or configure.',
+          },
+        ],
+      },
+
+      contact: {
+        eyebrow: 'Getting started',
+        title: 'Try it on one bouquet.',
+        lead: 'Message us on Telegram — we will show you a real card, set you up, and the first cards are free. No contract, nothing paid in advance.',
+        cta: 'Message us on Telegram',
+        note: 'We answer the same day.',
+      },
+    },
 
     notFound: {
       title: "This card isn't here.",

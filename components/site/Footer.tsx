@@ -15,6 +15,9 @@ export function Footer({ strings }: { strings: Dictionary['ui']['footer'] }) {
     {
       title: strings.forShops,
       links: [
+        // The pitch goes first: a florist who found the site has no other way
+        // in, and the dashboard below it is only useful once they have signed up.
+        { href: '/shops', label: strings.links.shops },
         { href: '/admin', label: strings.links.dashboard },
         { href: '/admin/orders', label: strings.links.orders },
         { href: '/c/8FJ29K/qr', label: strings.links.printable },
