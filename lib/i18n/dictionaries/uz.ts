@@ -301,7 +301,7 @@ export const uz: Dictionary = {
           },
           {
             q: 'Sotuvchilarni o‘qitish kerakmi?',
-            a: 'Yo‘q. Shakl — oddiy so‘zlar bilan sakkizta savol, hech qanday sozlama yoki muharrirsiz. Telefonda buyurtma qabul qila oladigan odam uddalaydi.',
+            a: 'Yo‘q. Shakl — oddiy so‘zlar bilan to‘qqizta savol, hech qanday sozlama yoki muharrirsiz. Telefonda buyurtma qabul qila oladigan odam uddalaydi.',
           },
           {
             q: 'Matnni kim yozadi?',

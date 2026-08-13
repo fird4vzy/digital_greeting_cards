@@ -5,7 +5,8 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 13 August 2026, after the rename to Bir dunyo.
+**Last updated:** 13 August 2026, after the rename to Bir dunyo and a pass over
+the repository for things the rename and the concierge pivot left behind.
 
 ---
 
@@ -196,8 +197,9 @@ common), **Konvert** (envelope — understood but generic), **Anor**
    signup form. Linked from the footer. A price *table* turned into a
    *calculator* deliberately — a florist wants to know what it adds to their
    counter, not what a card costs in the abstract.
-   **Before showing it to anyone:** set `telegram` in `lib/shops/offer.ts`; it
-   is still the placeholder `@morethanabouquet`.
+   **Before showing it to anyone:** set `telegram` in `lib/shops/offer.ts`. It
+   reads `@birdunyo`, which is a placeholder that merely looks real — nobody
+   has checked whether the handle exists or registered it.
 3. **Do not rebuild the homepage yet.** The current landing is what a shop
    sends its customer; it is written for exactly that. Rewriting it for an
    audience nobody has spoken to yet is optimising blind. Talk to five

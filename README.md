@@ -62,6 +62,7 @@ Worth visiting:
 | `/c/8FJ29K/qr` | The printable tag the shop ties to the flowers |
 | `/admin/login` | The way in — one shared password |
 | `/admin` | The shop-side queue |
+| `/shops` | The pitch, written for florists rather than their customers — the offer, an earnings calculator, the workflow |
 
 ```bash
 npm run build          # production build
@@ -82,9 +83,11 @@ React Three Fiber / three.js · zod · PostgreSQL-ready repository.
 ```
 app/
   page.tsx                  landing
+  icon.svg                  the tab mark, served from the route
   templates/                gallery + full previews
   create/                   the guided flow
   c/[code]/                 published cards + printable QR tag
+  shops/                    the pitch aimed at florists
   admin/                    shop dashboard, orders, cards, templates
   api/                      orders, cards, qr, ai/plan
 
@@ -93,6 +96,7 @@ components/
   cards/sections/           the 11 shared storytelling beats
   cards/CardRenderer.tsx    data → experience
   create/                   the creation flow
+  shops/                    the earnings calculator
   three/                    the entire WebGL surface
   admin/  ui/  site/
 
@@ -103,7 +107,12 @@ lib/
   i18n/       ru/uz/en dictionaries, negotiation, plural rules
   auth/       the admin password and session
   ai/         the plan contract, prompt, planners
+  shops/      every number the florist offer is made of
+  notify/     the Telegram message sent when an order lands
+  site.ts     the brand name, in one place
   hooks/  utils/
+
+public/brand/ marketing imagery and the wordmark — never used inside a card
 
 templates/    one directory per template
 ```
@@ -328,5 +337,12 @@ Honest list of what a v1 does not have:
 - **The creation flow collects a story, not a timeline.** Dates, memories and
   wishes are fully supported by the schema, the templates and the admin, but
   the customer-facing flow does not ask for them yet.
+- **Nobody chooses the card's language.** The two locales are separate by
+  construction — the card carries its own, so it does not follow the reader's
+  phone — but the flow never asks, so a card is always written in whatever
+  language the customer was browsing in. That is right most of the time and
+  wrong for the common case of buying in Russian for an Uzbek-speaking
+  grandmother. The field, the API and the renderer already carry it; only the
+  step is missing.
 - The file-backed store serialises writes through a single promise chain, which
   is correct for one process and wrong for many.

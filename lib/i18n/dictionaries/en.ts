@@ -297,7 +297,7 @@ export const en: Dictionary = {
           },
           {
             q: 'Do I have to train my staff?',
-            a: 'No. The form is eight questions in plain words — no settings, no editor. Anyone who can take an order over the phone can do it.',
+            a: 'No. The form is nine questions in plain words — no settings, no editor. Anyone who can take an order over the phone can do it.',
           },
           {
             q: 'Who writes the card?',

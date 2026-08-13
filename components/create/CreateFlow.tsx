@@ -25,10 +25,15 @@ import { cn } from '@/lib/utils/cn';
 /**
  * THE CREATION FLOW
  *
- * Eight questions, one screen each — a guided story rather than a builder.
+ * Nine screens, one question each — a guided story rather than a builder.
  * The customer never sees a canvas, a layer panel or a font picker; they
  * answer questions a friend would ask, and the template engine turns the
  * answers into a card.
+ *
+ * `STEPS.length` is the count the customer is shown ("Step 3 of 9"), so any
+ * prose that names a number — the `/create` meta description, the shops FAQ —
+ * has to move with it. It was eight until `brief` arrived with the concierge
+ * flow, and three strings were left behind saying so.
  *
  * All state lives in one `Draft` object, which is deliberately the same shape
  * the order API accepts, so publishing is a single POST with no translation
@@ -61,8 +66,15 @@ type Draft = {
   /** How the shop reaches them. At least one is required to submit. */
   phone: string;
   email: string;
-  /** The language the card is written in. Defaults to the browsing language,
-   *  but they are genuinely independent choices — see the language step. */
+  /** The language the card is written in.
+   *
+   *  Stored on the card and therefore independent of the reader's language by
+   *  construction — a Russian card stays Russian on an English phone. But
+   *  **nothing asks for it**: there is no language step, so it is always the
+   *  language the customer happened to be browsing in. That is right often
+   *  enough to ship and wrong for the person buying in Russian for an Uzbek
+   *  grandmother. Adding the step is the only change needed; the field, the
+   *  API and the renderer already carry it. */
   locale: string;
 };
 
@@ -533,8 +545,8 @@ export function CreateFlow({
 
               {/* Contact lives on the submit screen rather than in a step of
                   its own: it is the one thing asked for the shop's benefit
-                  instead of the card's, and a ninth question for two optional
-                  fields would be a step too many. */}
+                  instead of the card's, and a whole step for two optional
+                  fields would be one too many. */}
               <div className="mt-7 border-t border-line pt-7">
                 <p className="text-caption text-ink-muted">{copy.steps.contact.hint}</p>
 
