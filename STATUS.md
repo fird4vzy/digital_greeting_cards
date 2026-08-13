@@ -24,8 +24,8 @@ Environment variables in Vercel:
 | `DATABASE_URL` | set by the Neon integration |
 | `ADMIN_PASSWORD` | set |
 | `NEXT_PUBLIC_SITE_URL` | set |
-| `TELEGRAM_BOT_TOKEN` | set, **but see the open items below** |
-| `TELEGRAM_CHAT_ID` | **not set** — so no notification is ever sent |
+| `TELEGRAM_BOT_TOKEN` | set — but the token still wants revoking, see item 1 |
+| `TELEGRAM_CHAT_ID` | set. A new order writes to the group |
 
 Both migrations in `lib/db/migrations/` are applied to the live database.
 Verified by placing a real order against production: it was accepted, arrived
@@ -42,33 +42,30 @@ as `NEW`, and stored its brief.
    *Audited 13 August:* **this** repository is clean — nothing token-shaped in
    the working tree or in any commit of any branch, so there is no history to
    rewrite here. The exposure is the chat and the other repository.
-2. **`TELEGRAM_CHAT_ID` is missing**, so no order notification is sent. The
-   quickest way to the value is messaging @userinfobot. For a group, the bot
-   has to be a member of it, and the id is negative.
-   `notifyNewOrder` no longer fails silently: with *neither* variable set it
-   stays quiet (that is `npm run dev` and every preview), but with only one
-   set it logs an error naming the missing one, once per process. Until the
-   variable is added, that line is in the Vercel runtime logs on every order.
-   **The dashboard now checks this for you.** `/admin` carries a notifications
-   panel that reads the configuration server-side — it currently says which
-   variable is missing, by name — and a button that sends a real message and
-   reports Telegram's own refusal. That is the piece that was missing: both
-   variables can look set while the token is revoked or the chat id is wrong,
-   and `notifyNewOrder` must swallow that failure so an outage cannot break a
-   customer's order. *chat not found* means the id is wrong or the bot was
-   never added to the group; *Unauthorized* means the token is dead.
-3. **Redeploy after setting it.** Environment variables only reach a new build.
-   Then open `/admin` and press the button — no order required.
-4. **One test order is on production** and should be deleted from the
+2. ~~**`TELEGRAM_CHAT_ID` is missing.**~~ **Done** — reported working on
+   13 August: the bot is connected and a new order writes to the group. This
+   entry stayed marked open long after it was fixed and sent a whole session
+   after the wrong priority, which is the argument for closing items here as
+   they land rather than in a batch afterwards.
+   `/admin` now carries a notifications panel that reads the configuration
+   server-side and sends a test message on demand, reporting Telegram's own
+   refusal. It was built for this item and outlived it, because the useful half
+   is the part that survives a working setup: both variables can look set while
+   the token is revoked or the chat id is wrong, and `notifyNewOrder` must
+   swallow that failure so an outage cannot break a customer's order. *chat not
+   found* means the id is wrong or the bot was never added to the group;
+   *Unauthorized* means the token is dead. Nothing about it creates an order,
+   which is the point — see item 3.
+3. **One test order is on production** and should be deleted from the
    dashboard: `RWNPJV`. It is unpublished, so the delete button is offered.
-   Verifying Telegram no longer creates a second one; that is what the panel
-   in item 2 is for, and the pair of junk orders is what prompted it.
-5. **The VPS bot is dead** — it polls with the revoked token. Give it the new
+   The pair of junk orders that prompted the panel in item 2 came from the only
+   way to test a deployment that used to exist: placing a real order against it.
+4. **The VPS bot is dead** — it polls with the revoked token. Give it the new
    one or leave it down; nothing here depends on it.
-6. **That VPS publishes PostgreSQL on `5432`** with credentials that are in its
+5. **That VPS publishes PostgreSQL on `5432`** with credentials that are in its
    public repository. Worth checking from outside (`nc -vz <ip> 5432`) and
    binding to `127.0.0.1` if it answers.
-7. **The card published as `5HZKCH` still shows English wishes.** Cards are
+6. **The card published as `5HZKCH` still shows English wishes.** Cards are
    composed once and stored, so fixing the code does not rewrite them —
    "Собрать открытку" on the order regenerates it.
 
@@ -134,7 +131,7 @@ The code has already chosen a business model. The landing page has not.
 The creation flow no longer publishes — it takes a brief and a contact,
 composes a draft, and leaves publishing to the shop. That is a **concierge**
 model: the customer describes, a person finishes. The landing page still reads
-as **self-serve**: "Create something beautiful", eight steps, do it yourself.
+as **self-serve**: "Create something beautiful", nine steps, do it yourself.
 
 Nothing is broken. The shop window is one turn behind the machinery.
 
@@ -252,6 +249,33 @@ crowd of stamens fixed it for zero bytes.
 An imported GLB in the *card runtime* remains the thing not to do — the whole
 3D layer's claim is that it downloads nothing and degrades to CSS on a weak
 phone. Marketing pages are a different matter.
+
+**There is now a generated tag model**, in `assets/3d/tag/` — deliberately not
+in `public/`, so Next never serves it and it never joins a deployment. Its
+README carries the prompts, the task ids and the honest limits. Read that before
+regenerating anything.
+
+Two findings from making it, both worth keeping:
+
+- **Meshy is better than expected on hard-surface objects, and the route
+  matters.** A mesh built from a purpose-made design render — flat ground, even
+  light, blank face — has none of the baked lighting and lumpiness that a mesh
+  built from a *photograph* inherits. The card came out perfectly flat and the
+  twisted jute cord survived as real geometry, which is the part that normally
+  collapses. The blanket objection to image-to-3D was about photographs, and
+  saying so imprecisely nearly cost the attempt.
+- **The numbers still argue for shipping renders, not meshes.** 104 514
+  triangles and 6.9 MB for an object a person would model with two hundred, all
+  fused into one mesh with one material, so the brass eyelet cannot be given
+  metal and the cord cannot be given fibre. Remeshing halved the geometry and
+  *doubled* the file, because it re-encoded the textures from JPEG to PNG.
+
+So the tool earns its place upstream of the site, never inside it: open the
+model, light it, render a frame, ship the frame. The `/shops` hero was left
+alone — the existing photograph is a real scene and nothing generated beats it.
+
+The bouquet was never tested. The prediction that thin organic geometry comes
+out as a blob is still just a prediction.
 
 ---
 
