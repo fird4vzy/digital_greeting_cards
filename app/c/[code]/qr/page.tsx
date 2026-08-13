@@ -6,6 +6,7 @@ import { cardStrings } from '@/lib/card/copy';
 import { getOrderByCode } from '@/lib/db';
 import { getI18n } from '@/lib/i18n/server';
 import { cardUrl, qrSvg } from '@/lib/qr';
+import { SITE } from '@/lib/site';
 import { siteOrigin } from '@/lib/site-origin';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -113,7 +114,7 @@ export default async function QrCardPage({ params }: Props) {
             className="uppercase text-ink-muted"
             style={{ fontSize: '1.9mm', letterSpacing: '0.18em' }}
           >
-            More than a bouquet
+            {SITE.name}
           </span>
         </div>
       </div>

@@ -1,5 +1,5 @@
 -- ---------------------------------------------------------------------------
--- More than a bouquet — PostgreSQL schema
+-- Bir dunyo — PostgreSQL schema
 --
 -- The application talks to a repository interface (lib/db/repository.ts), so
 -- this schema is the production target rather than a hard dependency: the

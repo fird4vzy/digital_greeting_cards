@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Dictionary } from '@/lib/i18n/types';
+import { SITE } from '@/lib/site';
 import { Wordmark } from './Wordmark';
 
 export function Footer({ strings }: { strings: Dictionary['ui']['footer'] }) {
@@ -55,7 +56,7 @@ export function Footer({ strings }: { strings: Dictionary['ui']['footer'] }) {
       </div>
 
       <div className="mx-auto mt-14 flex w-full max-w-[86rem] flex-col gap-3 border-t border-line pt-7 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-caption text-ink-faint">© {new Date().getFullYear()} More than a bouquet</p>
+        <p className="text-caption text-ink-faint">© {new Date().getFullYear()} {SITE.name}</p>
         <p className="font-display text-caption italic text-ink-muted">{strings.tagline}</p>
       </div>
     </footer>

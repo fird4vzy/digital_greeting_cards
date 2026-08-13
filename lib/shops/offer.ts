@@ -60,7 +60,7 @@ export const OFFER = {
   },
 
   /** Where a shop actually reaches a human. Set this before the page is shared. */
-  telegram: '@morethanabouquet',
+  telegram: '@birdunyo',
 } as const;
 
 /** The card price this offer suggests beside a bouquet of `bouquetPrice`. */

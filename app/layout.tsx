@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { SITE } from '@/lib/site';
 import { Instrument_Serif, Inter } from 'next/font/google';
 import { LOCALE_META } from '@/lib/i18n/config';
 import { getLocale } from '@/lib/i18n/server';
@@ -28,13 +29,13 @@ const sans = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
   title: {
-    default: 'More than a bouquet',
-    template: '%s · More than a bouquet',
+    default: SITE.name,
+    template: `%s · ${SITE.name}`,
   },
   description:
     'Some feelings deserve more than a message. Create a little digital world for someone special, and attach it to their flowers.',
   openGraph: {
-    title: 'More than a bouquet',
+    title: SITE.name,
     description: 'Create a little digital world for someone special.',
     type: 'website',
   },

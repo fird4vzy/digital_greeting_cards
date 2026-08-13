@@ -12,11 +12,10 @@ import { t } from '@/lib/i18n';
 import { listTemplateSummaries } from '@/templates';
 import { cn } from '@/lib/utils/cn';
 
-export const metadata: Metadata = {
-  title: 'Templates',
-  description:
-    'Six ways to say it. Each template is a real experience with its own pace, palette and motion.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { dict } = await getI18n();
+  return { title: dict.ui.templates.metaTitle, description: dict.ui.templates.metaDescription };
+}
 
 type Props = { searchParams: Promise<{ feeling?: string }> };
 

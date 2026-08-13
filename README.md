@@ -1,4 +1,4 @@
-# More than a bouquet
+# Bir dunyo
 
 A premium platform for personalised digital greeting cards attached to physical
 flower bouquets by QR code.

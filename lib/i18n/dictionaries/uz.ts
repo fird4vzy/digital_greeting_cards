@@ -106,6 +106,9 @@ export const uz: Dictionary = {
     },
 
     templates: {
+      metaTitle: 'Shablonlar',
+      metaDescription:
+        "Buni aytishning olti yo'li. Har bir shablon — o'z sur'ati, ranglari va harakatiga ega alohida tajriba.",
       eyebrow: 'Kutubxona',
       title: 'Hikoyani tanlang.',
       lead: "Quyidagi har bir shablon o'zini o'zi o'ynatadi — tayyor kartochkadagi kabi komponentlar, ranglar va harakat. Bu yerda birorta maket yo'q.",
@@ -122,6 +125,8 @@ export const uz: Dictionary = {
     },
 
     create: {
+      metaTitle: 'Otkritka yaratish',
+      metaDescription: 'To‘qqizta savol — va bitta odam uchun yaratilgan kichkina dunyo.',
       progress: '{total} qadamdan {current}-si',
       back: 'Orqaga',
       continue: 'Davom etish',

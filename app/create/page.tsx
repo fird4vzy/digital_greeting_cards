@@ -5,10 +5,10 @@ import { localiseTemplates } from '@/lib/i18n/localise';
 import { getI18n } from '@/lib/i18n/server';
 import { listTemplateSummaries } from '@/templates';
 
-export const metadata: Metadata = {
-  title: 'Create a card',
-  description: 'Eight questions, and a little world made for someone.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { dict } = await getI18n();
+  return { title: dict.ui.create.metaTitle, description: dict.ui.create.metaDescription };
+}
 
 type Props = { searchParams: Promise<{ template?: string }> };
 

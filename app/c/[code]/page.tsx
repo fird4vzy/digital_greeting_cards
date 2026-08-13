@@ -6,6 +6,8 @@ import { parseCardConfig } from '@/lib/card/schema';
 import { composeConfigForOrder } from '@/lib/card/service';
 import { getOrderByCode } from '@/lib/db';
 import { getPalette } from '@/lib/design/palettes';
+import { getDictionary } from '@/lib/i18n';
+import { SITE } from '@/lib/site';
 import { resolveTemplate } from '@/templates';
 
 type Props = { params: Promise<{ code: string }> };
@@ -56,10 +58,14 @@ export default async function CardPage({ params }: Props) {
   const parsed = parseCardConfig(order.config ?? composeConfigForOrder(order));
   if (!parsed.ok) notFound();
 
+  // The colophon is read by the recipient, standing over the bouquet, so it
+  // follows the *card's* language — not the language of whoever opens the link.
+  const madeWith = getDictionary(order.locale).ui.card.madeWith;
+
   return (
     <main>
       <CardRenderer config={parsed.config} />
-      <CardColophon code={order.code} />
+      <CardColophon code={order.code} madeWith={madeWith} />
     </main>
   );
 }
@@ -69,13 +75,13 @@ export default async function CardPage({ params }: Props) {
  * line the recipient scrolls past once they are done. The card belongs to the
  * two people in it, not to us.
  */
-function CardColophon({ code }: { code: string }) {
+function CardColophon({ code, madeWith }: { code: string; madeWith: string }) {
   return (
     <div className="card-scope border-t border-[var(--card-line)] px-[var(--spacing-gutter)] py-10 text-center">
       <p className="text-caption text-[var(--card-ink-muted)]">
-        Made with{' '}
+        {madeWith}{' '}
         <Link href="/" className="underline decoration-[var(--card-line)] underline-offset-4 transition-colors hover:text-[var(--card-accent)]">
-          More than a bouquet
+          {SITE.name}
         </Link>
       </p>
       <p className="mt-2 text-[0.7rem] uppercase tracking-[0.16em] text-[var(--card-ink-muted)] opacity-50">

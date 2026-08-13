@@ -5,7 +5,7 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 13 August 2026, after building `/shops`.
+**Last updated:** 13 August 2026, after the rename to Bir dunyo.
 
 ---
 
@@ -152,12 +152,21 @@ literally the promise the product makes, readable in all three languages, and
 short enough for a domain and an Instagram handle. "More than a bouquet"
 stays as the tagline ("Больше, чем букет").
 
-Not yet done: domain and handle availability unchecked; nothing in the code
-renames yet. The wordmark, the `<title>` suffix, the printed tag's footer line
-and the package name all still say "More than a bouquet", deliberately — the
-rename is one job, not something to dribble through the codebase. The first
-generated brand assets in `public/brand/` already carry the new name on the
-printed tag.
+**The rename is done.** The wordmark, every `<title>`, the colophon inside a
+card, the printed tag, `package.json`, the schema header and the favicon all
+say Bir dunyo. The name now lives in `lib/site.ts` and everything reads it from
+there, so the next rename is one line. Two occurrences of the old name survive
+on purpose: `WordmarkBlossom` is the retired mark and its own label is
+historically correct, and `ui.closing.title` is the *tagline*, which the
+decision keeps.
+
+The mark is a wordmark — the bowl of the *d* in *dunyo* is a card with its
+corner turned, and it peels further open on hover. The tab carries that same
+card with a blossom on its face; the name alone is a smear at sixteen pixels,
+and the card without the flower reads as a file icon.
+
+Still not done: domain and handle availability unchecked, and
+`OFFER.telegram` is `@birdunyo` as a placeholder rather than a real handle.
 
 Candidates it beat: **Lola** (tulip, national flower — very local, very
 common), **Konvert** (envelope — understood but generic), **Anor**

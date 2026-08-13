@@ -118,6 +118,8 @@ export type Dictionary = {
       };
     };
     templates: {
+      metaTitle: string;
+      metaDescription: string;
       eyebrow: string;
       title: string;
       lead: string;
@@ -133,6 +135,8 @@ export type Dictionary = {
       back: string;
     };
     create: {
+      metaTitle: string;
+      metaDescription: string;
       progress: string;
       back: string;
       continue: string;

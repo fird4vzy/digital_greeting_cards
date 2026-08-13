@@ -102,6 +102,9 @@ export const en: Dictionary = {
     },
 
     templates: {
+      metaTitle: 'Templates',
+      metaDescription:
+        'Six ways to say it. Each template is a real experience with its own pace, palette and motion.',
       eyebrow: 'The library',
       title: 'Choose a story.',
       lead: 'Every template below is playing itself — the same components, palette and motion the finished card will use. Nothing here is a mockup.',
@@ -118,6 +121,8 @@ export const en: Dictionary = {
     },
 
     create: {
+      metaTitle: 'Create a card',
+      metaDescription: 'Nine questions, and a little world made for someone.',
       progress: 'Step {current} of {total}',
       back: 'Back',
       continue: 'Continue',
