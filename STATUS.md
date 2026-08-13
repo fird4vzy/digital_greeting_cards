@@ -5,7 +5,7 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 12 August 2026, at commit `7106f04`.
+**Last updated:** 13 August 2026, at commit `90e7430`.
 
 ---
 
@@ -38,6 +38,9 @@ as `NEW`, and stored its brief.
    @BotFather, then put the new one into Vercel. An earlier token was also
    committed to the public `fird4vzy/telegram-bot-docker` repository and
    revoked; that file is still in that repository's git history.
+   *Audited 13 August:* **this** repository is clean — nothing token-shaped in
+   the working tree or in any commit of any branch, so there is no history to
+   rewrite here. The exposure is the chat and the other repository.
 2. **`TELEGRAM_CHAT_ID` is missing**, so no order notification is sent. The
    quickest way to the value is messaging @userinfobot. For a group, the bot
    has to be a member of it, and the id is negative.
@@ -97,14 +100,93 @@ long version.
   as a dependency partway through; pulling onto a machine with older
   `node_modules` fails the build with a module-not-found pointing at
   `lib/db/postgres.ts`, which looks like a code fault and is not one.
+- **Stop the dev server before pulling.** The admin pages moved into the route
+  group `app/admin/(dashboard)/`, and on Windows git could not remove the old
+  directories while a watcher held them open. It asks
+  `Deletion of directory ... failed. Should I try again? (y/n)` — answering `n`
+  leaves them behind silently. They were empty that time, so nothing broke, but
+  a leftover `page.tsx` under both the old and the new path gives two sources
+  for one route with no warning. Verified clean on 13 August; the empty
+  directories were removed.
+
+---
+
+## Product direction
+
+This is the part that is not visible in the code, and it is currently the
+thing blocking work. Discussed 13 August; decisions marked as such.
+
+### The mismatch that was causing the confusion
+
+The code has already chosen a business model. The landing page has not.
+
+The creation flow no longer publishes — it takes a brief and a contact,
+composes a draft, and leaves publishing to the shop. That is a **concierge**
+model: the customer describes, a person finishes. The landing page still reads
+as **self-serve**: "Create something beautiful", eight steps, do it yourself.
+
+Nothing is broken. The shop window is one turn behind the machinery.
+
+### Decided
+
+- **The shop is the customer, not the buyer.** The shop already has a person
+  holding money in the right mood. A counter upsell converts incomparably
+  better than trying to bring that same person to a website cold.
+- **Per published card, never a subscription.** Small shops here will not buy
+  software on a recurring basis.
+- **Billing event is the publish action, which already exists.** The shop
+  publishes only after it has taken the customer's money, so the platform never
+  asks for money the shop does not yet have. This removes the only real
+  objection (paying up front for something that might not sell) and needs no
+  new code.
+- **First 10–20 cards free**, because their feedback is worth more than their
+  money at this stage.
+- **Stay concierge for now.** At zero volume the only moat is the quality of
+  the writing. The AI layer is the path to lowering that cost later, and it is
+  already constrained so a model cannot damage layout.
+
+### Not decided
+
+- **Price.** Needs one conversation with one florist, not a guess. Only the
+  shape is known: the add-on should be roughly 10–20% of the bouquet price to
+  stay an impulse yes, and the majority should stay with the shop — the pitch
+  is earnings, not commission. The fastest way to the number is asking a
+  florist what *they* would charge.
+- **The name.** "More than a bouquet" is a tagline, not a name: four English
+  words in a Russian- and Uzbek-speaking market, awkward as a domain, worse as
+  an Instagram handle — and Instagram is where Tashkent flower shops live. It
+  should stay as the tagline ("Больше, чем букет" works), with a short name in
+  front of it.
+  Candidates, all readable in three languages and none of them sounding like a
+  QR company or a flower shop (which would compete with the distributor):
+  **Anor** (pomegranate — regional, warm, botanical without being floral;
+  the recommendation), **Lola** (tulip, the national flower — very local but
+  very common), **Bir dunyo** ("a whole world" — literally the promise, but
+  Uzbek-centric), **Konvert** (envelope — understood in both languages,
+  but generic and hard to defend).
+  Domain and handle availability has not been checked.
+
+### Next, in this order
+
+1. **Close the STATUS items above.** A shop page in front of a product whose
+   notifications do not work is worthless — the brief never reaches anyone.
+2. **Build `/shops`.** One page, five blocks: earnings and effort up front, a
+   live phone showing a real card, the honest three-step workflow with a real
+   time cost, a price table with actual numbers, and "message us on Telegram"
+   rather than a signup form. First shops close in conversation.
+3. **Do not rebuild the homepage yet.** The current landing is what a shop
+   sends its customer; it is written for exactly that. Rewriting it for an
+   audience nobody has spoken to yet is optimising blind. Talk to five
+   florists first.
+
+Bear in mind the website is not the main tool while there are zero shops. The
+first ten close by walking in with a phone, showing a real card, and leaving a
+printed tag. The page is what they open after you leave, to check you are not
+a student project.
 
 ---
 
 ## Ideas discussed, not built
-
-The product is moving from self-serve towards a connector: the customer
-describes what they want and the shop builds it. The pipeline for that now
-exists. Still open:
 
 - Notifying the **customer** when their card is ready — the VPS bot's
   subscriber table is the obvious groundwork.
