@@ -5,8 +5,8 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 13 August 2026, after the rename to Bir dunyo and a pass over
-the repository for things the rename and the concierge pivot left behind.
+**Last updated:** 13 August 2026, after the 3D work on /shops and the decision
+to port the hand-made templates into the engine.
 
 ---
 
@@ -207,7 +207,9 @@ common), **Konvert** (envelope — understood but generic), **Anor**
    **Before showing it to anyone:** set `telegram` in `lib/shops/offer.ts`. It
    reads `@birdunyo`, which is a placeholder that merely looks real — nobody
    has checked whether the handle exists or registered it.
-3. **Do not rebuild the homepage yet.** The current landing is what a shop
+3. **Templates.** The plan is its own section further down — a video beat, then
+   one hand port, then a builder, then an importer. That is the next real work.
+4. **Do not rebuild the homepage yet.** The current landing is what a shop
    sends its customer; it is written for exactly that. Rewriting it for an
    audience nobody has spoken to yet is optimising blind. Talk to five
    florists first.
@@ -233,7 +235,8 @@ than a reconstruction from a photograph, which is a different and much better
 proposition for anything this product would want.
 
 **Higgsfield MCP** is connected too, with about 5.5 credits left — enough for
-two images, not for 3D (20) or video (60+).
+two images, not for 3D (20) or video (60+). Meshy had 560 and has **406**; what
+they bought is in the 3D section below.
 
 ---
 
@@ -270,12 +273,133 @@ Two findings from making it, both worth keeping:
   metal and the cord cannot be given fibre. Remeshing halved the geometry and
   *doubled* the file, because it re-encoded the textures from JPEG to PNG.
 
-So the tool earns its place upstream of the site, never inside it: open the
-model, light it, render a frame, ship the frame. The `/shops` hero was left
-alone — the existing photograph is a real scene and nothing generated beats it.
+### Where it landed: generate the organic, author the designed
 
-The bouquet was never tested. The prediction that thin organic geometry comes
-out as a blob is still just a prediction.
+The bouquet **was** tested, and the prediction that thin organic geometry comes
+out as a blob was wrong — that belief talked the attempt out of happening twice.
+The kraft cone has real creases, the jute bow has loops and tails, the stems
+below the tie are separate, and the roses keep the spiral of their petals.
+
+The tag went the other way. Two attempts at generating it failed differently:
+the first flattened the folded corner and invented lettering, the second turned
+the whole card scarlet. `image_to_3d` re-interprets a colour scheme every run,
+and that design *is* a colour scheme — cream face, rose reverse, a corner turned
+back to show it. So `components/three/scenes/BrandTag.tsx` builds it in code, a
+few kilobytes against 2 MB, in the brand's own hexes.
+
+**That is the rule now.** A rose is easier grown than drawn; a rounded rectangle
+with a chamfer, a hole and a torus is the opposite. The seam also happens to be
+the right one for the product: the flowers will not change and the tag will.
+
+### What is live on `/shops`
+
+The hero is that scene — bouquet mesh plus tag component, joined in the scene
+graph, transparent canvas on the page's own paper. It replaced a photograph
+that could not be re-shot and so went on showing a plain white rectangle long
+after the tag was designed. Below it the tag section is a **still** of the
+chosen design: two interactive objects on one page compete rather than add.
+
+`public/3d/bouquet.glb` is 3.98 MB and the only downloaded 3D asset in the
+product. It goes through the same gate as everything else, and three.js appears
+nowhere in the initial HTML — verified against a production build. Draco would
+take roughly half the geometry again if that ever matters.
+
+### Two tools, and why they exist
+
+- `scripts/glb-shrink.mjs` — re-encodes the textures inside a GLB. **Remesh
+  always re-exports them as PNG**, twice out of twice: it cuts geometry honestly
+  and then trebles the file. The bouquet went 44.29 → 17.32 → **3.80 MB** across
+  generate, remesh, shrink while its triangles fell 1 413 730 → 60 682 and
+  stayed there. Judge a GLB by its textures first.
+- `scripts/glb-render.mjs` — rasterises a GLB to PNG in pure node, no browser,
+  no GPU. It exists because a texture bug shipped twice and the *model* got the
+  blame both times. **glTF puts UV (0,0) at the image's top-left**, which already
+  matches a decoded bitmap's row order, so `imageOrientation: 'flipY'` samples
+  every atlas upside down. Pass `flip` to reproduce the failure. Check a model
+  here before anyone sees it.
+
+### Credits
+
+560 to start, **406 left** after the tag, the bouquet, four hero photographs and
+four tag designs. The two failed tag generations cost 69 of that, and buying the
+lesson was worth it.
+
+### The tag design
+
+Concept 1 — the folded corner — from four generated in
+`assets/3d/tag/concepts/`. The logo made physical: the bowl of the *d* is a card
+with its corner turned, so the tag is the mark rather than a label bearing it.
+
+One finding there is functional, not aesthetic: **a QR must be dark on light.**
+Concept 4 reverses it out of a rose band, and part of the scanner population
+will not take an inverted code. The tag is read in someone else's shop, in bad
+light, on the first try.
+
+---
+
+## Hand-made templates, and how they get in
+
+There are one-off cards written by hand as plain static pages, outside this
+repository:
+
+| Where | What | Weight |
+|---|---|---|
+| `github.com/fird4vzy/invite` | `main.html` + `yes.html`, css, js, five GIFs | **19 MB** |
+| `github.com/fird4vzy/1` | `index.html` + mp4 | 2 MB |
+| `~/Desktop/проджэктыы/iLove` | one `index.html`, inline style and script, video | 9 MB |
+
+**`iLove/index.html` has a bug to fix at source:** its first line is a markdown
+fence — ```` ```html ```` — and its last is ```` ``` ````. A browser renders
+both as visible text. Two lines to delete.
+
+### Decided: port them into the engine
+
+Four routes were weighed — link out to them as separate sites, upload and serve
+them sandboxed, the same with token substitution, or port them into the template
+engine. **Ported.** The others all end with third-party HTML and JS being served
+from this origin, which is fine while one person writes them and is a hole the
+day somebody else sends one: a script at `/c/[code]` shares an origin with the
+admin and can read an operator's session cookie.
+
+Porting removes that entirely. Nothing of theirs is ever served — it is read,
+and what comes out is data.
+
+### Why this is cheaper than it looks
+
+**A template is already data, not code.** All six read the same way:
+
+```ts
+const sections = standardArc(input, { envelopeVariant: 'wax' });
+return applyVariants(sections, this.sectionVariants);
+```
+
+Not one writes its own composition. The difference between any two is a palette
+(6), a scene (6), which beats play (11), and one word per beat (30 variants).
+That fits in a database row and a form — no file, no deploy.
+
+### The plan, in order
+
+1. **A video beat.** `iLove` is cover → envelope → *video* → letter, and four of
+   those five exist. The fifth does not, and no importer can invent it. Adding
+   it gives every template video, not just this one.
+2. **Port `iLove` by hand.** One template end to end, to find out what the port
+   actually costs before automating it.
+3. **A builder in `/admin/templates`.** Pick palette, scene, beats and a look
+   per beat; watch it play live; save. Then "save this order as a template" is a
+   button, because a finished order already carries most of those fields.
+4. **An importer.** Paste a repository URL, and the same trick the card planner
+   already uses reads the HTML and returns a `TemplateDefinition` — enums drawn
+   from the registry, validated by zod, so the model cannot emit markup any more
+   than it can today. Its most useful output is the list of screens it *could
+   not* map: that is the engine's missing vocabulary, named.
+
+Order matters. Building the builder first means guessing its fields; building
+the importer first means guessing what it should produce.
+
+The importer's result is a **draft an operator reviews**, never a live template.
+It maps structure, not character — the timing and choreography of a hand-written
+page do not survive, and pretending otherwise would make the port look like a
+failure when it is working as designed.
 
 ---
 
