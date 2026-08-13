@@ -272,7 +272,6 @@ export const uz: Dictionary = {
         eyebrow: 'Siz nimani bog‘laysiz',
         title: 'Mana shu yorliq.',
         lead: 'Qalin karton, guruch halqa, jut ip. Qo‘lingizda ushlaydigan yagona narsa: qolgani xaridorning telefonida yashaydi.',
-        hint: 'Aylantirish uchun torting',
         alt: 'Bir dunyo bosma yorlig‘i: karton, guruch halqa va jut ip',
         note: 'Bu yerda u bo‘sh, chunki shunday holda keladi. Ism va kod har bir buyurtma uchun alohida bosiladi — har bir otkritkaning o‘z kodi bor.',
       },

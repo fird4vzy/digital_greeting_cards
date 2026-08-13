@@ -268,7 +268,6 @@ export const en: Dictionary = {
         eyebrow: 'What you tie on',
         title: 'This tag.',
         lead: 'Thick card stock, a brass eyelet, jute string. The only part you hold: everything else lives on the customer’s phone.',
-        hint: 'Drag to turn it',
         alt: 'The printed Bir dunyo tag: card stock, a brass eyelet and jute string',
         note: 'It is blank here because that is how it arrives. The name and the code are printed on it for a particular order — every card has a code of its own.',
       },

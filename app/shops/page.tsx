@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Footer } from '@/components/site/Footer';
 import { Header } from '@/components/site/Header';
@@ -7,7 +8,6 @@ import { PhoneFrame } from '@/components/marketing/PhoneFrame';
 import { TemplateStage } from '@/components/marketing/TemplateStage';
 import { EarningsCalculator } from '@/components/shops/EarningsCalculator';
 import { BouquetShowcase } from '@/components/three/BouquetShowcase';
-import { TagShowcase } from '@/components/three/TagShowcase';
 import { ButtonLink } from '@/components/ui/Button';
 import { Reveal } from '@/components/ui/Reveal';
 import { copyFor } from '@/lib/card/copy';
@@ -154,9 +154,21 @@ export default async function ShopsPage() {
           <div className="mx-auto max-w-[62rem]">
             <SectionHeading eyebrow={t.tag.eyebrow} title={t.tag.title} lead={t.tag.lead} />
 
+            {/* A photograph, not a canvas. The tag turns in the hero already,
+                and a second interactive object on one page competes with the
+                first instead of adding to it — this one only has to be looked
+                at, and a still shows the deboss and the letterpress better than
+                a real-time render of them does. */}
             <Reveal preset="fade">
-              <div className="mt-10">
-                <TagShowcase strings={{ alt: t.tag.alt, hint: t.tag.hint }} />
+              <div className="mt-10 overflow-hidden rounded-[1.25rem] border border-line">
+                <Image
+                  src="/brand/tag-design.webp"
+                  alt={t.tag.alt}
+                  width={1024}
+                  height={1024}
+                  sizes="(max-width: 62rem) 100vw, 62rem"
+                  className="h-auto w-full"
+                />
               </div>
             </Reveal>
 

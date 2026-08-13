@@ -260,8 +260,6 @@ export type Dictionary = {
         eyebrow: string;
         title: string;
         lead: string;
-        /** Shown over the canvas once it is actually interactive. */
-        hint: string;
         /** Alt text for the rendered still, which is what most visitors see. */
         alt: string;
         /** Why the tag in view carries no name and no code. */

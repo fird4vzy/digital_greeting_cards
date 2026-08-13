@@ -25,11 +25,23 @@ export type BouquetCanvasProps = {
   onReady?: () => void;
 };
 
-/* Measured from the model, not guessed: it stands 1.896 units tall, its tie
-   sits about a third up from the bottom, and a real tag is roughly a sixth of
-   a bouquet's height. */
+/**
+ * Where the tag hangs — measured off the mesh, because the first attempt at
+ * these three numbers left it floating in mid-air beside the bouquet.
+ *
+ * The model stands 1.896 units tall and its tie sits about a third up from the
+ * bottom, at y −0.30. What the guess got wrong was depth: the wrap's front
+ * surface across the band the tag covers is at **z 0.128**, and the tag was put
+ * at 0.34 — a fifth of the bouquet's own width out in front of it. x 0.24 was
+ * past the wrap's edge at that height too, so it hung off the side as well as
+ * off the front.
+ *
+ * So: on the paper, a hair proud of it, and low enough that the cord loop lands
+ * at the tie rather than the card itself. A real 85mm tag against a 500mm
+ * bouquet is roughly a sixth of its height, which is the scale.
+ */
 const TAG_SCALE = 0.32;
-const TIE = { x: 0.24, y: -0.3, z: 0.34 };
+const TIE = { x: 0.1, y: -0.45, z: 0.148 };
 
 function Scene({ onReady }: { onReady?: () => void }) {
   const { scene } = useGLTF('/3d/bouquet.glb');
@@ -42,10 +54,9 @@ function Scene({ onReady }: { onReady?: () => void }) {
     <group position={[0, -0.15, 0]}>
       <primitive object={scene} />
 
-      {/* Hung at the wrap, turned out towards the reader and tilted the way
-          something on a string hangs — square to the camera would read as
-          pasted on. */}
-      <group position={[TIE.x, TIE.y, TIE.z]} rotation={[0.12, 0.42, -0.14]}>
+      {/* Turned out towards the reader and tilted the way something on a string
+          hangs — square to the camera would read as pasted on. */}
+      <group position={[TIE.x, TIE.y, TIE.z]} rotation={[0.08, 0.3, -0.09]}>
         <BrandTag scale={TAG_SCALE} />
       </group>
     </group>
