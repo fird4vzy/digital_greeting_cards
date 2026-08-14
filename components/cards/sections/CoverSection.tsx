@@ -28,13 +28,39 @@ export function CoverSection({ section, scene, motif }: Props) {
   const variant = section.variant ?? 'glow';
   const { reduced } = useMotionPrefs();
 
-  const name = (
-    <Reveal preset="rise" immediate as="span" className="block">
-      <span className="card-display block text-display-xl leading-[0.92] tracking-[-0.03em]">
-        {section.recipientName},
-      </span>
-    </Reveal>
-  );
+  /**
+   * `gradient` sets the name in colour that moves along it — the signature of
+   * the hand-written card this variant was ported from. It is a real gradient
+   * clipped to the glyphs rather than a tinted fill, so the letterforms carry
+   * the palette's own accent through three stops and back.
+   *
+   * The tracking is tighter and the leading shorter than the other covers:
+   * this treatment wants the name to read as one mass, and air between the
+   * letters would undo it.
+   */
+  const name =
+    variant === 'gradient' ? (
+      <Reveal preset="rise" immediate as="span" className="block">
+        <span
+          data-motion="gradient-text"
+          className="card-display block bg-clip-text text-display-xl leading-[0.9] tracking-[-0.045em] text-transparent"
+          style={{
+            backgroundImage:
+              'linear-gradient(90deg, var(--card-ink-muted), var(--card-accent), var(--card-ink-soft), var(--card-ink-muted))',
+            backgroundSize: '300%',
+            animation: 'cardGradientText 7s ease infinite',
+          }}
+        >
+          {section.recipientName},
+        </span>
+      </Reveal>
+    ) : (
+      <Reveal preset="rise" immediate as="span" className="block">
+        <span className="card-display block text-display-xl leading-[0.92] tracking-[-0.03em]">
+          {section.recipientName},
+        </span>
+      </Reveal>
+    );
 
   const headline = (
     <Reveal preset="rise" immediate delay={0.35} as="p" className="block">

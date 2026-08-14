@@ -26,8 +26,8 @@ import type { SectionKind } from './schema';
  * and tied to a bouquet has to outlive our refactors.
  */
 export const SECTION_VARIANTS = {
-  cover: ['arch', 'glow', 'paper', 'washi'],
-  envelope: ['ribbon', 'washi', 'wax'],
+  cover: ['arch', 'glow', 'gradient', 'paper', 'washi'],
+  envelope: ['heart', 'ribbon', 'washi', 'wax'],
   intro: ['centered', 'offset'],
   letter: ['handwritten', 'serif', 'washi'],
   video: ['framed', 'full'],

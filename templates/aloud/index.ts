@@ -5,10 +5,16 @@ import type { TemplateDefinition } from '@/lib/card/template';
  * Aloud — the one where the sender speaks.
  *
  * Ported from a hand-written card (`iLove`): a title screen over blush glows,
- * an envelope you tap, a recording, then a letter that arrives line by line.
- * Four screens, one of them a video, and no timeline — it is the shortest and
- * most direct template in the library, which is the whole reason to keep it
- * beside the longer ones.
+ * a heart you tap, a recording, then the letter. Four screens, one of them a
+ * video, and no timeline — the shortest and most direct template in the
+ * library, which is the whole reason to keep it beside the longer ones.
+ *
+ * **The look is ported too, not only the shape.** The first pass mapped its
+ * screens onto beats and left them wearing the engine's default clothes, which
+ * produced the right skeleton and the wrong card. `cover: gradient` and
+ * `envelope: heart` are its own: colour that travels along the name, and a gate
+ * that is a heart rather than an envelope, with the note escaping upward out of
+ * it instead of a flap lifting.
  *
  * **The port needed no markup.** The original was one 40 KB HTML file with its
  * styles and script inline; what survives here is a palette, four beats and a
@@ -40,8 +46,8 @@ export const aloudTemplate: TemplateDefinition = {
     'closing',
   ],
   sectionVariants: {
-    cover: 'glow',
-    envelope: 'ribbon',
+    cover: 'gradient',
+    envelope: 'heart',
     intro: 'centered',
     video: 'full',
     letter: 'serif',
@@ -51,7 +57,7 @@ export const aloudTemplate: TemplateDefinition = {
     closing: 'signature',
   },
   compose(input) {
-    const sections = standardArc(input, { envelopeVariant: 'ribbon' });
+    const sections = standardArc(input, { envelopeVariant: 'heart' });
 
     // The original played the recording *before* the letter, and that order is
     // the template's argument: you watch someone say it, and the words that

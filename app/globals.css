@@ -325,3 +325,37 @@
 .wm:focus-visible .wm-fold {
   transform: scale(1.35);
 }
+
+/* ---------------------------------------------------------------------------
+   Ported from the hand-written iLove card, for the templates that reproduce
+   its look. Keyframes rather than Framer Motion on purpose: these run forever
+   and on the compositor, so they cost nothing per frame and keep running while
+   the main thread is busy composing the rest of the card.
+--------------------------------------------------------------------------- */
+
+/* The title's colour travels along it. `background-size: 300%` is what gives
+   the gradient somewhere to travel to. */
+@keyframes cardGradientText {
+  0%, 100% { background-position: 0%; }
+  50% { background-position: 100%; }
+}
+
+/* The cue under the heart: never fully gone, never fully certain. */
+@keyframes cardPulseText {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+
+/* The heart is not still while it waits. */
+@keyframes cardGentleFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-scope [data-motion='gradient-text'],
+  .card-scope [data-motion='pulse-text'],
+  .card-scope [data-motion='gentle-float'] {
+    animation: none !important;
+  }
+}
