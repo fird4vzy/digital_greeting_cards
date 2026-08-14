@@ -522,6 +522,11 @@ export const uz: Dictionary = {
         'Keladigan odamlar',
         'Bitta juda yaxshi kechki ovqat',
       ],
+      video: {
+        play: 'Ko‘rish',
+        title: 'Bu yerda ovoz',
+        unsupported: 'Brauzer bu videoni ijro eta olmaydi.',
+      },
     },
 
     occasions: {

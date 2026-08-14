@@ -34,11 +34,40 @@ const sectionBase = {
   variant: z.string().optional(),
 };
 
+/**
+ * A video the customer recorded.
+ *
+ * **A URL, not a data URL.** Photographs are inlined into the order record
+ * today — the README lists that as a known gap — and the same trick is simply
+ * not available here: base64 inflates by a third, so a nine-megabyte clip
+ * becomes a twelve-megabyte database row. This field is the point at which
+ * object storage stops being optional, and saying so in the type is more
+ * honest than pretending otherwise.
+ *
+ * `poster` is not decoration. Nothing about the clip is fetched until the
+ * recipient reaches it, so the poster is what they see until then — see
+ * `VideoSection`.
+ */
+export const videoSchema = z.object({
+  id: z.string(),
+  url: z.string(),
+  /** Still shown before playback. Without one the beat is a blank rectangle. */
+  poster: z.string().optional(),
+  alt: z.string().optional(),
+  caption: z.string().optional(),
+  /** Intrinsic size, when known, so the renderer can reserve space (no CLS). */
+  width: z.number().int().positive().optional(),
+  height: z.number().int().positive().optional(),
+});
+
+export type CardVideo = z.infer<typeof videoSchema>;
+
 export const SECTION_KINDS = [
   'cover',
   'envelope',
   'intro',
   'letter',
+  'video',
   'gallery',
   'timeline',
   'memories',
@@ -83,6 +112,14 @@ export const letterSectionSchema = z.object({
   /** Blank-line separated paragraphs. Rendered one at a time as you scroll. */
   body: z.string(),
   signature: z.string().optional(),
+});
+
+/** A recording, played where a letter would otherwise carry the weight. */
+export const videoSectionSchema = z.object({
+  ...sectionBase,
+  type: z.literal('video'),
+  title: z.string().optional(),
+  video: videoSchema,
 });
 
 export const gallerySectionSchema = z.object({
@@ -151,6 +188,7 @@ export const cardSectionSchema = z.discriminatedUnion('type', [
   envelopeSectionSchema,
   introSectionSchema,
   letterSectionSchema,
+  videoSectionSchema,
   gallerySectionSchema,
   timelineSectionSchema,
   memoriesSectionSchema,

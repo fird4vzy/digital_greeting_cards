@@ -446,6 +446,15 @@ export type Dictionary = {
       unfold: string;
       wishesTitle: string;
       defaultWishes: string[];
+      /** The video beat. Nothing is fetched until this button is pressed. */
+      video: {
+        /** Accessible name of the play button, over the poster. */
+        play: string;
+        /** Heading above the beat when the template asks for one. */
+        title: string;
+        /** Shown in place of the clip when the browser cannot play it. */
+        unsupported: string;
+      };
     };
     occasions: Record<OccasionId, { label: string; line: string }>;
     moods: Record<MoodId, { label: string; line: string }>;

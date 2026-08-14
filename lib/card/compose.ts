@@ -116,6 +116,13 @@ export function standardArc(
     },
   ];
 
+  if (input.video) {
+    // After the letter, before the photographs. A recording is the closest
+    // thing to the sender being in the room, and it lands hardest once the
+    // words have set it up — put it first and the letter reads as a caption.
+    drafts.push({ type: 'video', title: strings.video.title, video: input.video });
+  }
+
   if (hasPhotos(input)) {
     drafts.push({
       type: 'gallery',

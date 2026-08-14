@@ -515,6 +515,11 @@ export const en: Dictionary = {
         'People who show up',
         'One very good meal',
       ],
+      video: {
+        play: 'Play',
+        title: 'A voice, here',
+        unsupported: 'This browser cannot play the video.',
+      },
     },
 
     occasions: {

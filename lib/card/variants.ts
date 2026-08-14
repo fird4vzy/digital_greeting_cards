@@ -30,6 +30,7 @@ export const SECTION_VARIANTS = {
   envelope: ['ribbon', 'washi', 'wax'],
   intro: ['centered', 'offset'],
   letter: ['handwritten', 'serif', 'washi'],
+  video: ['framed', 'full'],
   gallery: ['filmstrip', 'mosaic', 'polaroid', 'stack'],
   timeline: ['ledger', 'thread'],
   memories: ['chips', 'notes'],

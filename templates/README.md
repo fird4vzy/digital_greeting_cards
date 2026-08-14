@@ -29,8 +29,15 @@ needed: the gallery plays each template live through the real renderer.
 ## What you can draw from
 
 **Beats** (`supportedSections`) — `cover`, `envelope`, `intro`, `letter`,
-`gallery`, `timeline`, `memories`, `quote`, `wishes`, `final`, `closing`.
-A beat with no data disappears on its own: no photographs, no gallery.
+`video`, `gallery`, `timeline`, `memories`, `quote`, `wishes`, `final`,
+`closing`. A beat with no data disappears on its own: no photographs, no
+gallery.
+
+`video` is the one beat that can cost megabytes, so it is built to spend
+nothing until it is asked to: the element is not mounted until the beat is near
+the viewport, `preload` is `none`, and a poster stands in until then. Every
+template declares it, because a card without a recording loses nothing by the
+declaration.
 
 **Looks** (`sectionVariants`) — the vocabulary lives in
 [`lib/card/variants.ts`](../lib/card/variants.ts) and is checked at compile

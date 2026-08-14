@@ -3,6 +3,7 @@
 import { motion, useScroll, useSpring } from 'framer-motion';
 import type { CardConfig } from '@/lib/card/schema';
 import { keepSupported } from '@/lib/card/compose';
+import { cardStrings } from '@/lib/card/copy';
 import { getPalette, paletteVars } from '@/lib/design/palettes';
 import { resolveTemplate } from '@/templates';
 import { cn } from '@/lib/utils/cn';
@@ -38,6 +39,10 @@ export function CardRenderer({
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 90, damping: 28, mass: 0.3 });
 
+  // The card's locale, never the reader's: a Russian card stays Russian on an
+  // English phone, and its chrome has to follow its content.
+  const strings = cardStrings(config.locale);
+
   const senderInitial = (config.sender.name?.trim()?.charAt(0) || '♥').toUpperCase();
 
   return (
@@ -59,7 +64,7 @@ export function CardRenderer({
         <SectionRenderer
           key={section.id}
           section={section}
-          context={{ scene: template.scene, motif: template.motif, senderInitial }}
+          context={{ scene: template.scene, motif: template.motif, senderInitial, strings }}
         />
       ))}
     </div>

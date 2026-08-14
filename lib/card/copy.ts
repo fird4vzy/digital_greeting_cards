@@ -39,6 +39,8 @@ export function coverHeadline(locale: string): string {
 }
 
 /** Built-in strings rendered inside a card, in the card's own language. */
+export type CardStrings = ReturnType<typeof cardStrings>;
+
 export function cardStrings(locale: string) {
   return getDictionary(locale).content.card;
 }

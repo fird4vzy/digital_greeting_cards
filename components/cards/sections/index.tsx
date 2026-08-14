@@ -2,6 +2,7 @@
 
 import type { CardSection } from '@/lib/card/schema';
 import type { MotifId, SceneId } from '@/lib/card/template';
+import type { CardStrings } from '@/lib/card/copy';
 import { ClosingSection } from './ClosingSection';
 import { CoverSection } from './CoverSection';
 import { EnvelopeSection } from './EnvelopeSection';
@@ -9,6 +10,7 @@ import { FinalSection } from './FinalSection';
 import { GallerySection } from './GallerySection';
 import { IntroSection } from './IntroSection';
 import { LetterSection } from './LetterSection';
+import { VideoSection } from './VideoSection';
 import { MemoriesSection } from './MemoriesSection';
 import { QuoteSection } from './QuoteSection';
 import { TimelineSection } from './TimelineSection';
@@ -26,6 +28,13 @@ export type SectionContext = {
   scene: SceneId;
   motif: MotifId;
   senderInitial: string;
+  /**
+   * The card's own strings, in the card's own locale — not the reader's.
+   * Most beats have their text baked in at compose time; the video beat also
+   * needs chrome (a play label, a codec fallback) that is not content, and it
+   * still has to speak the language the card was written in.
+   */
+  strings: CardStrings;
 };
 
 export function SectionRenderer({
@@ -44,6 +53,8 @@ export function SectionRenderer({
       return <IntroSection section={section} />;
     case 'letter':
       return <LetterSection section={section} />;
+    case 'video':
+      return <VideoSection section={section} strings={context.strings} />;
     case 'gallery':
       return <GallerySection section={section} />;
     case 'timeline':

@@ -379,9 +379,24 @@ That fits in a database row and a form — no file, no deploy.
 
 ### The plan, in order
 
-1. **A video beat.** `iLove` is cover → envelope → *video* → letter, and four of
-   those five exist. The fifth does not, and no importer can invent it. Adding
-   it gives every template video, not just this one.
+1. ~~**A video beat.**~~ **Done, 14 August.** `video` is the twelfth section
+   kind, declared by all six templates, and it composes straight after the
+   letter — a recording is the closest thing to the sender being in the room,
+   and it lands hardest once the words have set it up. Verified through the real
+   path: with a clip the arc runs cover → envelope → intro → letter → **video**
+   → gallery → quote → final → closing, and the beat's title arrives in the
+   *card's* locale rather than the reader's.
+
+   It is the one beat that can cost megabytes, so it spends nothing until it is
+   asked to: the `<video>` is not mounted until the beat is near the viewport,
+   `preload` is `none`, and a poster stands in until then. Autoplay is muted,
+   in-view only, and off entirely under reduced motion.
+
+   **It takes a URL, not a data URL**, and that is the important consequence.
+   Photographs are inlined into the order record today; a nine-megabyte clip
+   would be a twelve-megabyte database row. This field is where object storage
+   stops being optional — the README already lists inlined photos as a known
+   gap, and this makes it due.
 2. **Port `iLove` by hand.** One template end to end, to find out what the port
    actually costs before automating it.
 3. **A builder in `/admin/templates`.** Pick palette, scene, beats and a look

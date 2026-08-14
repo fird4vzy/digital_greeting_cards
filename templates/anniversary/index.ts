@@ -23,6 +23,7 @@ export const anniversaryTemplate: TemplateDefinition = {
     'intro',
     'timeline',
     'letter',
+    'video',
     'gallery',
     'quote',
     'memories',
@@ -35,6 +36,8 @@ export const anniversaryTemplate: TemplateDefinition = {
     intro: 'centered',
     timeline: 'ledger',
     letter: 'serif',
+
+    video: 'framed',
     gallery: 'mosaic',
     memories: 'chips',
     quote: 'rule',

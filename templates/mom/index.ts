@@ -22,6 +22,7 @@ export const momTemplate: TemplateDefinition = {
     'envelope',
     'intro',
     'letter',
+    'video',
     'gallery',
     'timeline',
     'memories',
@@ -34,6 +35,8 @@ export const momTemplate: TemplateDefinition = {
     envelope: 'ribbon',
     intro: 'offset',
     letter: 'handwritten',
+
+    video: 'framed',
     gallery: 'mosaic',
     timeline: 'ledger',
     memories: 'notes',

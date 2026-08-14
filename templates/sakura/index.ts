@@ -22,6 +22,7 @@ export const sakuraTemplate: TemplateDefinition = {
     'envelope',
     'intro',
     'letter',
+    'video',
     'gallery',
     'quote',
     'memories',
@@ -34,6 +35,8 @@ export const sakuraTemplate: TemplateDefinition = {
     envelope: 'washi',
     intro: 'offset',
     letter: 'washi',
+
+    video: 'full',
     gallery: 'stack',
     timeline: 'thread',
     memories: 'notes',

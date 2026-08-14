@@ -1,5 +1,5 @@
 ﻿import type { PaletteId } from '@/lib/design/palettes';
-import type { CardSection, Photo, SectionKind } from './schema';
+import type { CardSection, Photo, SectionKind, CardVideo } from './schema';
 import type { SectionVariants } from './variants';
 import type { MoodId, OccasionId } from './taxonomy';
 
@@ -38,6 +38,11 @@ export type StoryInput = {
   /** Free text the customer wrote in "Tell us the story". */
   story: string;
   photos: Photo[];
+  /**
+   * A recording, if the customer sent one. Optional like every other beat's
+   * data — a template that plays the video beat simply skips it when absent.
+   */
+  video?: CardVideo;
   moments?: { date: string; title: string; text?: string }[];
   memories?: { label: string; text: string }[];
   wishes?: string[];
