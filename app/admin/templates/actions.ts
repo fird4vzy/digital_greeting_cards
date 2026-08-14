@@ -6,6 +6,8 @@ import { ADMIN_SESSION_COOKIE, verifyAdminSession } from '@/lib/auth/admin';
 import { templateRecipeDraftSchema } from '@/lib/card/recipe';
 import { getTemplateStore } from '@/lib/db';
 import { listTemplates } from '@/templates';
+import { importTemplate } from '@/lib/ai/importer';
+import type { TemplateImport } from '@/lib/ai/import-schema';
 
 /**
  * Saving a template an operator built.
@@ -73,4 +75,25 @@ export async function deleteTemplate(id: string): Promise<SaveResult> {
   revalidatePath('/');
 
   return { ok: true, id };
+}
+
+/**
+ * Reads a repository of hand-written HTML into a draft recipe.
+ *
+ * Returns it rather than saving it: the mapping is a judgement and some of
+ * those judgements will be wrong, so what comes back fills the form for an
+ * operator to correct. `unmapped` is handed over untouched — a screen the
+ * engine has no beat for is information, not an error.
+ */
+export async function importFromRepository(
+  url: string,
+): Promise<
+  | { ok: true; recipe: TemplateImport }
+  | { ok: false; error: string }
+> {
+  if (!(await verifyAdminSession((await cookies()).get(ADMIN_SESSION_COOKIE)?.value))) {
+    return { ok: false, error: 'Not authenticated' };
+  }
+
+  return importTemplate(url);
 }

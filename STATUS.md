@@ -5,8 +5,8 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 14 August 2026, after the video beat, the first ported
-template, and the builder that makes templates data.
+**Last updated:** 14 August 2026, after the video beat, the first template
+ported look and all, the builder, and the importer that fills it.
 
 ---
 
@@ -421,10 +421,32 @@ That fits in a database row and a form — no file, no deploy.
    watch someone say it, and the words that follow read as what would not fit
    in the camera.
 
-   **What did not survive is the choreography** — the specific hearts, the
-   exact easing. That is the honest cost of porting, and it is worth naming
-   now, before the importer starts making the same trade automatically on the
-   other two.
+   **The choreography was then ported too**, after the first pass turned out to
+   be the right skeleton in the engine's default clothes. Four variants carry
+   it, added the way `templates/README.md` prescribes so the next template gets
+   them free:
+
+   - `cover: gradient` — colour travelling along the name, three stops and back
+     over seven seconds.
+   - `envelope: heart` — not an envelope. The gate is a heart built from one
+     rotated square and two circles, and tapping it sends the note up out of it
+     rather than lifting a flap. The original's units are kept (a 125px square
+     at −45°, circles offset by half its width) because those numbers are what
+     make the lobes meet the point.
+   - `video: screen` — the clip in a near-black box even in a light palette. A
+     video is a window and a window is darker than its wall; without that it
+     reads as an illustration pasted onto paper.
+   - `letter: lines` — one line at a time, each resolving out of blur. The
+     original does this with thirty-six hand-written `nth-child` rules, which
+     works once, for a letter of exactly that length; here the stagger is an
+     index. The blur went to `lib/design/motion.ts` as a `focus` preset.
+
+   Hearts are thrown on the tap — fourteen, outward but never straight down,
+   because hearts that sink read as falling rather than escaping.
+
+   **What still does not survive a port is timing that was tuned by hand**, and
+   that is worth expecting rather than treating as a fault when the importer
+   makes the same trade automatically.
 
    Verified through the real path: given a clip, `aloud` composes
    cover → envelope → intro → **video → letter** → gallery → quote → final →
@@ -459,19 +481,33 @@ That fits in a database row and a form — no file, no deploy.
 
    Still to come: "save this order as a template", which is now cheap because a
    finished order already carries most of these fields.
-4. **An importer.** Paste a repository URL, and the same trick the card planner
-   already uses reads the HTML and returns a `TemplateDefinition` — enums drawn
-   from the registry, validated by zod, so the model cannot emit markup any more
-   than it can today. Its most useful output is the list of screens it *could
-   not* map: that is the engine's missing vocabulary, named.
+4. ~~**An importer.**~~ **Done, 14 August.** A field at the top of the builder:
+   paste a public GitHub URL, and it reads the repository's HTML, CSS and JS
+   and fills the form below.
 
-Order matters. Building the builder first means guessing its fields; building
-the importer first means guessing what it should produce.
+   It is the card planner with a different input. `lib/ai/import-schema.ts`
+   holds the contract, and every field in it is an enum built from what the
+   renderer implements — so the model cannot emit markup any more than the
+   planner can, because there is no field for markup. **That is also what
+   removes the security problem the other three routes had:** serving a
+   stranger's HTML puts their script in the same cookie jar as the admin, and
+   reading it produces data, which does not run.
 
-The importer's result is a **draft an operator reviews**, never a live template.
-It maps structure, not character — the timing and choreography of a hand-written
-page do not survive, and pretending otherwise would make the port look like a
-failure when it is working as designed.
+   **It never saves.** The mapping is a judgement and some of those judgements
+   will be wrong, so the result lands in the form for an operator to correct.
+
+   `unmapped` is the field worth watching. The model is told to list screens no
+   beat covers rather than stretch a beat to fit — that list is the engine's
+   missing vocabulary, named by the thing that needed it. The video beat exists
+   because a hand port turned one up the same way.
+
+   Private repositories are refused rather than asked for a token. A feature
+   that reads source should not start collecting credentials that can read
+   source.
+
+Order mattered, and it paid: building the builder first would have meant
+guessing its fields, and the `reorder` field — the one that separates *Aloud*
+from *Nocturne* — only became obvious after porting a template by hand.
 
 ---
 

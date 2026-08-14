@@ -485,6 +485,11 @@ export const en: Dictionary = {
         existing: 'Built here',
         none: 'None yet.',
         preview: 'Preview',
+        importTitle: 'Or read an existing page',
+        importHint: 'A link to a public repository of hand-written HTML. The model reads it and fills the form below — it saves nothing, this is a draft you correct.',
+        importAction: 'Read it',
+        importing: 'Reading…',
+        unmapped: 'Screens the engine has no beat for:',
       },
     },
 

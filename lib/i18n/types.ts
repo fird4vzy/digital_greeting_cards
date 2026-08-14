@@ -420,6 +420,12 @@ export type Dictionary = {
         existing: string;
         none: string;
         preview: string;
+        /** Reading a repository of hand-written HTML into this form. */
+        importTitle: string;
+        importHint: string;
+        importAction: string;
+        importing: string;
+        unmapped: string;
       };
     };
     order: {

@@ -491,6 +491,11 @@ export const uz: Dictionary = {
         existing: 'Shu yerda yig‘ilganlar',
         none: 'Hozircha yo‘q.',
         preview: 'Ko‘rish',
+        importTitle: 'Yoki tayyor sahifani o‘qish',
+        importHint: 'Qo‘lda yozilgan HTML joylashgan ochiq repozitoriyga havola. Model uni o‘qib, quyidagi shaklni to‘ldiradi — hech narsa saqlamaydi, bu siz tuzatadigan qoralama.',
+        importAction: 'O‘qish',
+        importing: 'O‘qilmoqda…',
+        unmapped: 'Dvigatelda mos qismi yo‘q ekranlar:',
       },
     },
 

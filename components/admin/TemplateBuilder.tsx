@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import Link from 'next/link';
-import { saveTemplate, deleteTemplate } from '@/app/admin/templates/actions';
+import { saveTemplate, deleteTemplate, importFromRepository } from '@/app/admin/templates/actions';
 import { SECTION_VARIANTS } from '@/lib/card/variants';
 import { SECTION_KINDS, type SectionKind } from '@/lib/card/schema';
 import type { TemplateRecipe } from '@/lib/card/recipe';
@@ -63,6 +63,11 @@ export type BuilderStrings = {
   existing: string;
   none: string;
   preview: string;
+  importTitle: string;
+  importHint: string;
+  importAction: string;
+  importing: string;
+  unmapped: string;
 };
 
 const EMPTY = (defaults: Vocabulary) => ({
@@ -91,6 +96,39 @@ export function TemplateBuilder({
   const [message, setMessage] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
   const [pending, startTransition] = useTransition();
+
+  const [repoUrl, setRepoUrl] = useState('');
+  const [unmapped, setUnmapped] = useState<string[]>([]);
+  const [rationale, setRationale] = useState('');
+
+  function runImport() {
+    setMessage(null);
+    setUnmapped([]);
+    setRationale('');
+
+    startTransition(async () => {
+      const result = await importFromRepository(repoUrl);
+
+      if (!result.ok) {
+        setFailed(true);
+        setMessage(result.error);
+        return;
+      }
+
+      const { unmapped: gaps, rationale: why, strings: copy, ...recipe } = result.recipe;
+
+      setForm((current) => ({
+        ...current,
+        ...recipe,
+        sectionVariants: recipe.sectionVariants as Record<string, string | undefined>,
+        strings: { en: copy },
+      }));
+      setUnmapped(gaps);
+      setRationale(why);
+      setFailed(false);
+      setMessage(null);
+    });
+  }
 
   const set = <K extends keyof ReturnType<typeof EMPTY>>(
     key: K,
@@ -126,6 +164,45 @@ export function TemplateBuilder({
   return (
     <div className="grid gap-12 lg:grid-cols-[1fr_18rem]">
       <div className="flex flex-col gap-9">
+        {/* The importer fills this form; it never saves. The mapping is a
+            judgement and some of it will be wrong, so it lands where an
+            operator can correct it before anything is stored. */}
+        <Group title={t.importTitle} hint={t.importHint}>
+          <div className="flex flex-wrap gap-3">
+            <input
+              value={repoUrl}
+              onChange={(event) => setRepoUrl(event.target.value)}
+              placeholder="https://github.com/user/repo"
+              className={`${inputClass} max-w-[26rem] flex-1`}
+            />
+            <button
+              type="button"
+              disabled={pending || !repoUrl.trim()}
+              onClick={runImport}
+              className="rounded-full border border-line-strong px-5 py-2 text-caption text-ink transition-colors hover:border-ink hover:bg-ink hover:text-paper disabled:opacity-40"
+            >
+              {pending ? t.importing : t.importAction}
+            </button>
+          </div>
+
+          {unmapped.length > 0 ? (
+            <div className="mt-5 rounded-[0.6rem] border-l-2 border-accent bg-accent/[0.06] px-4 py-3">
+              <p className="text-caption text-ink">{t.unmapped}</p>
+              <ul className="mt-2 space-y-1">
+                {unmapped.map((item, index) => (
+                  <li key={index} className="text-caption text-ink-muted">
+                    — {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          {rationale ? (
+            <p className="mt-4 max-w-[60ch] text-caption text-ink-muted">{rationale}</p>
+          ) : null}
+        </Group>
+
         <Group title={t.identity}>
           <Field label={t.idLabel} hint={t.idHint}>
             <input
