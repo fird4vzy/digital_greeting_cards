@@ -5,8 +5,8 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 13 August 2026, after the 3D work on /shops and the decision
-to port the hand-made templates into the engine.
+**Last updated:** 14 August 2026, after the video beat and the first template
+ported out of a hand-written page.
 
 ---
 
@@ -108,6 +108,11 @@ long version.
   as a dependency partway through; pulling onto a machine with older
   `node_modules` fails the build with a module-not-found pointing at
   `lib/db/postgres.ts`, which looks like a code fault and is not one.
+- **Clear `.next` when a registry change does not appear.** A newly registered
+  template was missing from `/templates` and 404ed at `/templates/<id>` after a
+  normal `next build`; `rm -rf .next` and the same build produced all seven.
+  Both pages read `listTemplates()` and the registry was correct throughout, so
+  nothing in the source explained it — try this before debugging the code.
 - **Stop the dev server before pulling.** The admin pages moved into the route
   group `app/admin/(dashboard)/`, and on Windows git could not remove the old
   directories while a watcher held them open. It asks
@@ -397,8 +402,28 @@ That fits in a database row and a form — no file, no deploy.
    would be a twelve-megabyte database row. This field is where object storage
    stops being optional — the README already lists inlined photos as a known
    gap, and this makes it due.
-2. **Port `iLove` by hand.** One template end to end, to find out what the port
-   actually costs before automating it.
+2. ~~**Port `iLove` by hand.**~~ **Done, 14 August.** It is `templates/aloud/`,
+   called *Вслух / Aloud / Ovoz bilan* — the one where the sender speaks. Live
+   at `/templates/aloud`.
+
+   **The port needed no markup, and cost one palette and one reordering.** The
+   original was a single 40 KB HTML file with its styles and script inline; its
+   four screens mapped onto `cover → envelope → video → letter` exactly, its
+   letter was already blank-line separated paragraphs, and its flying hearts
+   became the `petals` scene over a new `blush` palette taken from its own hex
+   values. The only custom code is a `compose` that moves the video ahead of
+   the letter, the same technique `anniversary` uses for its timeline: you
+   watch someone say it, and the words that follow read as what would not fit
+   in the camera.
+
+   **What did not survive is the choreography** — the specific hearts, the
+   exact easing. That is the honest cost of porting, and it is worth naming
+   now, before the importer starts making the same trade automatically on the
+   other two.
+
+   Verified through the real path: given a clip, `aloud` composes
+   cover → envelope → intro → **video → letter** → gallery → quote → final →
+   closing, while `romantic` on the same input keeps letter → video.
 3. **A builder in `/admin/templates`.** Pick palette, scene, beats and a look
    per beat; watch it play live; save. Then "save this order as a template" is a
    button, because a finished order already carries most of those fields.

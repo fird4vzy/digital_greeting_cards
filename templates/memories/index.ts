@@ -36,7 +36,6 @@ export const memoriesTemplate: TemplateDefinition = {
     gallery: 'filmstrip',
     timeline: 'ledger',
     letter: 'serif',
-
     video: 'framed',
     memories: 'chips',
     quote: 'rule',

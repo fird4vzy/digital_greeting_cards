@@ -36,7 +36,6 @@ export const birthdayTemplate: TemplateDefinition = {
     envelope: 'ribbon',
     intro: 'centered',
     letter: 'serif',
-
     video: 'full',
     gallery: 'polaroid',
     memories: 'chips',

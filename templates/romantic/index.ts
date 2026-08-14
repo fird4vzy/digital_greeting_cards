@@ -35,7 +35,6 @@ export const romanticTemplate: TemplateDefinition = {
     envelope: 'wax',
     intro: 'centered',
     letter: 'serif',
-
     video: 'full',
     gallery: 'stack',
     timeline: 'thread',

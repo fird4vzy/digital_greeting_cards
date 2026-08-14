@@ -35,7 +35,6 @@ export const momTemplate: TemplateDefinition = {
     envelope: 'ribbon',
     intro: 'offset',
     letter: 'handwritten',
-
     video: 'framed',
     gallery: 'mosaic',
     timeline: 'ledger',

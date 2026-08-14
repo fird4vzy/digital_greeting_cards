@@ -597,6 +597,13 @@ export const en: Dictionary = {
           'Borrowed from Japanese print composition rather than Japanese decoration: enormous margins, a deliberately off-centre column, and a single sakura branch that sheds petals as you read. The quietest template in the library, and the one that ages best.',
         animationStyle: 'Falling sakura, asymmetric columns, ink-wash transitions',
       },
+      aloud: {
+        name: 'Aloud',
+        tagline: 'A recording first, then the words.',
+        description:
+          'The shortest card in the library, and the only one that opens its mouth. A title over soft light, an envelope to tap, then the sender on camera before a single line is read — the letter arrives afterwards, one line at a time, as the reply. For the message that is easier said than written.',
+        animationStyle: 'Drifting light, a tapped envelope, the letter line by line',
+      },
     },
 
     copy: {

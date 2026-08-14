@@ -604,6 +604,13 @@ export const uz: Dictionary = {
           "Yapon bezagidan emas, yapon bosma kompozitsiyasidan olingan: ulkan chekkalar, ataylab markazdan siljitilgan ustun va siz o'qiyotganingizda gulbarglarini to'kadigan bitta sakura shoxi. Kutubxonadagi eng tinch shablon va eng yaxshi qariydigani.",
         animationStyle: "Tushayotgan sakura, assimetrik ustunlar, siyoh o'tishlari",
       },
+      aloud: {
+        name: 'Ovoz bilan',
+        tagline: 'Avval yozuv, keyin so‘zlar.',
+        description:
+          'Kutubxonadagi eng qisqa otkritka va og‘iz ochadigan yagonasi. Yumshoq yorug‘likdagi sarlavha, tegib ochiladigan konvert va birinchi satr o‘qilmasdan oldin kameradagi odam. Xat keyin keladi — satrma-satr, javob kabi. Yozishdan ko‘ra aytish osonroq bo‘lgan gap uchun.',
+        animationStyle: 'Suzuvchi yorug‘lik, tegib ochiladigan konvert, satrma-satr xat',
+      },
     },
 
     copy: {

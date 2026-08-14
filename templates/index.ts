@@ -1,5 +1,6 @@
 import type { StoryInput, TemplateDefinition, TemplateSummary } from '@/lib/card/template';
 import { toSummary } from '@/lib/card/template';
+import { aloudTemplate } from './aloud';
 import { anniversaryTemplate } from './anniversary';
 import { birthdayTemplate } from './birthday';
 import { memoriesTemplate } from './memories';
@@ -19,6 +20,7 @@ const registry: TemplateDefinition[] = [
   anniversaryTemplate,
   memoriesTemplate,
   sakuraTemplate,
+  aloudTemplate,
 ];
 
 const byId = new Map(registry.map((template) => [template.id, template]));

@@ -136,6 +136,28 @@ export const palettes = {
     particles: ['#f4cdd6', '#dda3b1', '#fdeef1'],
     swatches: ['#f5f2ee', '#c98a97', '#f0dcdf', '#1a1a1a'],
   },
+  /**
+   * Aloud — the blush of the hand-written card this template was ported from.
+   * Paper so pale it is almost white, one warm pink doing all the work, and
+   * ink that stays brown rather than black so nothing on it reads as printed.
+   */
+  blush: {
+    id: 'blush',
+    name: 'Blush',
+    scheme: 'light',
+    bg: '#fff5f5',
+    bgDeep: '#fff1f4',
+    ink: '#21171b',
+    inkSoft: '#704653',
+    inkMuted: '#9b596b',
+    accent: '#e87e96',
+    accentSoft: '#f7a3b3',
+    glow: 'rgba(232, 126, 150, 0.28)',
+    line: 'rgba(33, 23, 27, 0.12)',
+    particles: ['#f7a3b3', '#e87e96', '#fff1f4'],
+    swatches: ['#fff5f5', '#e87e96', '#f7a3b3', '#21171b'],
+  },
+
 } as const satisfies Record<string, CardPalette>;
 
 export type PaletteId = keyof typeof palettes;
