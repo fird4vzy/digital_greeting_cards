@@ -17,6 +17,55 @@ export function LetterSection({ section }: { section: SectionOfKind<'letter'> })
   const variant = section.variant ?? 'serif';
   const blocks = paragraphs(section.body);
 
+  /**
+   * `lines` reveals one *line* at a time, not one paragraph.
+   *
+   * Ported from the hand-written card, where it is thirty-six `nth-child`
+   * rules each nudging the delay along — which works exactly once, for a letter
+   * of exactly that length. Here the stagger is an index on a custom property,
+   * so it fits a letter of any length and a letter nobody has written yet.
+   *
+   * Each line resolves out of a blur rather than merely fading. That is the
+   * detail that makes the beat feel like remembering rather than loading, and
+   * it is the one thing worth keeping from the original's timing.
+   */
+  if (variant === 'lines') {
+    const lines = section.body
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line, index, all) => line.length > 0 || all[index - 1]?.length > 0);
+
+    return (
+      <Beat innerClassName="max-w-[34rem]">
+        <RevealGroup step={0} className="text-[var(--card-ink-soft)]">
+          {lines.map((line, index) =>
+            line.length === 0 ? (
+              <span key={index} aria-hidden="true" className="block h-[0.9em]" />
+            ) : (
+              <Reveal
+                key={index}
+                preset="focus"
+                as="p"
+                delay={index * 0.14}
+                className="card-display mb-[0.28em] text-[clamp(1.375rem,1rem+1.6vw,1.95rem)] leading-[1.5]"
+              >
+                {line}
+              </Reveal>
+            ),
+          )}
+        </RevealGroup>
+
+        {section.signature ? (
+          <Reveal preset="fade" delay={lines.length * 0.14 + 0.2}>
+            <p className="card-display mt-12 text-title italic text-[var(--card-ink)]">
+              {section.signature}
+            </p>
+          </Reveal>
+        ) : null}
+      </Beat>
+    );
+  }
+
   // A drop cap needs a paragraph deep enough for the text to wrap around it.
   // Letters routinely open on a bare salutation ("Alina,"), where a drop cap
   // leaves a stranded capital and a hole in the column.

@@ -31,6 +31,33 @@ export function EnvelopeSection({
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLElement | null>(null);
 
+  /** Only the `heart` gate throws these; the others open in silence. */
+  const [burst, setBurst] = useState<
+    { id: number; x: number; y: number; rotation: number; size: number }[]
+  >([]);
+
+  const throwHearts = useCallback(() => {
+    if (reduced) return;
+
+    setBurst(
+      Array.from({ length: 14 }, (_, index) => {
+        // Outward in every direction, but never straight down: hearts that
+        // sink read as falling rather than escaping.
+        const angle = (index / 14) * Math.PI * 2 - Math.PI / 2;
+        const distance = 90 + Math.random() * 150;
+        return {
+          id: Date.now() + index,
+          x: Math.cos(angle) * distance,
+          y: Math.sin(angle) * distance - 40,
+          rotation: Math.round((Math.random() - 0.5) * 90),
+          size: Math.round(Math.random() * 16),
+        };
+      }),
+    );
+
+    window.setTimeout(() => setBurst([]), 2400);
+  }, [reduced]);
+
   const handleOpen = useCallback(() => {
     if (open) return;
     setOpen(true);
@@ -64,11 +91,37 @@ export function EnvelopeSection({
     return (
       <section
         ref={rootRef}
-        className="relative flex min-h-[100svh] w-full flex-col items-center justify-center gap-10 px-[var(--spacing-gutter)] py-20"
+        className="relative flex min-h-[100svh] w-full flex-col items-center justify-center gap-10 overflow-hidden px-[var(--spacing-gutter)] py-20"
       >
+        {/* The burst. Thrown once, on the tap, and then left alone: the nodes
+            are removed when the animation ends rather than kept and reused,
+            because a card is opened once and a pool would outlive its use. */}
+        {burst.map((heart) => (
+          <span
+            key={heart.id}
+            aria-hidden="true"
+            className="pointer-events-none absolute left-1/2 top-1/2 z-20 select-none"
+            style={
+              {
+                '--x': `${heart.x}px`,
+                '--y': `${heart.y}px`,
+                '--rotation': `${heart.rotation}deg`,
+                fontSize: `${14 + heart.size}px`,
+                color: 'color-mix(in srgb, var(--card-accent) 70%, transparent)',
+                animation: 'cardHeartFly 2.2s cubic-bezier(.15,.8,.2,1) forwards',
+              } as React.CSSProperties
+            }
+          >
+            ♥
+          </span>
+        ))}
+
         <motion.button
           type="button"
-          onClick={handleOpen}
+          onClick={() => {
+            throwHearts();
+            handleOpen();
+          }}
           aria-label={section.prompt ?? 'Open it'}
           data-motion="gentle-float"
           className="relative block cursor-pointer focus-visible:outline-offset-8"

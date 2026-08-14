@@ -359,3 +359,17 @@
     animation: none !important;
   }
 }
+
+/* Hearts thrown out of the gate when it is tapped. Positions come in as
+   custom properties so one keyframe serves every one of them. */
+@keyframes cardHeartFly {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2) rotate(0deg);
+  }
+  15% { opacity: 0.8; }
+  100% {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) scale(1) rotate(var(--rotation));
+  }
+}

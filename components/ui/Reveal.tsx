@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import type { ElementType, ReactNode } from 'react';
-import { fadeUp, maskReveal, riseIn, settleImage, splitWords, stagger, viewportOnce, wordReveal } from '@/lib/design/motion';
+import { fadeUp, focusIn, maskReveal, riseIn, settleImage, splitWords, stagger, viewportOnce, wordReveal } from '@/lib/design/motion';
 import { useMotionPrefs } from '@/lib/hooks/useMotionPrefs';
 import { cn } from '@/lib/utils/cn';
 
@@ -10,14 +10,14 @@ type RevealProps = {
   children: ReactNode;
   className?: string;
   /** `rise` is the slower headline treatment; `fade` is for body content. */
-  preset?: 'fade' | 'rise' | 'mask' | 'image';
+  preset?: 'fade' | 'rise' | 'mask' | 'image' | 'focus';
   delay?: number;
   as?: ElementType;
   /** Opt out of scroll triggering — animate as soon as it mounts. */
   immediate?: boolean;
 };
 
-const presets = { fade: fadeUp, rise: riseIn, mask: maskReveal, image: settleImage };
+const presets = { fade: fadeUp, rise: riseIn, mask: maskReveal, image: settleImage, focus: focusIn };
 
 export function Reveal({
   children,

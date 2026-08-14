@@ -53,6 +53,24 @@ export const fadeUp: VariantFactory = (reduced = false) => ({
   },
 });
 
+/**
+ * A line resolving out of blur, ported from the hand-written card.
+ *
+ * Shorter travel than  and a heavier blur: this runs on every line of
+ * a letter rather than once on a headline, so it has to read as the text
+ * coming into focus, not as each line making an entrance. The distinction is
+ * what makes the beat feel like remembering instead of loading.
+ */
+export const focusIn: VariantFactory = (reduced = false) => ({
+  hidden: { opacity: 0, y: reduced ? 0 : 22, filter: reduced ? 'none' : 'blur(5px)' },
+  show: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: { duration: reduced ? 0.3 : 1, ease: easing.out },
+  },
+});
+
 /** For headlines: slower, longer travel, feels like a camera settling. */
 export const riseIn: VariantFactory = (reduced = false) => ({
   hidden: { opacity: 0, y: reduced ? 0 : 42, filter: reduced ? 'none' : 'blur(6px)' },

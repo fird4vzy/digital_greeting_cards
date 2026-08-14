@@ -6,6 +6,7 @@ import { Reveal } from '@/components/ui/Reveal';
 import { useInView } from '@/lib/hooks/useInView';
 import { useMotionPrefs } from '@/lib/hooks/useMotionPrefs';
 import type { SectionOfKind } from '@/lib/card/schema';
+import { cn } from '@/lib/utils/cn';
 import type { CardStrings } from '@/lib/card/copy';
 
 /**
@@ -76,7 +77,15 @@ export function VideoSection({
   const frame = (
     <div
       ref={ref}
-      className="relative overflow-hidden rounded-[1.25rem] bg-[color-mix(in_srgb,var(--card-bg)_80%,#000)]"
+      className={cn(
+        'relative overflow-hidden rounded-[1.25rem]',
+        // A window is darker than the wall around it. On the `screen` variant
+        // the box is near-black even in a light palette, which is what stops
+        // the clip reading as an illustration pasted onto paper.
+        variant === 'screen'
+          ? 'bg-[color-mix(in_srgb,var(--card-ink)_92%,#000)]'
+          : 'bg-[color-mix(in_srgb,var(--card-bg)_80%,#000)]',
+      )}
       style={{ aspectRatio: aspect }}
     >
       {video.poster ? (
@@ -129,6 +138,58 @@ export function VideoSection({
   const caption = video.caption ? (
     <p className="mt-4 text-caption text-[var(--card-ink-muted)]">{video.caption}</p>
   ) : null;
+
+  /**
+   * `screen` is the original's own framing: the title above in the display
+   * face, the clip in a near-black box lit from behind by the palette, and a
+   * small pulsing cue underneath.
+   *
+   * The dark box is the point. Every other beat in a light template sits on
+   * paper; this one deliberately does not, because a video is a window and a
+   * window is darker than the wall around it. Without that the clip reads as
+   * an illustration pasted onto the page.
+   */
+  if (variant === 'screen') {
+    return (
+      <section className="py-24 sm:py-32">
+        <div className="mx-auto w-full max-w-[34rem] px-[var(--spacing-gutter)] text-center">
+          {section.title ? (
+            <Reveal preset="rise" as="h2" className="block">
+              <span className="card-display block text-[clamp(2.375rem,1.5rem+3.5vw,3.75rem)] leading-none text-[var(--card-ink-soft)]">
+                {section.title}
+              </span>
+            </Reveal>
+          ) : null}
+
+          <Reveal preset="fade" delay={0.3} className="mt-6 block">
+            <div
+              className="overflow-hidden rounded-[1.25rem]"
+              style={{
+                boxShadow:
+                  '0 30px 80px color-mix(in srgb, var(--card-ink) 26%, transparent), 0 0 55px color-mix(in srgb, var(--card-accent-soft) 24%, transparent)',
+              }}
+            >
+              {frame}
+            </div>
+          </Reveal>
+
+          <Reveal preset="fade" delay={0.7} className="block">
+            <p
+              data-motion="pulse-text"
+              className="mt-4 text-[0.625rem] uppercase tracking-[0.2em] text-[var(--card-ink-muted)]"
+              style={{
+                animation: reduced ? undefined : 'cardPulseText 2.5s ease-in-out infinite',
+              }}
+            >
+              {strings.video.play}
+            </p>
+          </Reveal>
+
+          {caption}
+        </div>
+      </section>
+    );
+  }
 
   if (variant === 'framed') {
     return (
