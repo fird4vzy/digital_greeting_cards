@@ -6,17 +6,23 @@ import { demoConfig } from '@/lib/card/demo';
 import { getPalette } from '@/lib/design/palettes';
 import { localiseTemplate } from '@/lib/i18n/localise';
 import { getI18n } from '@/lib/i18n/server';
-import { getTemplate, listTemplates } from '@/templates';
+import { listTemplates } from '@/templates';
+import { findTemplate } from '@/lib/card/registry';
 
 type Props = { params: Promise<{ slug: string }> };
 
+/**
+ * Compiled templates only. Operator-built ones are rendered on demand — Next
+ * allows params outside this list by default, and pre-rendering a list that
+ * changes without a deploy would defeat the point of storing them.
+ */
 export function generateStaticParams() {
   return listTemplates().map((template) => ({ slug: template.id }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const raw = getTemplate(slug);
+  const raw = await findTemplate(slug);
   if (!raw) return {};
 
   const { dict } = await getI18n();
@@ -30,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export async function generateViewport({ params }: Props): Promise<Viewport> {
   const { slug } = await params;
-  const template = getTemplate(slug);
+  const template = await findTemplate(slug);
   const palette = getPalette(template?.paletteId ?? 'duskRose');
   return { themeColor: palette.bg, colorScheme: palette.scheme };
 }
@@ -45,7 +51,7 @@ export async function generateViewport({ params }: Props): Promise<Viewport> {
  */
 export default async function TemplatePreviewPage({ params }: Props) {
   const { slug } = await params;
-  const raw = getTemplate(slug);
+  const raw = await findTemplate(slug);
   if (!raw) notFound();
 
   const { dict } = await getI18n();

@@ -3,7 +3,7 @@ import { CreateFlow } from '@/components/create/CreateFlow';
 import { Header } from '@/components/site/Header';
 import { localiseTemplates } from '@/lib/i18n/localise';
 import { getI18n } from '@/lib/i18n/server';
-import { listTemplateSummaries } from '@/templates';
+import { listAllTemplateSummaries } from '@/lib/card/registry';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { dict } = await getI18n();
@@ -21,7 +21,7 @@ export default async function CreatePage({ searchParams }: Props) {
       <Header locale={locale} strings={{ ...dict.ui.nav, language: dict.ui.localeSwitcher.label }} />
       <main className="flex min-h-[100svh] flex-col bg-paper-warm">
         <CreateFlow
-          templates={localiseTemplates(listTemplateSummaries(), dict)}
+          templates={localiseTemplates(await listAllTemplateSummaries(), dict)}
           initialTemplate={template}
           locale={locale}
           dict={dict}

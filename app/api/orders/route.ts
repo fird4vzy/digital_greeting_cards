@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { createOrder, listOrders } from '@/lib/db';
 import { ORDER_STATUSES } from '@/lib/db/types';
 import { photoSchema } from '@/lib/card/schema';
-import { composeConfigForOrder } from '@/lib/card/service';
+import { composeConfigForOrderAnywhere } from '@/lib/card/compose-server';
 import { notifyNewOrder } from '@/lib/notify/telegram';
 import { siteOrigin } from '@/lib/site-origin';
 import { DEFAULT_TEMPLATE_ID } from '@/templates';
@@ -75,7 +75,7 @@ export async function POST(request: Request) {
   // `publish` decides only whether it is live: on the customer flow it is
   // false, and a person reviews the draft before a code goes onto a tag.
   const created = await createOrder({ ...draft, status: 'NEW', config: null });
-  const config = composeConfigForOrder(created);
+  const config = await composeConfigForOrderAnywhere(created);
 
   const { updateOrder } = await import('@/lib/db');
   const order =

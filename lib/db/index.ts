@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { fileStore } from './file-store';
+import { fileTemplateStore, type TemplateStore } from './templates';
 import { createPostgresStore } from './postgres';
 import type { OrderRepository } from './repository';
 import type { Order, PublishedCard } from './types';
@@ -15,25 +16,41 @@ import type { Order, PublishedCard } from './types';
  * Resolved once per process and memoised on the promise, not the value, so
  * concurrent first requests share a single connection pool.
  */
-let repositoryPromise: Promise<OrderRepository> | null = null;
+type Stores = { orders: OrderRepository; templates: TemplateStore };
 
-async function resolveRepository(): Promise<OrderRepository> {
+let storesPromise: Promise<Stores> | null = null;
+
+async function resolveStores(): Promise<Stores> {
   const url = process.env.DATABASE_URL;
 
   if (url) {
-    const store = await createPostgresStore(url);
-    if (store) return store;
+    const stores = await createPostgresStore(url);
+    if (stores) return stores;
     console.warn(
       '[db] DATABASE_URL is set but the "pg" driver could not be loaded — falling back to the file store. Run: npm install pg',
     );
   }
 
-  return fileStore;
+  return { orders: fileStore, templates: fileTemplateStore };
 }
 
-export function getRepository(): Promise<OrderRepository> {
-  repositoryPromise ??= resolveRepository();
-  return repositoryPromise;
+function getStores(): Promise<Stores> {
+  storesPromise ??= resolveStores();
+  return storesPromise;
+}
+
+export async function getRepository(): Promise<OrderRepository> {
+  return (await getStores()).orders;
+}
+
+/**
+ * Templates an operator built, as opposed to the ones in `templates/`.
+ *
+ * Separate from `getRepository` because they are separate concerns, resolved
+ * together because they are one database and one pool.
+ */
+export async function getTemplateStore(): Promise<TemplateStore> {
+  return (await getStores()).templates;
 }
 
 /** Convenience wrappers so pages do not repeat the await dance. */

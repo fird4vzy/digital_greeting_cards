@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { CardRenderer } from '@/components/cards/CardRenderer';
 import { parseCardConfig } from '@/lib/card/schema';
-import { composeConfigForOrder } from '@/lib/card/service';
+import { composeConfigForOrderAnywhere } from '@/lib/card/compose-server';
+import { resolveTemplateAnywhere } from '@/lib/card/registry';
+import { toSummary } from '@/lib/card/template';
 import { getOrderByCode } from '@/lib/db';
 import { getI18n } from '@/lib/i18n/server';
 
@@ -33,7 +35,7 @@ export default async function CardPreviewPage({ params }: Props) {
   const order = await getOrderByCode(code);
   if (!order || order.status === 'CANCELLED') notFound();
 
-  const parsed = parseCardConfig(order.config ?? composeConfigForOrder(order));
+  const parsed = parseCardConfig(order.config ?? await composeConfigForOrderAnywhere(order));
   if (!parsed.ok) notFound();
 
   const { dict } = await getI18n();
@@ -52,7 +54,7 @@ export default async function CardPreviewPage({ params }: Props) {
         </div>
       ) : null}
 
-      <CardRenderer config={parsed.config} />
+      <CardRenderer template={toSummary(await resolveTemplateAnywhere(order.templateId))} config={parsed.config} />
     </main>
   );
 }

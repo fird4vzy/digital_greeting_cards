@@ -8,7 +8,7 @@ import { MemoriesSection } from '@/components/marketing/MemoriesSection';
 import { StorySection } from '@/components/marketing/StorySection';
 import { localiseTemplates } from '@/lib/i18n/localise';
 import { getI18n } from '@/lib/i18n/server';
-import { listTemplateSummaries } from '@/templates';
+import { listAllTemplateSummaries } from '@/lib/card/registry';
 
 /**
  * The landing page.
@@ -23,7 +23,7 @@ import { listTemplateSummaries } from '@/templates';
  */
 export default async function HomePage() {
   const { locale, dict } = await getI18n();
-  const templates = localiseTemplates(listTemplateSummaries(), dict);
+  const templates = localiseTemplates(await listAllTemplateSummaries(), dict);
 
   return (
     <>

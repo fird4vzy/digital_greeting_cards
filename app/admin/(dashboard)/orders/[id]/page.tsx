@@ -18,7 +18,7 @@ import {
 import { plural } from '@/lib/i18n/plural';
 import { cardUrl } from '@/lib/qr';
 import { siteOrigin } from '@/lib/site-origin';
-import { listTemplates, resolveTemplate } from '@/templates';
+import { resolveTemplateAnywhere, listAllTemplates } from '@/lib/card/registry';
 import { paragraphs } from '@/lib/card/schema';
 
 type Props = { params: Promise<{ id: string }> };
@@ -33,7 +33,7 @@ export default async function OrderDetail({ params }: Props) {
 
   const origin = await siteOrigin();
   const url = cardUrl(origin, order.code);
-  const template = localiseTemplate(resolveTemplate(order.templateId), dict);
+  const template = localiseTemplate(await resolveTemplateAnywhere(order.templateId), dict);
 
   const dateTime = (value: string) =>
     new Date(value).toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' });
@@ -217,7 +217,7 @@ export default async function OrderDetail({ params }: Props) {
                   defaultValue={order.templateId}
                   className="mb-2.5 h-9 w-full rounded-[0.5rem] border border-line-strong bg-white px-3 text-caption text-ink outline-none focus:border-ink"
                 >
-                  {localiseTemplates(listTemplates(), dict).map((option) => (
+                  {localiseTemplates(await listAllTemplates(), dict).map((option) => (
                     <option key={option.id} value={option.id}>
                       {option.name}
                     </option>

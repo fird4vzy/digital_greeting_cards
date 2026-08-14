@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ADMIN_SESSION_COOKIE, verifyAdminSession } from '@/lib/auth/admin';
-import { composeConfigForOrder } from '@/lib/card/service';
+import { composeConfigForOrderAnywhere } from '@/lib/card/compose-server';
 import { getOrder, removeOrder, updateOrder } from '@/lib/db';
 import { ORDER_STATUSES, isDeletable, type OrderStatus } from '@/lib/db/types';
 import { sendTestNotification, type TestResult } from '@/lib/notify/telegram';
@@ -42,7 +42,7 @@ export async function setOrderStatus(id: string, status: string) {
   if (!order) return;
 
   // Publishing an order with no composed card would produce an empty page.
-  const config = order.config ?? (status === 'PUBLISHED' ? composeConfigForOrder(order) : null);
+  const config = order.config ?? (status === 'PUBLISHED' ? await composeConfigForOrderAnywhere(order) : null);
 
   await updateOrder(id, { status: status as OrderStatus, ...(config ? { config } : {}) });
 
@@ -63,7 +63,7 @@ export async function regenerateCard(id: string, templateId?: string) {
 
   await updateOrder(id, {
     templateId: nextTemplate,
-    config: composeConfigForOrder({ ...order, templateId: nextTemplate }),
+    config: await composeConfigForOrderAnywhere({ ...order, templateId: nextTemplate }),
     status: order.status === 'NEW' ? 'PROCESSING' : order.status,
   });
 

@@ -4,7 +4,11 @@ import { getPalette } from '@/lib/design/palettes';
 import { getI18n } from '@/lib/i18n/server';
 import { localiseTemplates, occasionLabel } from '@/lib/i18n/localise';
 import { plural } from '@/lib/i18n/plural';
-import { listTemplateSummaries } from '@/templates';
+import { listAllTemplateSummaries } from '@/lib/card/registry';
+import { TemplateBuilder } from '@/components/admin/TemplateBuilder';
+import { getTemplateStore } from '@/lib/db';
+import { palettes } from '@/lib/design/palettes';
+import { MOODS, OCCASIONS } from '@/lib/card/taxonomy';
 
 // The dashboard reflects a live queue; prerendering it at build time would
 // show an operator whatever the data looked like when the image was built.
@@ -18,16 +22,22 @@ export async function generateMetadata() {
 /**
  * The registry, as the shop sees it.
  *
- * Read-only on purpose: templates are code, not content. Everything here is
- * derived from `templates/index.ts`, so this page cannot drift out of date —
- * adding a template file makes it appear, with no admin work at all.
+ * The list is derived, not maintained: adding a template file makes it appear
+ * with no admin work at all.
+ *
+ * Below it is the builder, and that is where "templates are code, not content"
+ * stopped being the whole truth. A template is a palette, a scene, a list of
+ * beats and one word each — data, not behaviour — so it fits a form and a
+ * database row, and an operator can add one without a deploy. The compiled
+ * ones stay compiled; see `lib/card/recipe.ts`.
  */
 export default async function AdminTemplatesPage() {
   const { locale, dict } = await getI18n();
   const t = dict.admin.templates;
 
-  const templates = localiseTemplates(listTemplateSummaries(), dict);
+  const templates = localiseTemplates(await listAllTemplateSummaries(), dict);
   const orders = await listOrders();
+  const stored = await (await getTemplateStore()).list();
 
   const usage = templates.map((template) => ({
     template,
@@ -97,6 +107,33 @@ export default async function AdminTemplatesPage() {
           );
         })}
       </ul>
+
+      <section className="mt-16 border-t border-line pt-12">
+        <h2 className="font-display text-display-sm leading-none tracking-[-0.025em] text-ink">
+          {t.builder.newTemplate}
+        </h2>
+
+        <div className="mt-9">
+          <TemplateBuilder
+            stored={stored}
+            strings={t.builder}
+            vocabulary={{
+              palettes: Object.values(palettes).map((palette) => ({
+                id: palette.id,
+                name: palette.name,
+                swatches: palette.swatches,
+              })),
+              scenes: ['petals', 'sakura', 'bloom', 'heart', 'embers', 'none'],
+              motifs: ['petals', 'sparks', 'linen', 'arch', 'sun', 'branch'],
+              occasions: OCCASIONS.map((occasion) => ({
+                id: occasion.id,
+                label: occasionLabel(occasion.id, dict),
+              })),
+              moods: MOODS.map((mood) => ({ id: mood.id, label: mood.label })),
+            }}
+          />
+        </div>
+      </section>
     </>
   );
 }

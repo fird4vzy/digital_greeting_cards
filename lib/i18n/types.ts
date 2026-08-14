@@ -387,6 +387,40 @@ export type Dictionary = {
       noScene: string;
       usage: PluralForms;
       preview: string;
+      /** The builder: a template assembled from the vocabulary, no deploy. */
+      builder: {
+        newTemplate: string;
+        identity: string;
+        idLabel: string;
+        idHint: string;
+        look: string;
+        palette: string;
+        scene: string;
+        motif: string;
+        suits: string;
+        moods: string;
+        beats: string;
+        beatsHint: string;
+        order: string;
+        orderHint: string;
+        orderNone: string;
+        orderMove: string;
+        orderBefore: string;
+        copy: string;
+        copyHint: string;
+        name: string;
+        tagline: string;
+        description: string;
+        animationStyle: string;
+        save: string;
+        saving: string;
+        saved: string;
+        remove: string;
+        removeConfirm: string;
+        existing: string;
+        none: string;
+        preview: string;
+      };
     };
     order: {
       back: string;

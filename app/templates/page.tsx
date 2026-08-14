@@ -9,7 +9,7 @@ import { OCCASIONS, type OccasionId } from '@/lib/card/taxonomy';
 import { localiseTemplates, localisedOccasions, occasionLabel } from '@/lib/i18n/localise';
 import { getI18n } from '@/lib/i18n/server';
 import { t } from '@/lib/i18n';
-import { listTemplateSummaries } from '@/templates';
+import { listAllTemplateSummaries } from '@/lib/card/registry';
 import { cn } from '@/lib/utils/cn';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -23,7 +23,7 @@ export default async function TemplatesPage({ searchParams }: Props) {
   const { feeling } = await searchParams;
   const { locale, dict } = await getI18n();
 
-  const all = localiseTemplates(listTemplateSummaries(), dict);
+  const all = localiseTemplates(await listAllTemplateSummaries(), dict);
   const active = OCCASIONS.some((o) => o.id === feeling) ? (feeling as OccasionId) : undefined;
   const templates = active ? all.filter((template) => template.occasions.includes(active)) : all;
 

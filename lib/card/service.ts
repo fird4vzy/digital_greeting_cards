@@ -2,7 +2,7 @@ import { resolveTemplate } from '@/templates';
 import { asLocale } from '@/lib/i18n/config';
 import type { Order } from '@/lib/db/types';
 import { CARD_CONFIG_VERSION, cardConfigSchema, type CardConfig } from './schema';
-import type { StoryInput } from './template';
+import type { StoryInput, TemplateDefinition } from './template';
 
 /**
  * The composition service — the single path from an order to a renderable
@@ -27,9 +27,18 @@ export function orderToStoryInput(order: Order): StoryInput {
   };
 }
 
-export function composeConfig(input: StoryInput, templateId: string): CardConfig {
-  const template = resolveTemplate(templateId);
-
+/**
+ * The composition itself, against an already-resolved template.
+ *
+ * Split out so a caller that had to look its template up asynchronously — an
+ * operator-built one lives in the database — runs exactly the same code as one
+ * that read it straight out of the compiled registry. See
+ * `lib/card/compose-server.ts`.
+ */
+export function composeConfigWithTemplate(
+  input: StoryInput,
+  template: TemplateDefinition,
+): CardConfig {
   const config: CardConfig = {
     version: CARD_CONFIG_VERSION,
     templateId: template.id,
@@ -46,6 +55,11 @@ export function composeConfig(input: StoryInput, templateId: string): CardConfig
   // Compose then validate: a template that emits a malformed section should
   // fail here, in one place, rather than at render time inside a React tree.
   return cardConfigSchema.parse(config);
+}
+
+/** Compiled templates only. Correct for demo content and seeds. */
+export function composeConfig(input: StoryInput, templateId: string): CardConfig {
+  return composeConfigWithTemplate(input, resolveTemplate(templateId));
 }
 
 export function composeConfigForOrder(order: Order, templateId?: string): CardConfig {

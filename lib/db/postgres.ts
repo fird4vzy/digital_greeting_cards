@@ -1,5 +1,6 @@
 ﻿import { generateCode, generateId, type OrderRepository } from './repository';
 import type { Order, OrderDraft, OrderFilter, OrderPatch } from './types';
+import { createPostgresTemplateStore, type TemplateStore } from './templates';
 
 /**
  * PostgreSQL implementation of `OrderRepository`, against lib/db/schema.sql.
@@ -120,7 +121,16 @@ const COLUMNS = `id, code, customer_name, customer_email, customer_phone, shop,
   memories, wishes, template_id, status, config, notes, brief, created_at, updated_at,
   published_at`;
 
-export async function createPostgresStore(connectionString: string): Promise<OrderRepository | null> {
+/**
+ * Both stores, on one pool.
+ *
+ * Orders and operator-built templates are unrelated concerns, but they are the
+ * same database and a second pool for a table read once per page would be
+ * waste. The template store is a thin wrapper — see lib/db/templates.ts.
+ */
+export async function createPostgresStore(
+  connectionString: string,
+): Promise<{ orders: OrderRepository; templates: TemplateStore } | null> {
   let pool: Pool;
 
   try {
@@ -294,5 +304,5 @@ export async function createPostgresStore(connectionString: string): Promise<Ord
     },
   };
 
-  return store;
+  return { orders: store, templates: createPostgresTemplateStore(pool) };
 }

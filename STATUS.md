@@ -5,8 +5,8 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 14 August 2026, after the video beat and the first template
-ported out of a hand-written page.
+**Last updated:** 14 August 2026, after the video beat, the first ported
+template, and the builder that makes templates data.
 
 ---
 
@@ -108,11 +108,16 @@ long version.
   as a dependency partway through; pulling onto a machine with older
   `node_modules` fails the build with a module-not-found pointing at
   `lib/db/postgres.ts`, which looks like a code fault and is not one.
-- **Clear `.next` when a registry change does not appear.** A newly registered
-  template was missing from `/templates` and 404ed at `/templates/<id>` after a
-  normal `next build`; `rm -rf .next` and the same build produced all seven.
-  Both pages read `listTemplates()` and the registry was correct throughout, so
-  nothing in the source explained it — try this before debugging the code.
+- **Kill stale `next start` processes before believing a local test.** Ten of
+  them were found listening at once on this machine. A new server on a taken
+  port fails with `EADDRINUSE` *in its log* and exits, so requests go to
+  whatever old build already owned the port and everything looks inexplicably
+  out of date — a newly registered template missing from `/templates`, a 404 on
+  a page that exists. `netstat -ano | grep LISTENING` and check the port is
+  actually yours.
+  This was first written up as "clear `.next`", because clearing it appeared to
+  fix exactly that symptom. It probably did not: the working run also used a
+  free port. The `.next` claim is withdrawn rather than left in as folklore.
 - **Stop the dev server before pulling.** The admin pages moved into the route
   group `app/admin/(dashboard)/`, and on Windows git could not remove the old
   directories while a watcher held them open. It asks
@@ -424,9 +429,36 @@ That fits in a database row and a form — no file, no deploy.
    Verified through the real path: given a clip, `aloud` composes
    cover → envelope → intro → **video → letter** → gallery → quote → final →
    closing, while `romantic` on the same input keeps letter → video.
-3. **A builder in `/admin/templates`.** Pick palette, scene, beats and a look
-   per beat; watch it play live; save. Then "save this order as a template" is a
-   button, because a finished order already carries most of those fields.
+3. ~~**A builder in `/admin/templates`.**~~ **Done, 14 August.** Pick a palette,
+   a scene, the beats and a look for each, plus one optional reordering, and
+   save. It appears in the gallery, at `/templates/<id>` and in the creation
+   flow with no deploy.
+
+   **A template is a row now, not a file.** `lib/card/recipe.ts` is the shape
+   and `recipeToDefinition` rebuilds a working `TemplateDefinition` from it,
+   `compose` included, so nothing downstream can tell a stored template from a
+   compiled one. Stored in `card_templates` as JSONB — migration
+   `003-templates.sql`, and **`npm run db:migrate` has to run against
+   production before the next deploy.**
+
+   Every control is an enum drawn from the vocabulary the renderer implements,
+   so a form post cannot ask for a look nobody built — the same guarantee the
+   AI layer has, for the same reason. An id belonging to a compiled template is
+   refused outright rather than shadowing it.
+
+   Two things it deliberately does not do. **The AI planner will not see a new
+   template until the next restart**, because `lib/ai/schema.ts` builds its
+   enum at module load; the cost is a slightly worse suggestion, never a broken
+   card. And **there is no live preview in the form** — save it and open
+   `/templates/<id>`, which plays the real thing rather than an approximation
+   of it.
+
+   Verified end to end against a production build: a recipe written straight
+   into the store appears in the gallery beside the seven compiled ones and its
+   page renders.
+
+   Still to come: "save this order as a template", which is now cheap because a
+   finished order already carries most of these fields.
 4. **An importer.** Paste a repository URL, and the same trick the card planner
    already uses reads the HTML and returns a `TemplateDefinition` — enums drawn
    from the registry, validated by zod, so the model cannot emit markup any more

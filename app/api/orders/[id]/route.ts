@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getOrder, updateOrder } from '@/lib/db';
 import { ORDER_STATUSES } from '@/lib/db/types';
-import { composeConfigForOrder } from '@/lib/card/service';
+import { composeConfigForOrderAnywhere } from '@/lib/card/compose-server';
 
 const patchSchema = z.object({
   status: z.enum(ORDER_STATUSES).optional(),
@@ -40,7 +40,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     // Publishing without a composed card would produce an empty page, so
     // compose implicitly whenever one is missing.
     ...(regenerate || (patch.status === 'PUBLISHED' && !existing.config)
-      ? { config: composeConfigForOrder(merged) }
+      ? { config: await composeConfigForOrderAnywhere(merged) }
       : {}),
   });
 

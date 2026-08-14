@@ -3,12 +3,13 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { CardRenderer } from '@/components/cards/CardRenderer';
 import { parseCardConfig } from '@/lib/card/schema';
-import { composeConfigForOrder } from '@/lib/card/service';
+import { composeConfigForOrderAnywhere } from '@/lib/card/compose-server';
+import { resolveTemplateAnywhere } from '@/lib/card/registry';
+import { toSummary } from '@/lib/card/template';
 import { getOrderByCode } from '@/lib/db';
 import { getPalette } from '@/lib/design/palettes';
 import { getDictionary } from '@/lib/i18n';
 import { SITE } from '@/lib/site';
-import { resolveTemplate } from '@/templates';
 
 type Props = { params: Promise<{ code: string }> };
 
@@ -36,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export async function generateViewport({ params }: Props): Promise<Viewport> {
   const { code } = await params;
   const order = await getOrderByCode(code);
-  const palette = getPalette(resolveTemplate(order?.templateId).paletteId);
+  const palette = getPalette((await resolveTemplateAnywhere(order?.templateId)).paletteId);
 
   return {
     themeColor: palette.bg,
@@ -55,7 +56,7 @@ export default async function CardPage({ params }: Props) {
 
   // Fall back to composing on the fly: a published order with no stored
   // config is a data bug, not a reason to show the recipient an error page.
-  const parsed = parseCardConfig(order.config ?? composeConfigForOrder(order));
+  const parsed = parseCardConfig(order.config ?? await composeConfigForOrderAnywhere(order));
   if (!parsed.ok) notFound();
 
   // The colophon is read by the recipient, standing over the bouquet, so it
@@ -64,7 +65,7 @@ export default async function CardPage({ params }: Props) {
 
   return (
     <main>
-      <CardRenderer config={parsed.config} />
+      <CardRenderer template={toSummary(await resolveTemplateAnywhere(order.templateId))} config={parsed.config} />
       <CardColophon code={order.code} madeWith={madeWith} />
     </main>
   );

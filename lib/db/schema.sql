@@ -93,3 +93,15 @@ CREATE TABLE card_views (
 );
 
 CREATE INDEX card_views_code_idx ON card_views (code, viewed_at DESC);
+
+-- ---------------------------------------------------------------------------
+-- Templates an operator built. See migrations/003-templates.sql for the full
+-- reasoning; kept here so a database created from scratch matches one that was
+-- migrated forward.
+-- ---------------------------------------------------------------------------
+CREATE TABLE card_templates (
+  id          TEXT PRIMARY KEY,
+  recipe      JSONB NOT NULL,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getOrderByCode } from '@/lib/db';
-import { composeConfigForOrder } from '@/lib/card/service';
+import { composeConfigForOrderAnywhere } from '@/lib/card/compose-server';
 
 /**
  * GET /api/cards/8FJ29K
@@ -17,7 +17,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ cod
     return NextResponse.json({ error: 'Card not found' }, { status: 404 });
   }
 
-  const config = order.config ?? composeConfigForOrder(order);
+  const config = order.config ?? await composeConfigForOrderAnywhere(order);
 
   return NextResponse.json(
     { code: order.code, config },
