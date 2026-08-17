@@ -9,6 +9,7 @@ import { resolveTemplate } from '@/templates';
 import type { TemplateSummary } from '@/lib/card/template';
 import { cn } from '@/lib/utils/cn';
 import { SectionRenderer } from './sections';
+import { CardPlayer } from './primitives/CardPlayer';
 
 /**
  * THE RENDERER
@@ -80,6 +81,13 @@ export function CardRenderer({
           context={{ scene: template.scene, motif: template.motif, senderInitial, strings }}
         />
       ))}
+
+      {/* Card-level rather than a beat: it plays while the reader is somewhere
+          else on the page. Never in the builder's preview, where a second
+          sound source competing with the operator's own tab helps nobody. */}
+      {config.audio && !embedded ? (
+        <CardPlayer audio={config.audio} label={strings.audio.play} />
+      ) : null}
     </div>
   );
 }

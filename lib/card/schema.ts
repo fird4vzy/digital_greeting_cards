@@ -74,6 +74,7 @@ export const SECTION_KINDS = [
   'quote',
   'wishes',
   'question',
+  'cake',
   'final',
   'closing',
 ] as const;
@@ -196,6 +197,25 @@ export const questionSectionSchema = z.object({
   reply: z.string(),
 });
 
+/**
+ * A cake with candles that are still lit.
+ *
+ * The one beat with something to *do* rather than something to read, and the
+ * reason its original existed at all: everything before it was the run-up to
+ * blowing these out. Like the question beat its copy is structural, so it
+ * comes from the dictionaries at compose time.
+ */
+export const cakeSectionSchema = z.object({
+  ...sectionBase,
+  type: z.literal('cake'),
+  prompt: z.string(),
+  hint: z.string(),
+  /** Shown once they are out. */
+  reply: z.string(),
+  /** Kept small: past about seven they stop reading as candles. */
+  candles: z.number().int().min(1).max(7).default(5),
+});
+
 export const finalSectionSchema = z.object({
   ...sectionBase,
   type: z.literal('final'),
@@ -223,12 +243,34 @@ export const cardSectionSchema = z.discriminatedUnion('type', [
   quoteSectionSchema,
   wishesSectionSchema,
   questionSectionSchema,
+  cakeSectionSchema,
   finalSectionSchema,
   closingSectionSchema,
 ]);
 
 export type CardSection = z.infer<typeof cardSectionSchema>;
 export type SectionOfKind<K extends SectionKind> = Extract<CardSection, { type: K }>;
+
+/**
+ * Music for the whole card, not for one beat.
+ *
+ * Deliberately not a section: it has no place in the arc, it does not end, and
+ * it is playing while the reader is somewhere else on the page. A beat that
+ * behaves like that is not a beat, it is a property of the card — the same
+ * reason the progress rail lives in the renderer rather than in a section.
+ *
+ * **Never autoplays.** A card is opened next to a bouquet, often in a shop or
+ * an office, and sound that starts by itself is the one thing that can make a
+ * gift embarrassing. Browsers would block it anyway; this refuses on purpose
+ * rather than by accident.
+ */
+export const cardAudioSchema = z.object({
+  url: z.string(),
+  /** Shown beside the control. The track's name, not a description. */
+  title: z.string().optional(),
+});
+
+export type CardAudio = z.infer<typeof cardAudioSchema>;
 
 export const CARD_CONFIG_VERSION = 1;
 
@@ -248,6 +290,8 @@ export const cardConfigSchema = z.object({
   mood: z.string(),
   /** Free-form language tag; reserved for localisation of built-in copy. */
   locale: z.string().default('en'),
+  /** Optional music, played only when the reader asks for it. */
+  audio: cardAudioSchema.optional(),
   sections: z.array(cardSectionSchema).min(1),
 });
 

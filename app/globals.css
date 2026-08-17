@@ -373,3 +373,8 @@
     transform: translate(var(--x), var(--y)) scale(1) rotate(var(--rotation));
   }
 }
+
+/* The card player's disc, turning while it plays. */
+@keyframes cardSpin {
+  to { transform: rotate(360deg); }
+}

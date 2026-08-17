@@ -551,6 +551,12 @@ export const en: Dictionary = {
       pullRibbon: 'Pull the ribbon',
       unfold: 'Unfold',
       wishesTitle: 'A few wishes',
+      audio: { play: 'Play the music' },
+      cake: {
+        prompt: 'Make a wish.',
+        hint: 'Tap to blow them out',
+        reply: 'Made it? Then it counts.',
+      },
       question: {
         ask: 'Shall we?',
         yes: 'Yes',
@@ -665,6 +671,13 @@ export const en: Dictionary = {
         description:
           'The only template that asks for something instead of telling you something. Photographs, a short run-up, and a question with two buttons — except that "no" runs away from the cursor. There is no way to decline, and that is the joke: the card is not requesting a decision, it is performing one.',
         animationStyle: 'Bright, a button that flees, an answer instead of a question',
+      },
+      candlelight: {
+        name: 'Candlelight',
+        tagline: 'A dark room, a cake, and one wish.',
+        description:
+          'A birthday card that does not shout. It happens in the dark: a few words first, then a cake whose candles have to be blown out, and only afterwards the photographs. The one card with something to do rather than only something to read.',
+        animationStyle: 'Candlelight, flames going out one by one, music if you want it',
       },
     },
 

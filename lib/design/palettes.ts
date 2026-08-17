@@ -203,6 +203,29 @@ export const palettes = {
     swatches: ['#fffdf9', '#ff5c8a', '#ffc2d4', '#1f1a1c'],
   },
 
+  /**
+   * Candlelight — the plum dark and candle golds of the birthday card this was
+   * ported from. The only dark palette that is warm rather than formal:
+   * midnightBrass is a room with the lights off, this is a room lit by five
+   * small flames.
+   */
+  candlelight: {
+    id: 'candlelight',
+    name: 'Candlelight',
+    scheme: 'dark',
+    bg: '#1c1220',
+    bgDeep: '#120b16',
+    ink: '#fff7e6',
+    inkSoft: '#f3d9a6',
+    inkMuted: '#c2a179',
+    accent: '#ffd873',
+    accentSoft: '#ff9d3d',
+    glow: 'rgba(255, 216, 115, 0.32)',
+    line: 'rgba(255, 247, 230, 0.16)',
+    particles: ['#ffd873', '#ff9d3d', '#ffe4b3'],
+    swatches: ['#1c1220', '#ffd873', '#ff9d3d', '#fff7e6'],
+  },
+
 } as const satisfies Record<string, CardPalette>;
 
 export type PaletteId = keyof typeof palettes;

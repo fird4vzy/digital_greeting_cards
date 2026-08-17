@@ -558,6 +558,12 @@ export const uz: Dictionary = {
       pullRibbon: 'Tasmani torting',
       unfold: 'Yoying',
       wishesTitle: 'Bir nechta tilak',
+      audio: { play: 'Musiqani yoqish' },
+      cake: {
+        prompt: 'Tilak tilang.',
+        hint: "O'chirish uchun bosing",
+        reply: 'Tiladingizmi? Ushalsin.',
+      },
       question: {
         ask: 'Boramizmi?',
         yes: 'Ha',
@@ -672,6 +678,13 @@ export const uz: Dictionary = {
         description:
           'Aytib beradigan emas, so‘raydigan yagona shablon. Suratlar, qisqa kirish va ikkita tugmali savol — faqat «yo‘q» kursordan qochadi. Rad etib bo‘lmaydi, hazil ham shunda: otkritka ruxsat so‘ramaydi, uni o‘ynab ko‘rsatadi.',
         animationStyle: 'Yorqin, qochadigan tugma, savol o‘rniga javob',
+      },
+      candlelight: {
+        name: 'Sham yorug‘ida',
+        tagline: 'Qorong‘i xona, tort va bitta tilak.',
+        description:
+          'Baqirmaydigan tug‘ilgan kun otkritkasi. Hammasi qorong‘ida bo‘ladi: avval bir necha so‘z, keyin shamlari o‘chirilishi kerak bo‘lgan tort, va shundan keyingina suratlar. O‘qish emas, qilish mumkin bo‘lgan yagona otkritka.',
+        animationStyle: 'Sham yorug‘i, birma-bir o‘chadigan olovlar, xohlasangiz musiqa',
       },
     },
 

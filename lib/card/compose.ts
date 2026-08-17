@@ -125,6 +125,17 @@ export function standardArc(
     drafts.push({ type: 'video', title: strings.video.title, video: input.video });
   }
 
+  // Before the photographs, because the cake is what the run-up was for: an
+  // album afterwards reads as the evening continuing, and an album first makes
+  // the cake an afterthought to the pictures rather than the thing they follow.
+  drafts.push({
+    type: 'cake',
+    prompt: strings.cake.prompt,
+    hint: strings.cake.hint,
+    reply: strings.cake.reply,
+    candles: 5,
+  });
+
   if (hasPhotos(input)) {
     drafts.push({
       type: 'gallery',

@@ -3,6 +3,7 @@
 import type { CardSection } from '@/lib/card/schema';
 import type { MotifId, SceneId } from '@/lib/card/template';
 import type { CardStrings } from '@/lib/card/copy';
+import { CakeSection } from './CakeSection';
 import { ClosingSection } from './ClosingSection';
 import { CoverSection } from './CoverSection';
 import { EnvelopeSection } from './EnvelopeSection';
@@ -66,6 +67,8 @@ export function SectionRenderer({
       return <QuoteSection section={section} />;
     case 'wishes':
       return <WishesSection section={section} />;
+    case 'cake':
+      return <CakeSection section={section} />;
     case 'question':
       return <QuestionSection section={section} />;
     case 'final':

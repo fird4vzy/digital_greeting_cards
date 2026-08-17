@@ -489,6 +489,10 @@ export type Dictionary = {
       pullRibbon: string;
       unfold: string;
       wishesTitle: string;
+      /** The card-level music control. */
+      audio: { play: string };
+      /** The cake beat. Structural, like the question's. */
+      cake: { prompt: string; hint: string; reply: string };
       /** The question beat. Structural copy, so it lives here, not in a template. */
       question: {
         ask: string;

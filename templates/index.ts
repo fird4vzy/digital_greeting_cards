@@ -4,6 +4,7 @@ import { aloudTemplate } from './aloud';
 import { anniversaryTemplate } from './anniversary';
 import { askTemplate } from './ask';
 import { birthdayTemplate } from './birthday';
+import { candlelightTemplate } from './candlelight';
 import { memoriesTemplate } from './memories';
 import { momTemplate } from './mom';
 import { romanticTemplate } from './romantic';
@@ -25,6 +26,7 @@ const registry: TemplateDefinition[] = [
   aloudTemplate,
   windowTemplate,
   askTemplate,
+  candlelightTemplate,
 ];
 
 const byId = new Map(registry.map((template) => [template.id, template]));
