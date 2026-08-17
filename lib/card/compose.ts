@@ -147,6 +147,17 @@ export function standardArc(
     drafts.push({ type: 'wishes', title: strings.wishesTitle, items: input.wishes ?? [] });
   }
 
+  // Always composed, never always played: only a template that declares the
+  // beat keeps it, because a question is a decision about the card's manner
+  // rather than something the order supplies.
+  drafts.push({
+    type: 'question',
+    question: strings.question.ask,
+    yes: strings.question.yes,
+    no: strings.question.no,
+    reply: strings.question.reply,
+  });
+
   drafts.push(
     { type: 'final', headline: copy.finalHeadline, text: copy.finalText },
     { type: 'closing', signOff: copy.signOff, from: input.senderName || 'Me' },

@@ -489,6 +489,13 @@ export type Dictionary = {
       pullRibbon: string;
       unfold: string;
       wishesTitle: string;
+      /** The question beat. Structural copy, so it lives here, not in a template. */
+      question: {
+        ask: string;
+        yes: string;
+        no: string;
+        reply: string;
+      };
       defaultWishes: string[];
       /** The video beat. Nothing is fetched until this button is pressed. */
       video: {

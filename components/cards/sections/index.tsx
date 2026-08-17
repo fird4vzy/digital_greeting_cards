@@ -12,6 +12,7 @@ import { IntroSection } from './IntroSection';
 import { LetterSection } from './LetterSection';
 import { VideoSection } from './VideoSection';
 import { MemoriesSection } from './MemoriesSection';
+import { QuestionSection } from './QuestionSection';
 import { QuoteSection } from './QuoteSection';
 import { TimelineSection } from './TimelineSection';
 import { WishesSection } from './WishesSection';
@@ -65,6 +66,8 @@ export function SectionRenderer({
       return <QuoteSection section={section} />;
     case 'wishes':
       return <WishesSection section={section} />;
+    case 'question':
+      return <QuestionSection section={section} />;
     case 'final':
       return <FinalSection section={section} scene={context.scene} />;
     case 'closing':

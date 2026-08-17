@@ -180,6 +180,29 @@ export const palettes = {
     swatches: ['#fbfaf8', '#e06666', '#ffb7c5', '#2c2c2c'],
   },
 
+  /**
+   * Confetti — for the card that asks a question and expects one answer.
+   * Bright, close to white, and unembarrassed: the original was a page of GIFs
+   * and a button running away, and a restrained palette would have been
+   * apologising for it.
+   */
+  confetti: {
+    id: 'confetti',
+    name: 'Confetti',
+    scheme: 'light',
+    bg: '#fffdf9',
+    bgDeep: '#ffeef2',
+    ink: '#1f1a1c',
+    inkSoft: '#5b4750',
+    inkMuted: '#8b7480',
+    accent: '#ff5c8a',
+    accentSoft: '#ffc2d4',
+    glow: 'rgba(255, 92, 138, 0.28)',
+    line: 'rgba(31, 26, 28, 0.12)',
+    particles: ['#ff5c8a', '#ffc2d4', '#ffe9a8'],
+    swatches: ['#fffdf9', '#ff5c8a', '#ffc2d4', '#1f1a1c'],
+  },
+
 } as const satisfies Record<string, CardPalette>;
 
 export type PaletteId = keyof typeof palettes;

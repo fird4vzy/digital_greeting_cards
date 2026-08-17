@@ -36,6 +36,7 @@ export const SECTION_VARIANTS = {
   memories: ['chips', 'notes'],
   quote: ['centered', 'rule'],
   wishes: ['list'],
+  question: ['chase', 'plain'],
   final: ['bloom', 'fade'],
   closing: ['seal', 'signature'],
 } as const satisfies Record<SectionKind, readonly string[]>;

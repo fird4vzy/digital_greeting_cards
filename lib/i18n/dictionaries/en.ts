@@ -551,6 +551,12 @@ export const en: Dictionary = {
       pullRibbon: 'Pull the ribbon',
       unfold: 'Unfold',
       wishesTitle: 'A few wishes',
+      question: {
+        ask: 'Shall we?',
+        yes: 'Yes',
+        no: 'No',
+        reply: 'Knew it.',
+      },
       defaultWishes: [
         'A slow morning',
         'Something you did not plan',
@@ -652,6 +658,13 @@ export const en: Dictionary = {
         description:
           'The video plays behind the words rather than beside them, like a view somebody is half-watching. There is little text and it is large, because nobody reads for long across a moving picture. For the things said quietly: rest, get better, I am here.',
         animationStyle: 'Movement behind the type, falling petals, nothing hurried',
+      },
+      ask: {
+        name: 'Shall We',
+        tagline: 'Asks a question and will not take no.',
+        description:
+          'The only template that asks for something instead of telling you something. Photographs, a short run-up, and a question with two buttons — except that "no" runs away from the cursor. There is no way to decline, and that is the joke: the card is not requesting a decision, it is performing one.',
+        animationStyle: 'Bright, a button that flees, an answer instead of a question',
       },
     },
 

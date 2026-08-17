@@ -558,6 +558,12 @@ export const uz: Dictionary = {
       pullRibbon: 'Tasmani torting',
       unfold: 'Yoying',
       wishesTitle: 'Bir nechta tilak',
+      question: {
+        ask: 'Boramizmi?',
+        yes: 'Ha',
+        no: 'Yo‘q',
+        reply: 'Bilardim.',
+      },
       defaultWishes: [
         'Shoshilmagan tong',
         'Rejalashtirilmagan biror narsa',
@@ -659,6 +665,13 @@ export const uz: Dictionary = {
         description:
           'Video matnning yonida emas, orqasida ketadi — go‘yo kimdir yarim ko‘z bilan qarab turgan manzara. So‘z kam va yirik, chunki harakatlanayotgan tasvir ustidan uzoq o‘qib bo‘lmaydi. Sekin aytiladigan gaplar uchun: dam ol, tuzalib ket, men yoningdaman.',
         animationStyle: 'Matn ortidagi harakat, tushayotgan gulbarglar, shoshilmasdan',
+      },
+      ask: {
+        name: 'Boramizmi?',
+        tagline: 'Savol beradi va rad javobini olmaydi.',
+        description:
+          'Aytib beradigan emas, so‘raydigan yagona shablon. Suratlar, qisqa kirish va ikkita tugmali savol — faqat «yo‘q» kursordan qochadi. Rad etib bo‘lmaydi, hazil ham shunda: otkritka ruxsat so‘ramaydi, uni o‘ynab ko‘rsatadi.',
+        animationStyle: 'Yorqin, qochadigan tugma, savol o‘rniga javob',
       },
     },
 

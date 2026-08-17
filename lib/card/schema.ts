@@ -73,6 +73,7 @@ export const SECTION_KINDS = [
   'memories',
   'quote',
   'wishes',
+  'question',
   'final',
   'closing',
 ] as const;
@@ -177,6 +178,24 @@ export const wishesSectionSchema = z.object({
   items: z.array(z.string()).default([]),
 });
 
+/**
+ * A question with two answers, one of which does not want to be pressed.
+ *
+ * The only beat that asks the reader for something rather than telling them.
+ * Its text is structural — it belongs to the template, not to the order — so
+ * it comes from the dictionaries at compose time like every other built-in
+ * line, and a card written in Russian keeps asking in Russian.
+ */
+export const questionSectionSchema = z.object({
+  ...sectionBase,
+  type: z.literal('question'),
+  question: z.string(),
+  yes: z.string(),
+  no: z.string(),
+  /** Shown once they say yes. There is no path where they say no. */
+  reply: z.string(),
+});
+
 export const finalSectionSchema = z.object({
   ...sectionBase,
   type: z.literal('final'),
@@ -203,6 +222,7 @@ export const cardSectionSchema = z.discriminatedUnion('type', [
   memoriesSectionSchema,
   quoteSectionSchema,
   wishesSectionSchema,
+  questionSectionSchema,
   finalSectionSchema,
   closingSectionSchema,
 ]);
