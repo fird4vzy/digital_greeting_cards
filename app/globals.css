@@ -89,9 +89,27 @@
 
   html {
     -webkit-text-size-adjust: 100%;
-    scroll-behavior: smooth;
     /* iOS: keep the address bar collapse from jolting fixed 3D canvases */
     -webkit-tap-highlight-color: transparent;
+
+    /*
+      `scroll-behavior: smooth` used to be here and was landing people at the
+      bottom of the page.
+
+      Two ways it did that. On a fresh load the browser restores the previous
+      scroll offset while the document is still short — fonts, images and the
+      lazy sections have not arrived — so a restore of 3000px into a document
+      that is currently 1200px tall is clamped to the end, and the page then
+      grows underneath a reader who is already at the bottom. And on navigation
+      the App Router's own scroll-to-top becomes an animation racing a document
+      whose height is still changing, which is a race it frequently loses.
+
+      Anchor links jump instead of gliding now. That is the ordinary behaviour
+      of a link and nobody has ever filed a bug about it; being reliably at the
+      top of the page you asked for matters more. Anything that genuinely wants
+      a smooth scroll asks for it at the call site — `EnvelopeSection` already
+      passes `behavior` to `scrollIntoView`, and honours reduced motion there.
+    */
   }
 
   body {

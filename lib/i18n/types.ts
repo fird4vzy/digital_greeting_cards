@@ -1,5 +1,7 @@
 import type { MoodId, OccasionId, RecipientId } from '@/lib/card/taxonomy';
 import type { OrderStatus } from '@/lib/db/types';
+import type { SectionKind } from '@/lib/card/schema';
+import type { MotifId, SceneId } from '@/lib/card/template';
 
 /**
  * The dictionary contract.
@@ -513,6 +515,27 @@ export type Dictionary = {
     };
     occasions: Record<OccasionId, { label: string; line: string }>;
     moods: Record<MoodId, { label: string; line: string }>;
+    /**
+     * Names for the vocabulary itself — the scenes and the beats.
+     *
+     * These are identifiers everywhere else in the codebase and were being
+     * printed raw into a Russian dashboard, which is the same class of bug as
+     * an English string in a template file: correct-looking in English, wrong
+     * in both other languages.
+     */
+    scenes: Record<SceneId, string>;
+    beats: Record<SectionKind, string>;
+    motifs: Record<MotifId, string>;
+    /**
+     * Names for the looks, keyed `kind.variant`.
+     *
+     * A flat record with a fallback to the identifier rather than a nested
+     * type: the vocabulary itself is already compile-checked in
+     * `SECTION_VARIANTS`, so the risk here is a missing translation, and a
+     * missing translation should show an operator the id rather than fail the
+     * build for everyone.
+     */
+    looks: Record<string, string>;
     recipients: Record<RecipientId, string>;
     templates: Record<string, TemplateStrings>;
     copy: Record<OccasionId, OccasionCopyStrings>;

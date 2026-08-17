@@ -100,3 +100,21 @@ export function localisedStatus(status: OrderStatus, dictionary: Dictionary): Lo
     tone: meta.tone,
   };
 }
+
+/** Names for the vocabulary itself, so a dashboard never prints an id. */
+export function sceneLabel(id: string, dictionary: Dictionary): string {
+  return dictionary.content.scenes[id as keyof Dictionary['content']['scenes']] ?? id;
+}
+
+export function beatLabel(id: string, dictionary: Dictionary): string {
+  return dictionary.content.beats[id as keyof Dictionary['content']['beats']] ?? id;
+}
+
+export function motifLabel(id: string, dictionary: Dictionary): string {
+  return dictionary.content.motifs[id as keyof Dictionary['content']['motifs']] ?? id;
+}
+
+/** A look's name, or its identifier when nobody has named it yet. */
+export function lookLabel(kind: string, variant: string, dictionary: Dictionary): string {
+  return dictionary.content.looks[`${kind}.${variant}`] ?? variant;
+}

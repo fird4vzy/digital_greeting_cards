@@ -8,7 +8,6 @@ import {
   importFromRepository,
   importFromFiles,
 } from '@/app/admin/templates/actions';
-import { SECTION_VARIANTS } from '@/lib/card/variants';
 import { SECTION_KINDS, type SectionKind } from '@/lib/card/schema';
 import type { TemplateRecipe } from '@/lib/card/recipe';
 
@@ -30,8 +29,9 @@ import type { TemplateRecipe } from '@/lib/card/recipe';
 
 type Vocabulary = {
   palettes: { id: string; name: string; swatches: readonly string[] }[];
-  scenes: readonly string[];
-  motifs: readonly string[];
+  scenes: { id: string; label: string }[];
+  motifs: { id: string; label: string }[];
+  beats: { id: string; label: string; looks: { id: string; label: string }[] }[];
   occasions: { id: string; label: string }[];
   moods: { id: string; label: string }[];
 };
@@ -322,8 +322,8 @@ export function TemplateBuilder({
                 className={inputClass}
               >
                 {vocabulary.scenes.map((scene) => (
-                  <option key={scene} value={scene}>
-                    {scene}
+                  <option key={scene.id} value={scene.id}>
+                    {scene.label}
                   </option>
                 ))}
               </select>
@@ -336,8 +336,8 @@ export function TemplateBuilder({
                 className={inputClass}
               >
                 {vocabulary.motifs.map((motif) => (
-                  <option key={motif} value={motif}>
-                    {motif}
+                  <option key={motif.id} value={motif.id}>
+                    {motif.label}
                   </option>
                 ))}
               </select>
@@ -363,7 +363,6 @@ export function TemplateBuilder({
           <ul className="divide-y divide-line border-y border-line">
             {SECTION_KINDS.map((kind) => {
               const on = form.supportedSections.includes(kind);
-              const looks = SECTION_VARIANTS[kind];
 
               return (
                 <li key={kind} className="flex flex-wrap items-center gap-x-5 gap-y-2 py-3">
@@ -379,7 +378,7 @@ export function TemplateBuilder({
                       }
                       className="h-4 w-4 accent-[var(--color-accent)]"
                     />
-                    <code>{kind}</code>
+                    <span title={kind}>{vocabulary.beats.find((beat) => beat.id === kind)?.label ?? kind}</span>
                   </label>
 
                   <select
@@ -394,11 +393,13 @@ export function TemplateBuilder({
                     className={`${inputClass} max-w-[12rem] disabled:opacity-40`}
                   >
                     <option value="">—</option>
-                    {looks.map((look) => (
-                      <option key={look} value={look}>
-                        {look}
-                      </option>
-                    ))}
+                    {(vocabulary.beats.find((beat) => beat.id === kind)?.looks ?? []).map(
+                      (look) => (
+                        <option key={look.id} value={look.id}>
+                          {look.label}
+                        </option>
+                      ),
+                    )}
                   </select>
                 </li>
               );
@@ -424,7 +425,7 @@ export function TemplateBuilder({
                 <option value="">{t.orderNone}</option>
                 {form.supportedSections.map((kind) => (
                   <option key={kind} value={kind}>
-                    {kind}
+                    {vocabulary.beats.find((beat) => beat.id === kind)?.label ?? kind}
                   </option>
                 ))}
               </select>
@@ -444,7 +445,7 @@ export function TemplateBuilder({
               >
                 {form.supportedSections.map((kind) => (
                   <option key={kind} value={kind}>
-                    {kind}
+                    {vocabulary.beats.find((beat) => beat.id === kind)?.label ?? kind}
                   </option>
                 ))}
               </select>

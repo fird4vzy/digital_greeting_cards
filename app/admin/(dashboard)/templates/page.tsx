@@ -2,13 +2,23 @@ import Link from 'next/link';
 import { listOrders } from '@/lib/db';
 import { getPalette } from '@/lib/design/palettes';
 import { getI18n } from '@/lib/i18n/server';
-import { localiseTemplates, occasionLabel } from '@/lib/i18n/localise';
+import {
+  beatLabel,
+  localiseTemplates,
+  moodLabel,
+  motifLabel,
+  occasionLabel,
+  lookLabel,
+  sceneLabel,
+} from '@/lib/i18n/localise';
 import { plural } from '@/lib/i18n/plural';
 import { listAllTemplateSummaries } from '@/lib/card/registry';
 import { TemplateBuilder } from '@/components/admin/TemplateBuilder';
 import { getTemplateStore } from '@/lib/db';
 import { palettes } from '@/lib/design/palettes';
 import { MOODS, OCCASIONS } from '@/lib/card/taxonomy';
+import { SECTION_KINDS } from '@/lib/card/schema';
+import { SECTION_VARIANTS } from '@/lib/card/variants';
 
 // The dashboard reflects a live queue; prerendering it at build time would
 // show an operator whatever the data looked like when the image was built.
@@ -82,14 +92,16 @@ export default async function AdminTemplatesPage() {
                   <code className="text-ink">{template.id}</code>
                 </Row>
                 <Row label={t.rows.scene}>
-                  {template.scene === 'none' ? t.noScene : template.scene}
+                  {template.scene === 'none' ? t.noScene : sceneLabel(template.scene, dict)}
                 </Row>
                 <Row label={t.rows.suits}>
                   {template.occasions.map((id) => occasionLabel(id, dict)).join(', ')}
                 </Row>
-                <Row label={t.rows.moods}>{template.moods.join(', ')}</Row>
+                <Row label={t.rows.moods}>{template.moods.map((id) => moodLabel(id, dict)).join(', ')}</Row>
                 <Row label={t.rows.motion}>{template.animationStyle}</Row>
-                <Row label={t.rows.sections}>{template.supportedSections.join(', ')}</Row>
+                <Row label={t.rows.sections}>
+                  {template.supportedSections.map((id) => beatLabel(id, dict)).join(', ')}
+                </Row>
               </dl>
 
               <div className="flex flex-col items-start gap-3 lg:items-end">
@@ -123,13 +135,25 @@ export default async function AdminTemplatesPage() {
                 name: palette.name,
                 swatches: palette.swatches,
               })),
-              scenes: ['petals', 'sakura', 'bloom', 'heart', 'embers', 'none'],
-              motifs: ['petals', 'sparks', 'linen', 'arch', 'sun', 'branch'],
+              scenes: (['petals', 'sakura', 'bloom', 'heart', 'embers', 'none'] as const).map(
+                (id) => ({ id, label: sceneLabel(id, dict) }),
+              ),
+              motifs: (['petals', 'sparks', 'linen', 'arch', 'sun', 'branch'] as const).map(
+                (id) => ({ id, label: motifLabel(id, dict) }),
+              ),
+              beats: SECTION_KINDS.map((id) => ({
+                id,
+                label: beatLabel(id, dict),
+                looks: SECTION_VARIANTS[id].map((look) => ({
+                  id: look,
+                  label: lookLabel(id, look, dict),
+                })),
+              })),
               occasions: OCCASIONS.map((occasion) => ({
                 id: occasion.id,
                 label: occasionLabel(occasion.id, dict),
               })),
-              moods: MOODS.map((mood) => ({ id: mood.id, label: mood.label })),
+              moods: MOODS.map((mood) => ({ id: mood.id, label: moodLabel(mood.id, dict) })),
             }}
           />
         </div>
