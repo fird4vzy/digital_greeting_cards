@@ -5,7 +5,8 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 17 August 2026, after every hand-written card was ported.
+**Last updated:** 17 August 2026 — every hand-written card ported, the
+scroll bug found, and the dashboard finished in three languages.
 
 ---
 
@@ -97,6 +98,14 @@ long version.
   printed onto a tag. Drafts live at `/c/[code]/preview`.
 - **`NEXT_PUBLIC_SITE_URL` is baked into printed QR codes.** Changing the
   domain after tags are printed strands them.
+- **Never print an identifier at a person either.** The dashboard spent weeks
+  showing `СЦЕНА petals`, `НАСТРОЕНИЯ romantic, warm, dreamy` and every look in
+  the builder as a raw id, which is the same bug as the one below wearing a
+  different hat: correct-looking in English, wrong in both other languages, and
+  invisible to anyone testing in English. Scenes, motifs, beats and all 37 looks
+  are named in ru/en/uz now — `sceneLabel`, `motifLabel`, `beatLabel`,
+  `lookLabel` in `lib/i18n/localise.ts`. A *template id* stays Latin, in a
+  `<code>` under a label that says ID: an id is not a word.
 - **Never put a user-visible string in a template file or a component.** Three
   separate bugs came from exactly that, each one a word-for-word copy of an
   English dictionary entry, so each looked correct in English and broke both
@@ -117,6 +126,16 @@ long version.
   This was first written up as "clear `.next`", because clearing it appeared to
   fix exactly that symptom. It probably did not: the working run also used a
   free port. The `.next` claim is withdrawn rather than left in as folklore.
+- **Do not put `scroll-behavior: smooth` on `html`.** It was there and it was
+  landing readers at the *bottom* of every page, two different ways. On a fresh
+  load the browser restores the previous scroll offset while the document is
+  still short — fonts, images and lazy sections have not arrived — so a restore
+  of 3000px into a document currently 1200px tall clamps to the end, and the
+  page then grows underneath somebody already at the bottom. On navigation the
+  App Router's own scroll-to-top becomes an animation racing a document whose
+  height is still changing. Anchor links jump now, which is what links do.
+  Anything that wants smooth asks at the call site, the way `EnvelopeSection`
+  does.
 - **Stop the dev server before pulling.** The admin pages moved into the route
   group `app/admin/(dashboard)/`, and on Windows git could not remove the old
   directories while a watcher held them open. It asks
@@ -183,7 +202,22 @@ card with a blossom on its face; the name alone is a smear at sixteen pixels,
 and the card without the flower reads as a file icon.
 
 Still not done: domain and handle availability unchecked, and
-`OFFER.telegram` is `@birdunyo` as a placeholder rather than a real handle.
+`OFFER.telegram` is `@birdunyo` as a placeholder rather than a real handle, so
+the "write to us on Telegram" button on `/shops` currently leads nowhere.
+
+**One bot cannot both notify and receive, asked and answered 17 August.** A
+Telegram bot's username has to end in `bot`, so `@birdunyo` can never be the
+notification bot — it would be `@birdunyo_bot`, and `t.me/birdunyo` is a person
+or a channel. Separately, the bot here only *sends*: `lib/notify/telegram.ts`
+deliberately has nothing to poll and no webhook, because notifications only go
+outward. Making it receive means a webhook, a route and forwarding.
+
+Three ways out, cheapest first: put a **real personal username** in
+`lib/shops/offer.ts` — one line, works today, and a florist reaching a human
+beats reaching a bot at zero volume; or `@birdunyo_bot` **with a webhook**,
+which is real work and adds the inbound path the architecture avoided; or a
+**channel**, which looks right and is the wrong shape, because nobody writes
+into a channel. The first is the recommendation.
 
 Candidates it beat: **Lola** (tulip, national flower — very local, very
 common), **Konvert** (envelope — understood but generic), **Anor**
