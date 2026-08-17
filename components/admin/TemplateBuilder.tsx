@@ -2,7 +2,12 @@
 
 import { useState, useTransition } from 'react';
 import Link from 'next/link';
-import { saveTemplate, deleteTemplate, importFromRepository } from '@/app/admin/templates/actions';
+import {
+  saveTemplate,
+  deleteTemplate,
+  importFromRepository,
+  importFromFiles,
+} from '@/app/admin/templates/actions';
 import { SECTION_VARIANTS } from '@/lib/card/variants';
 import { SECTION_KINDS, type SectionKind } from '@/lib/card/schema';
 import type { TemplateRecipe } from '@/lib/card/recipe';
@@ -68,6 +73,10 @@ export type BuilderStrings = {
   importAction: string;
   importing: string;
   unmapped: string;
+  importOr: string;
+  importFiles: string;
+  importFilesHint: string;
+  importNoFiles: string;
 };
 
 const EMPTY = (defaults: Vocabulary) => ({
@@ -101,32 +110,76 @@ export function TemplateBuilder({
   const [unmapped, setUnmapped] = useState<string[]>([]);
   const [rationale, setRationale] = useState('');
 
+  /** Both routes end here: a recipe fills the form, it is never saved. */
+  function applyImport(result: Awaited<ReturnType<typeof importFromRepository>>) {
+    if (!result.ok) {
+      setFailed(true);
+      setMessage(result.error);
+      return;
+    }
+
+    const { unmapped: gaps, rationale: why, strings: copy, ...recipe } = result.recipe;
+
+    setForm((current) => ({
+      ...current,
+      ...recipe,
+      sectionVariants: recipe.sectionVariants as Record<string, string | undefined>,
+      strings: { en: copy },
+    }));
+    setUnmapped(gaps);
+    setRationale(why);
+    setFailed(false);
+    setMessage(null);
+  }
+
   function runImport() {
+    setMessage(null);
+    setUnmapped([]);
+    setRationale('');
+    startTransition(async () => applyImport(await importFromRepository(repoUrl)));
+  }
+
+  /**
+   * Reads a dropped folder in the browser and posts only its text.
+   *
+   * Photographs, audio and video are skipped before anything leaves the page:
+   * they are what a *card* carries, not a template, and a 3 MB song sent to a
+   * server action to be discarded is waste twice over. The folder's own name
+   * becomes the suggested id, because that is what the operator already calls
+   * this thing.
+   */
+  function runFileImport(fileList: FileList | null) {
+    if (!fileList || fileList.length === 0) return;
+
     setMessage(null);
     setUnmapped([]);
     setRationale('');
 
     startTransition(async () => {
-      const result = await importFromRepository(repoUrl);
+      const readable = Array.from(fileList).filter((file) =>
+        /\.(html?|css|js)$/i.test(file.name),
+      );
 
-      if (!result.ok) {
+      if (readable.length === 0) {
         setFailed(true);
-        setMessage(result.error);
+        setMessage(t.importNoFiles);
         return;
       }
 
-      const { unmapped: gaps, rationale: why, strings: copy, ...recipe } = result.recipe;
+      // HTML first: it is the structure, and the budget is spent in order.
+      readable.sort((a, b) => Number(b.name.endsWith('.html')) - Number(a.name.endsWith('.html')));
 
-      setForm((current) => ({
-        ...current,
-        ...recipe,
-        sectionVariants: recipe.sectionVariants as Record<string, string | undefined>,
-        strings: { en: copy },
-      }));
-      setUnmapped(gaps);
-      setRationale(why);
-      setFailed(false);
-      setMessage(null);
+      const files = await Promise.all(
+        readable.map(async (file) => ({
+          path: (file as File & { webkitRelativePath?: string }).webkitRelativePath || file.name,
+          text: await file.text(),
+        })),
+      );
+
+      const first = files[0]?.path ?? '';
+      const folder = first.includes('/') ? first.split('/')[0] : 'imported';
+
+      applyImport(await importFromFiles(files, folder));
     });
   }
 
@@ -184,6 +237,27 @@ export function TemplateBuilder({
               {pending ? t.importing : t.importAction}
             </button>
           </div>
+
+          <p className="mt-5 text-caption text-ink-faint">{t.importOr}</p>
+
+          <label className="mt-3 inline-flex cursor-pointer items-center gap-3 rounded-full border border-dashed border-line-strong px-5 py-2.5 text-caption text-ink-soft transition-colors hover:border-ink hover:text-ink">
+            <input
+              type="file"
+              multiple
+              // Chromium and WebKit both take a whole folder this way. Firefox
+              // ignores it and offers multi-select, which is the same job with
+              // one more click rather than a dead control.
+              {...({ webkitdirectory: '', directory: '' } as Record<string, string>)}
+              className="sr-only"
+              onChange={(event) => {
+                runFileImport(event.target.files);
+                event.target.value = '';
+              }}
+            />
+            {t.importFiles}
+          </label>
+
+          <p className="mt-2 text-[0.72rem] text-ink-faint">{t.importFilesHint}</p>
 
           {unmapped.length > 0 ? (
             <div className="mt-5 rounded-[0.6rem] border-l-2 border-accent bg-accent/[0.06] px-4 py-3">

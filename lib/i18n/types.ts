@@ -426,6 +426,10 @@ export type Dictionary = {
         importAction: string;
         importing: string;
         unmapped: string;
+        importOr: string;
+        importFiles: string;
+        importFilesHint: string;
+        importNoFiles: string;
       };
     };
     order: {

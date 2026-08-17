@@ -519,6 +519,10 @@ export const ru: Dictionary = {
         importAction: 'Прочитать',
         importing: 'Читаем…',
         unmapped: 'Экраны, для которых в движке нет части:',
+        importOr: 'Или, если это папка на диске, а не репозиторий:',
+        importFiles: 'Выбрать папку',
+        importFilesHint: 'Читаются только html, css и js. Фотографии, музыка и видео не отправляются: это содержимое заказа, а не шаблона.',
+        importNoFiles: 'В папке нет ни html, ни css, ни js.',
       },
     },
 

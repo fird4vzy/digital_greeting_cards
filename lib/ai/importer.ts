@@ -32,7 +32,7 @@ const IMPORT_JSON_SCHEMA = strictJsonSchema(templateImportSchema);
 /** Total source handed to the model. Enough for a one-page card, not a site. */
 const BUDGET = 180_000;
 
-type SourceFile = { path: string; text: string };
+export type SourceFile = { path: string; text: string };
 
 /**
  * Pulls the readable source out of a public GitHub repository.
@@ -141,26 +141,44 @@ function userPrompt(files: SourceFile[], suggestedId: string): string {
   ].join('\n');
 }
 
+/** Turns any name into something usable as a template id. */
+export function slugify(name: string): string {
+  return (
+    name
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 32) || 'imported'
+  );
+}
+
 /**
- * Reads a repository into a draft recipe. Requires `ANTHROPIC_API_KEY`; without
- * it the importer is simply unavailable, and the builder form still works by
- * hand — the same relationship the card planner has to its heuristic.
+ * Reads source that is already in hand into a draft recipe.
+ *
+ * Split from the fetching so a folder dropped into the admin and a repository
+ * URL reach the model by the same path — most hand-written cards are a folder
+ * on somebody's desktop, and requiring a repository first would be asking the
+ * operator to do extra work for the tool's convenience.
+ *
+ * Requires `ANTHROPIC_API_KEY`. Without it the importer is unavailable and the
+ * builder still works by hand, the same relationship the planner has to its
+ * heuristic. Note that the key alone no longer switches the planner: writing a
+ * customer's letter and reading an operator's folder are separate decisions,
+ * and the second one is `AI_PLANNER`.
  */
-export async function importTemplate(url: string): Promise<ImportResult> {
+export async function importFiles(
+  files: SourceFile[],
+  suggestedName: string,
+): Promise<ImportResult> {
   if (!process.env.ANTHROPIC_API_KEY) {
     return { ok: false, error: 'ANTHROPIC_API_KEY is not set' };
   }
+  if (files.length === 0) {
+    return { ok: false, error: 'No readable files' };
+  }
 
-  const source = await fetchRepositorySource(url);
-  if (!source.ok) return { ok: false, error: source.error };
-
-  const suggestedId =
-    url
-      .match(/github\.com\/[^/]+\/([A-Za-z0-9_.-]+?)(?:\.git)?(?:\/|$)/)?.[1]
-      ?.toLowerCase()
-      .replace(/[^a-z0-9-]/g, '-')
-      .replace(/^-+|-+$/g, '')
-      .slice(0, 32) || 'imported';
+  const suggestedId = slugify(suggestedName);
 
   try {
     const { default: Anthropic } = await import('@anthropic-ai/sdk');
@@ -179,11 +197,11 @@ export async function importTemplate(url: string): Promise<ImportResult> {
       betas: ['server-side-fallback-2026-07-01'],
       fallbacks: 'default',
       system: systemPrompt(),
-      messages: [{ role: 'user', content: userPrompt(source.files, suggestedId) }],
+      messages: [{ role: 'user', content: userPrompt(files, suggestedId) }],
     });
 
     if (response.stop_reason === 'refusal') {
-      return { ok: false, error: 'The assistant declined to read this repository.' };
+      return { ok: false, error: 'The assistant declined to read these files.' };
     }
 
     const text = response.content.find((block) => block.type === 'text');
@@ -204,4 +222,14 @@ export async function importTemplate(url: string): Promise<ImportResult> {
   } catch (error) {
     return { ok: false, error: `Import failed: ${(error as Error).message}` };
   }
+}
+
+/** The same thing, for source that has to be fetched first. */
+export async function importTemplate(url: string): Promise<ImportResult> {
+  const source = await fetchRepositorySource(url);
+  if (!source.ok) return { ok: false, error: source.error };
+
+  const repo =
+    url.match(/github\.com\/[^/]+\/([A-Za-z0-9_.-]+?)(?:\.git)?(?:\/|$)/)?.[1] ?? 'imported';
+  return importFiles(source.files, repo);
 }

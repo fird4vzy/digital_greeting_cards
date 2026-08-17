@@ -490,6 +490,10 @@ export const en: Dictionary = {
         importAction: 'Read it',
         importing: 'Reading…',
         unmapped: 'Screens the engine has no beat for:',
+        importOr: 'Or, if it is a folder rather than a repository:',
+        importFiles: 'Choose a folder',
+        importFilesHint: 'Only html, css and js are read. Photographs, music and video are not sent: they belong to an order, not to a template.',
+        importNoFiles: 'That folder has no html, css or js in it.',
       },
     },
 

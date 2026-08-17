@@ -204,8 +204,22 @@ export const claudePlanner: CardPlanner = {
 
 /* -------------------------------------------------------------------------- */
 
+/**
+ * The model writes cards only when *asked to*, not merely when a key exists.
+ *
+ * The key used to be the switch on its own, which quietly coupled two unrelated
+ * decisions: turning on the template importer — an operator tool, run a handful
+ * of times — also handed every customer's letter to a model. Those deserve
+ * separate answers, and the important one is the letter: at this volume a
+ * person writes better than a model, which is why the product is concierge and
+ * why this defaults to off.
+ *
+ * Set `AI_PLANNER=on` when volume makes writing by hand expensive. Until then
+ * the heuristic routes the customer's own words into the card and changes
+ * nothing they wrote.
+ */
 export function isAiEnabled(): boolean {
-  return Boolean(process.env.ANTHROPIC_API_KEY);
+  return Boolean(process.env.ANTHROPIC_API_KEY) && process.env.AI_PLANNER === 'on';
 }
 
 export function getPlanner(): CardPlanner {

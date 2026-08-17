@@ -6,7 +6,7 @@ import { ADMIN_SESSION_COOKIE, verifyAdminSession } from '@/lib/auth/admin';
 import { templateRecipeDraftSchema } from '@/lib/card/recipe';
 import { getTemplateStore } from '@/lib/db';
 import { listTemplates } from '@/templates';
-import { importTemplate } from '@/lib/ai/importer';
+import { importTemplate, importFiles } from '@/lib/ai/importer';
 import type { TemplateImport } from '@/lib/ai/import-schema';
 
 /**
@@ -96,4 +96,31 @@ export async function importFromRepository(
   }
 
   return importTemplate(url);
+}
+
+/**
+ * The same import, from files the operator dropped in.
+ *
+ * Most hand-written cards are a folder on somebody's desktop rather than a
+ * repository, and asking for a repository first would be making the operator
+ * do extra work for the tool's convenience.
+ *
+ * The browser reads the text files and posts their contents; nothing is
+ * uploaded to storage and nothing is kept. Images, audio and video are dropped
+ * before they are sent — they are what a *card* carries, not a template, and
+ * shipping a 3 MB song through a server action to be thrown away would be
+ * waste twice over.
+ */
+export async function importFromFiles(
+  files: { path: string; text: string }[],
+  folderName: string,
+): Promise<
+  | { ok: true; recipe: TemplateImport }
+  | { ok: false; error: string }
+> {
+  if (!(await verifyAdminSession((await cookies()).get(ADMIN_SESSION_COOKIE)?.value))) {
+    return { ok: false, error: 'Not authenticated' };
+  }
+
+  return importFiles(files, folderName);
 }

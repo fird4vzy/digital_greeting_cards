@@ -496,6 +496,10 @@ export const uz: Dictionary = {
         importAction: 'O‘qish',
         importing: 'O‘qilmoqda…',
         unmapped: 'Dvigatelda mos qismi yo‘q ekranlar:',
+        importOr: 'Yoki agar bu repozitoriy emas, diskdagi papka bo‘lsa:',
+        importFiles: 'Papkani tanlash',
+        importFilesHint: 'Faqat html, css va js o‘qiladi. Suratlar, musiqa va video yuborilmaydi: ular buyurtmaga tegishli, shablonga emas.',
+        importNoFiles: 'Bu papkada html ham, css ham, js ham yo‘q.',
       },
     },
 
