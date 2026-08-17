@@ -93,7 +93,7 @@ app/
 
 components/
   marketing/                landing + gallery sections
-  cards/sections/           the 12 shared storytelling beats
+  cards/sections/           the 14 shared storytelling beats
   cards/CardRenderer.tsx    data → experience
   create/                   the creation flow
   shops/                    the earnings calculator
@@ -142,7 +142,7 @@ Add the file, add one line to `templates/index.ts`, and it appears in the
 gallery, the creation flow, the admin registry and the AI planner's prompt —
 because all four read the registry rather than a hard-coded list.
 
-The twelve section kinds live in `lib/card/schema.ts` as a discriminated union.
+The fourteen section kinds live in `lib/card/schema.ts` as a discriminated union.
 The dispatch layer is a single exhaustive `switch`, so **TypeScript fails the
 build** if a section kind is added without a component to render it.
 

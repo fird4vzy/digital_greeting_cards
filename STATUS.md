@@ -5,8 +5,7 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 14 August 2026, after the video beat, the first template
-ported look and all, the builder, and the importer that fills it.
+**Last updated:** 17 August 2026, after every hand-written card was ported.
 
 ---
 
@@ -504,6 +503,40 @@ That fits in a database row and a form — no file, no deploy.
    Private repositories are refused rather than asked for a token. A feature
    that reads source should not start collecting credentials that can read
    source.
+
+   **It is not switched on, deliberately.** `ANTHROPIC_API_KEY` is unset and
+   buying one was weighed and declined on 17 August: the importer saves work on
+   templates that are now all ported, and the four that existed were done by
+   hand for nothing. Turn it on when somebody other than the two of us needs to
+   add a template, or when there are thirty rather than ten.
+
+   Setting the key no longer switches the card planner — that needs
+   `AI_PLANNER=on` as well. They were one switch, which quietly coupled an
+   operator tool run a handful of times to every customer's letter being
+   rewritten by a model. At this volume a person writes better, which is why the
+   product is concierge; the planner stays off until writing by hand gets
+   expensive.
+
+   The importer also takes a **folder**, not only a URL. Most hand-written cards
+   are a folder on a desktop, and the browser posts only the text — images,
+   audio and video are filtered out, because they belong to a card rather than a
+   template.
+
+5. ~~**`invite` and `1` through the builder.**~~ **Ported by hand instead, 17
+   August, along with `BirthdayParty`.** The importer needs a paid key that is
+   not worth buying yet — see the note below — and four templates by hand is an
+   afternoon, so they were done properly rather than approximately.
+
+   | Original | Template | What the engine was missing |
+   |---|---|---|
+   | `iLove` | **Вслух / Aloud** | the `video` beat |
+   | `1` | **За окном / The Window** | `cover: film` — video *behind* the type |
+   | `invite` | **Пойдём? / Shall We** | the `question` beat |
+   | `BirthdayParty` | **При свечах / Candlelight** | the `cake` beat, card-level music |
+
+   Ten templates now, four of them ported. **Every port turned up vocabulary
+   the engine did not have**, which is the same thing the importer's
+   `unmapped` field is for — doing them by hand simply found it sooner.
 
 Order mattered, and it paid: building the builder first would have meant
 guessing its fields, and the `reorder` field — the one that separates *Aloud*

@@ -29,8 +29,8 @@ needed: the gallery plays each template live through the real renderer.
 ## What you can draw from
 
 **Beats** (`supportedSections`) — `cover`, `envelope`, `intro`, `letter`,
-`video`, `gallery`, `timeline`, `memories`, `quote`, `wishes`, `final`,
-`closing`. A beat with no data disappears on its own: no photographs, no
+`video`, `gallery`, `timeline`, `memories`, `quote`, `wishes`, `question`,
+`cake`, `final`, `closing`. A beat with no data disappears on its own: no photographs, no
 gallery.
 
 `video` is the one beat that can cost megabytes, so it is built to spend
