@@ -87,6 +87,15 @@ export const coverSectionSchema = z.object({
   headline: z.string(),
   subline: z.string().optional(),
   hint: z.string().optional(),
+  /**
+   * A clip behind the title, for covers that want one.
+   *
+   * The same video the order carries. A template plays it *either* here as a
+   * background *or* as its own beat, never both — declaring the `video` beat is
+   * what chooses the second. The field is always populated; the variant decides
+   * whether anything looks at it.
+   */
+  video: videoSchema.optional(),
 });
 
 /** The gate: nothing is revealed until they open it. */

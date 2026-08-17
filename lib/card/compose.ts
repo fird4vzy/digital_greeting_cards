@@ -94,6 +94,8 @@ export function standardArc(
       headline: coverHeadline(input.locale),
       subline: undefined,
       hint: strings.scrollGently,
+      // Carried always; only a cover variant that wants a background reads it.
+      video: input.video,
     },
     {
       // The prompt is always derived, never passed in. Templates used to hand

@@ -85,6 +85,50 @@ export function CoverSection({ section, scene, motif }: Props) {
         variant === 'washi' ? 'justify-end pb-24' : 'justify-center',
       )}
     >
+      {/*
+        `film` puts the clip behind everything and washes it out, the way the
+        card this variant was ported from does: the video is weather, not
+        content — you are meant to read across it, not watch it.
+
+        It plays muted, looping and inline, which is the only combination a
+        mobile browser will start on its own; reduced motion gets the poster
+        and no movement. There is no play control on purpose, because there is
+        nothing here to start or finish.
+      */}
+      {variant === 'film' && section.video ? (
+        <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
+          {reduced ? (
+            section.video.poster ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={section.video.poster}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            ) : null
+          ) : (
+            <video
+              src={section.video.url}
+              poster={section.video.poster}
+              className="h-full w-full object-cover"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+            />
+          )}
+
+          {/* The wash. Without it the type is unreadable over half the frames
+              a video will ever show, and a card that is legible only sometimes
+              is not legible. */}
+          <div
+            className="absolute inset-0 backdrop-blur-[5px]"
+            style={{ background: 'color-mix(in srgb, var(--card-bg) 62%, transparent)' }}
+          />
+        </div>
+      ) : null}
+
       {/* Ambient layer. Renders CSS-only atmosphere unless the device opts in. */}
       <Atmosphere scene={scene} className="absolute inset-0" priority />
 
@@ -117,6 +161,14 @@ export function CoverSection({ section, scene, motif }: Props) {
           'relative mx-auto w-full',
           variant === 'washi' ? 'max-w-[38rem] pl-[8vw] text-left' : 'max-w-[44rem] text-center',
         )}
+        // A shadow rather than a heavier wash: the video should still read as a
+        // moving picture, and darkening it enough for bare type would flatten
+        // it into a texture.
+        style={
+          variant === 'film'
+            ? { textShadow: '0 2px 10px color-mix(in srgb, var(--card-bg) 85%, transparent)' }
+            : undefined
+        }
       >
         {variant === 'paper' || variant === 'arch' ? (
           <Reveal preset="fade" immediate as="div">

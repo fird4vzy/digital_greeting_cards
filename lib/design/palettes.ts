@@ -158,6 +158,28 @@ export const palettes = {
     swatches: ['#fff5f5', '#e87e96', '#f7a3b3', '#21171b'],
   },
 
+  /**
+   * The Window — the wash of the get-well card this was ported from. Almost no
+   * colour of its own, because a video plays behind it and the palette's job
+   * there is to stay out of the way; the coral is the only thing that speaks.
+   */
+  daylight: {
+    id: 'daylight',
+    name: 'Daylight',
+    scheme: 'light',
+    bg: '#fbfaf8',
+    bgDeep: '#f1efec',
+    ink: '#2c2c2c',
+    inkSoft: '#4a4a4a',
+    inkMuted: '#5c5c5c',
+    accent: '#e06666',
+    accentSoft: '#ffb7c5',
+    glow: 'rgba(255, 183, 197, 0.3)',
+    line: 'rgba(44, 44, 44, 0.12)',
+    particles: ['#ffb7c5', '#ff99aa', '#fbfaf8'],
+    swatches: ['#fbfaf8', '#e06666', '#ffb7c5', '#2c2c2c'],
+  },
+
 } as const satisfies Record<string, CardPalette>;
 
 export type PaletteId = keyof typeof palettes;

@@ -653,6 +653,13 @@ export const uz: Dictionary = {
           'Kutubxonadagi eng qisqa otkritka va og‘iz ochadigan yagonasi. Yumshoq yorug‘likdagi sarlavha, tegib ochiladigan konvert va birinchi satr o‘qilmasdan oldin kameradagi odam. Xat keyin keladi — satrma-satr, javob kabi. Yozishdan ko‘ra aytish osonroq bo‘lgan gap uchun.',
         animationStyle: 'Suzuvchi yorug‘lik, tegib ochiladigan konvert, satrma-satr xat',
       },
+      window: {
+        name: 'Deraza ortida',
+        tagline: 'Harakat ustida bir necha so‘z.',
+        description:
+          'Video matnning yonida emas, orqasida ketadi — go‘yo kimdir yarim ko‘z bilan qarab turgan manzara. So‘z kam va yirik, chunki harakatlanayotgan tasvir ustidan uzoq o‘qib bo‘lmaydi. Sekin aytiladigan gaplar uchun: dam ol, tuzalib ket, men yoningdaman.',
+        animationStyle: 'Matn ortidagi harakat, tushayotgan gulbarglar, shoshilmasdan',
+      },
     },
 
     copy: {

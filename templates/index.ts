@@ -7,6 +7,7 @@ import { memoriesTemplate } from './memories';
 import { momTemplate } from './mom';
 import { romanticTemplate } from './romantic';
 import { sakuraTemplate } from './sakura';
+import { windowTemplate } from './window';
 
 /**
  * THE TEMPLATE REGISTRY
@@ -21,6 +22,7 @@ const registry: TemplateDefinition[] = [
   memoriesTemplate,
   sakuraTemplate,
   aloudTemplate,
+  windowTemplate,
 ];
 
 const byId = new Map(registry.map((template) => [template.id, template]));
