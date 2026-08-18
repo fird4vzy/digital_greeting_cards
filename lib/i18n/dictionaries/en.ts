@@ -11,6 +11,7 @@ export const en: Dictionary = {
   ui: {
     nav: {
       templates: 'Templates',
+      works: 'Our work',
       howItWorks: 'How it works',
       createCard: 'Create a card',
       viewSite: 'View site',
@@ -94,6 +95,7 @@ export const en: Dictionary = {
         templates: 'Templates',
         create: 'Create a card',
         seeCard: 'See a real card',
+        works: 'Our work',
         shops: 'For shops: what it pays',
         dashboard: 'Shop dashboard',
         orders: 'Orders',
@@ -342,6 +344,27 @@ export const en: Dictionary = {
 
     card: { madeWith: 'Made with' },
 
+    works: {
+      metaTitle: 'Our work',
+      metaDescription:
+        'Cards already made and handed to real people. Not samples — the ones that arrived.',
+      eyebrow: 'Made',
+      title: 'Our work.',
+      lead: 'Cards that already reached their person. Each opens exactly as the recipient saw it — not rebuilt, not tidied.',
+      tabTemplates: 'Templates',
+      tabWorks: 'Our work',
+      open: 'Open',
+      openFull: 'Open in a new tab',
+      year: 'Year',
+      basedTemplate: 'A template was built from it',
+      noteCompressedVideo:
+        'The video is re-encoded: the original was 123 MB and GitHub refuses anything over 100 MB. Everything else is untouched.',
+      qr: 'QR code',
+      copyLink: 'Copy link',
+      copied: 'Copied',
+      back: 'All work',
+      original: 'The original, as the recipient opened it.',
+    },
     localeSwitcher: { label: 'Language' },
   },
 

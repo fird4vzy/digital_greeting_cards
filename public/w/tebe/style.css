@@ -1,0 +1,502 @@
+/* ==========================================================================
+   TOKENS
+   ========================================================================== */
+:root{
+  --night-950:#04050b;
+  --night-900:#080a17;
+  --night-800:#0e1226;
+  --night-700:#161c38;
+  --star:#f7f4ec;
+  --star-dim:rgba(247,244,236,.55);
+  --moon:#a9bdea;
+  --thread:#e23a56;
+  --thread-deep:#7c0f2a;
+  --gold:#f0c987;
+  --ink:#efece3;
+  --ink-soft:rgba(239,236,227,.72);
+  --ink-faint:rgba(239,236,227,.4);
+
+  --f-display:'Yeseva One', 'PT Serif', serif;
+  --f-body:'PT Serif', Georgia, serif;
+
+  --ease-soft: cubic-bezier(.22,.61,.36,1);
+  --ease-out-slow: cubic-bezier(.16,.84,.32,1);
+}
+
+*{box-sizing:border-box;}
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  background:var(--night-950);
+  color:var(--ink);
+  font-family:var(--f-body);
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+::selection{ background:rgba(226,58,86,.35); color:var(--ink); }
+
+button{ font-family:inherit; }
+
+/* ==========================================================================
+   STAGES
+   ========================================================================== */
+.stage{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+
+#stage-scenes{
+  background:radial-gradient(120% 90% at 50% 20%, var(--night-800) 0%, var(--night-900) 55%, var(--night-950) 100%);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 1.8s var(--ease-soft);
+}
+#stage-scenes.active{
+  opacity:1;
+  pointer-events:auto;
+}
+
+/* ==========================================================================
+   HERO / FIRST SCREEN  (kept as close to the original as possible)
+   ========================================================================== */
+.hero-video{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center center;
+  transform:scale(1.02);
+  animation:kenburns 34s linear forwards;
+  filter:saturate(1.02) contrast(1.03);
+}
+@keyframes kenburns{
+  from{ transform:scale(1.02); }
+  to{ transform:scale(1.12); }
+}
+
+.hero-vignette{
+  position:absolute; inset:0;
+  background:
+    radial-gradient(120% 85% at 50% 100%, rgba(4,5,11,.85) 0%, rgba(4,5,11,.15) 45%, rgba(4,5,11,0) 60%),
+    radial-gradient(120% 60% at 50% 0%, rgba(4,5,11,.65) 0%, rgba(4,5,11,0) 45%),
+    linear-gradient(180deg, rgba(4,5,11,.25) 0%, rgba(4,5,11,.05) 30%, rgba(4,5,11,.35) 75%, rgba(4,5,11,.75) 100%);
+  pointer-events:none;
+}
+.hero-grain{
+  position:absolute; inset:0;
+  pointer-events:none;
+  opacity:.05;
+  mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+.hero-text{
+  position:absolute;
+  left:50%;
+  bottom:26%;
+  transform:translate(-50%, 0);
+  width:min(88vw, 720px);
+  text-align:center;
+  z-index:2;
+}
+.hero-line{
+  margin:0 0 .55em;
+  font-family:var(--f-body);
+  font-style:italic;
+  font-weight:400;
+  font-size:clamp(19px, 3.1vw, 30px);
+  line-height:1.5;
+  color:var(--ink);
+  letter-spacing:.01em;
+  text-shadow:0 2px 24px rgba(0,0,0,.55), 0 1px 2px rgba(0,0,0,.4);
+  opacity:0;
+  filter:blur(10px);
+  transform:translateY(14px);
+}
+.hero-line.show{
+  animation:heroLineIn 1.8s var(--ease-out-slow) forwards;
+}
+@keyframes heroLineIn{
+  0%{ opacity:0; filter:blur(10px); transform:translateY(14px); }
+  100%{ opacity:1; filter:blur(0); transform:translateY(0); }
+}
+
+.continue-btn{
+  position:absolute;
+  left:50%;
+  bottom:9%;
+  transform:translate(-50%, 10px);
+  z-index:3;
+  background:transparent;
+  border:1px solid rgba(239,236,227,.55);
+  color:var(--ink);
+  padding:14px 38px;
+  border-radius:999px;
+  font-size:13px;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  cursor:pointer;
+  opacity:0;
+  pointer-events:none;
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  background:rgba(8,10,23,.18);
+  transition:border-color .5s var(--ease-soft), background .5s var(--ease-soft), box-shadow .5s var(--ease-soft), transform .4s var(--ease-soft), opacity 1.4s var(--ease-out-slow);
+}
+.continue-btn.show{
+  opacity:1;
+  pointer-events:auto;
+  transform:translate(-50%, 0);
+}
+.continue-btn:hover{
+  border-color:var(--thread);
+  box-shadow:0 0 28px rgba(226,58,86,.35);
+  background:rgba(124,15,42,.18);
+}
+.continue-btn:active{ transform:translate(-50%, 1px) scale(.98); }
+.continue-btn.fading{
+  opacity:0 !important;
+  pointer-events:none;
+  transition:opacity .8s var(--ease-soft);
+}
+
+/* ==========================================================================
+   SCENE STAGE (night sky chapters)
+   ========================================================================== */
+
+/* background.jpg: split into a drift wrapper (parallax, JS-driven transform)
+   and an inner layer (fade-in + slow one-shot zoom, class-driven transform).
+   Two elements, two independent transforms — nothing to fight over. */
+.scene-bg-wrap{
+  position:absolute; inset:-4%;
+  z-index:0;
+  transition:transform .7s var(--ease-soft);
+  will-change:transform;
+}
+.scene-bg{
+  position:absolute; inset:0;
+  background-image:url("./assets/background.jpg");
+  background-size:cover;
+  background-position:center 42%;
+  opacity:0;
+  transform:scale(1.09);
+  filter:saturate(1.05) brightness(.9) contrast(1.02);
+  transition:opacity 3s var(--ease-out-slow), transform 70s linear;
+}
+.scene-bg.show{ opacity:.9; transform:scale(1); }
+.scene-bg::after{
+  content:'';
+  position:absolute; inset:0;
+  background:
+    radial-gradient(120% 90% at 50% 12%, rgba(4,5,11,.5) 0%, rgba(4,5,11,0) 46%),
+    linear-gradient(180deg, rgba(4,5,11,.12) 0%, rgba(4,5,11,.06) 38%, rgba(4,5,11,.5) 100%);
+}
+
+#sky{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  display:block;
+  z-index:1;
+}
+/* Final video (video2) — sits above every scene layer but below the vinyl
+   player, so the music control stays usable through the finale. Starts
+   fully transparent; JS fades it in only once playback has actually begun,
+   and fades it out again once it's finished, so there's never a hard cut
+   into or out of it. */
+.final-video{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:20;
+  background:var(--night-950);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 1.6s var(--ease-soft);
+}
+.final-video.show{ opacity:1; }
+
+.scene-text-wrap{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:min(86vw, 760px);
+  text-align:center;
+  z-index:3;
+  pointer-events:none;
+}
+
+.scene-text{
+  margin:0;
+  font-family:var(--f-body);
+  font-style:italic;
+  font-weight:400;
+  font-size:clamp(20px, 3.4vw, 34px);
+  line-height:1.55;
+  color:var(--ink);
+  letter-spacing:.01em;
+  opacity:0;
+  will-change:transform, filter, opacity;
+  text-shadow:0 0 30px rgba(0,0,0,.4);
+}
+
+/* transition variants, toggled via JS classes */
+.scene-text.t-blur.enter{ animation:tBlur 2.1s var(--ease-out-slow) forwards; }
+@keyframes tBlur{
+  0%{ opacity:0; filter:blur(16px); }
+  100%{ opacity:1; filter:blur(0); }
+}
+
+.scene-text.t-rise.enter{ animation:tRise 2s var(--ease-out-slow) forwards; }
+@keyframes tRise{
+  0%{ opacity:0; transform:translateY(36px) scale(.98); filter:blur(6px); }
+  100%{ opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
+}
+
+.scene-text.t-scale.enter{ animation:tScale 2.2s var(--ease-out-slow) forwards; }
+@keyframes tScale{
+  0%{ opacity:0; transform:scale(.85); filter:blur(4px); }
+  60%{ opacity:1; }
+  100%{ opacity:1; transform:scale(1); filter:blur(0); }
+}
+
+.scene-text.t-light.enter{ animation:tLight 2.4s var(--ease-out-slow) forwards; }
+@keyframes tLight{
+  0%{ opacity:0; letter-spacing:.3em; filter:brightness(2.2) blur(8px); }
+  100%{ opacity:1; letter-spacing:.01em; filter:brightness(1) blur(0); }
+}
+
+.scene-text.t-drift.enter{ animation:tDrift 2.3s var(--ease-out-slow) forwards; }
+@keyframes tDrift{
+  0%{ opacity:0; transform:translateX(-26px); filter:blur(8px); }
+  100%{ opacity:1; transform:translateX(0); filter:blur(0); }
+}
+
+.scene-text.exit{ animation:tExit 1.3s var(--ease-soft) forwards; }
+@keyframes tExit{
+  0%{ opacity:1; filter:blur(0); }
+  100%{ opacity:0; filter:blur(14px); transform:translateY(-14px); }
+}
+
+/* finale caption — a two-beat reveal: a quiet whispered line, then the
+   confession itself in a large glowing script. Nothing here is subtle by
+   accident: this is the one moment the whole site has been building to. */
+.finale-caption{
+  position:absolute;
+  left:50%;
+  top:64%;
+  transform:translate(-50%, 0);
+  z-index:4;
+  margin:0;
+  text-align:center;
+  pointer-events:none;
+  width:min(92vw, 900px);
+}
+
+.finale-pre{
+  margin:0 0 .9em;
+  font-family:var(--f-body);
+  font-style:italic;
+  font-weight:400;
+  font-size:clamp(14px, 2vw, 19px);
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  opacity:0;
+  filter:blur(10px);
+  transform:translateY(10px);
+}
+
+.finale-main{
+  position:relative;
+  margin:0;
+  font-family:'Marck Script', var(--f-display), cursive;
+  font-weight:400;
+  font-size:clamp(44px, 8.5vw, 96px);
+  line-height:1.15;
+  color:#fffaf3;
+  letter-spacing:.01em;
+  opacity:0;
+  filter:blur(20px) brightness(1.6);
+  transform:scale(.82);
+  text-shadow:
+    0 0 18px rgba(255,236,214,.9),
+    0 0 46px rgba(226,58,86,.6),
+    0 0 110px rgba(226,58,86,.35),
+    0 2px 20px rgba(0,0,0,.55);
+}
+
+/* soft warm light blooming outward from behind the words */
+.finale-main::before{
+  content:'';
+  position:absolute;
+  left:50%; top:50%;
+  width:130%;
+  height:340%;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(closest-side, rgba(240,201,135,.22), rgba(226,58,86,.10) 45%, rgba(226,58,86,0) 72%);
+  opacity:0;
+  z-index:-1;
+  pointer-events:none;
+}
+
+.finale-caption.show .finale-pre{
+  animation: finalePreIn 2.2s var(--ease-out-slow) .2s forwards;
+}
+.finale-caption.show .finale-main{
+  animation: finaleMainIn 2.8s var(--ease-out-slow) 1.5s forwards,
+             finaleGlowPulse 4.4s ease-in-out 4.4s infinite;
+}
+.finale-caption.show .finale-main::before{
+  animation: finaleBloomIn 3.2s var(--ease-out-slow) 1.6s forwards;
+}
+
+@keyframes finalePreIn{
+  0%{ opacity:0; filter:blur(10px); transform:translateY(10px); }
+  100%{ opacity:1; filter:blur(0); transform:translateY(0); }
+}
+
+@keyframes finaleMainIn{
+  0%{ opacity:0; filter:blur(20px) brightness(1.6); transform:scale(.82); }
+  50%{ opacity:1; filter:blur(4px) brightness(1.25); transform:scale(1.03); }
+  100%{ opacity:1; filter:blur(0) brightness(1); transform:scale(1); }
+}
+
+@keyframes finaleBloomIn{
+  0%{ opacity:0; }
+  100%{ opacity:1; }
+}
+
+@keyframes finaleGlowPulse{
+  0%, 100%{
+    text-shadow:
+      0 0 18px rgba(255,236,214,.85),
+      0 0 46px rgba(226,58,86,.55),
+      0 0 110px rgba(226,58,86,.3),
+      0 2px 20px rgba(0,0,0,.55);
+  }
+  50%{
+    text-shadow:
+      0 0 26px rgba(255,236,214,1),
+      0 0 66px rgba(226,58,86,.75),
+      0 0 150px rgba(226,58,86,.45),
+      0 2px 20px rgba(0,0,0,.55);
+  }
+}
+
+/* ==========================================================================
+   VINYL PLAYER
+   ========================================================================== */
+.vinyl{
+  position:fixed;
+  right:22px;
+  bottom:22px;
+  width:74px;
+  height:74px;
+  z-index:50;
+  cursor:pointer;
+  filter:drop-shadow(0 6px 18px rgba(0,0,0,.55));
+  transition:transform .35s var(--ease-soft);
+}
+.vinyl:hover{ transform:scale(1.05); }
+.vinyl,
+.vinyl:focus{ outline:none; }
+/* Soft glow instead of a hard outline ring — no stray colored line sitting
+   next to the disc, but focus is still clearly visible for keyboard users. */
+.vinyl:focus-visible{
+  outline:none;
+  box-shadow:0 0 0 3px rgba(240,201,135,.4);
+  border-radius:50%;
+}
+
+.vinyl-disc{
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  background:
+    repeating-radial-gradient(circle at 50% 50%, #14141a 0 2px, #1c1c24 2px 4px),
+    radial-gradient(circle at 38% 34%, #2b2b35 0%, #0c0c10 70%);
+  border:1px solid rgba(255,255,255,.08);
+  position:relative;
+  animation:spin 5.5s linear infinite;
+  animation-play-state:paused;
+}
+.vinyl.playing .vinyl-disc{ animation-play-state:running; }
+@keyframes spin{ from{ transform:rotate(0); } to{ transform:rotate(360deg); } }
+
+.vinyl-ring{
+  position:absolute;
+  inset:14%;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.06);
+}
+.vinyl-label{
+  position:absolute;
+  inset:37%;
+  border-radius:50%;
+  background:radial-gradient(circle at 40% 35%, #caa568 0%, #5c3f22 70%);
+  box-shadow:inset 0 0 6px rgba(0,0,0,.5);
+}
+.vinyl-label::after{
+  content:"";
+  position:absolute;
+  inset:42%;
+  border-radius:50%;
+  background:#04050b;
+}
+.vinyl-arm{
+  position:absolute;
+  top:-6px;
+  right:-4px;
+  width:34px;
+  height:34px;
+  border-right:2px solid rgba(240,201,135,.65);
+  border-top:2px solid rgba(240,201,135,.65);
+  border-radius:0 100% 0 0;
+  transform-origin:100% 0%;
+  transform:rotate(-18deg);
+  transition:transform .6s var(--ease-soft);
+  opacity:.85;
+}
+.vinyl.playing .vinyl-arm{ transform:rotate(2deg); }
+
+/* ==========================================================================
+   REDUCED MOTION
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce){
+  .hero-video{ animation:none; }
+  .scene-text.enter, .scene-text.exit{ animation-duration:.4s !important; }
+  .scene-bg{ transition:opacity 1s ease; }
+  .scene-bg-wrap{ transition:none; }
+  .finale-caption.show .finale-pre,
+  .finale-caption.show .finale-main,
+  .finale-caption.show .finale-main::before{
+    animation-duration:.6s !important;
+    animation-iteration-count:1 !important;
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width:640px){
+  .hero-text{ bottom:24%; width:90vw; }
+  .continue-btn{ bottom:8%; padding:12px 30px; font-size:12px; }
+  .vinyl{ width:60px; height:60px; right:16px; bottom:16px; }
+  .finale-caption{ top:70%; }
+}
+
+@media (min-aspect-ratio: 3/2){
+  /* very wide desktop: keep hero text a touch higher, above lower crop */
+  .hero-text{ bottom:22%; }
+}

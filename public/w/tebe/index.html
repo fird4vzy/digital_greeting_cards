@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Тебе.</title>
+<meta name="description" content="Иногда чувства приходят не сразу." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Yeseva+One&family=Marck+Script&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+<!-- ============ STAGE 0 — ПЕРВЫЙ ЭКРАН ============ -->
+<section id="stage-video" class="stage">
+  <video
+    id="hero-video"
+    class="hero-video"
+    src="./assets/video.mp4"
+    muted
+    autoplay
+    loop
+    playsinline
+    webkit-playsinline
+    preload="auto"
+  ></video>
+  <div class="hero-vignette"></div>
+  <div class="hero-grain"></div>
+
+  <div class="hero-text">
+    <p class="hero-line" data-line="1">Иногда чувства приходят не сразу.</p>
+    <p class="hero-line" data-line="2">Иногда они просто постепенно становятся чем-то&nbsp;большим.</p>
+  </div>
+
+  <button id="continue-btn" class="continue-btn" type="button">
+    <span>Продолжить</span>
+  </button>
+</section>
+
+<!-- ============ STAGE 1 — НОЧНОЕ НЕБО / СЦЕНЫ ============ -->
+<section id="stage-scenes" class="stage" aria-hidden="true">
+  <!-- background.jpg lives in its own drift wrapper (parallax) separate from
+       the zoom/fade wrapper (.scene-bg) so the two transforms never fight. -->
+  <div class="scene-bg-wrap" id="scene-bg-wrap">
+    <div class="scene-bg" id="scene-bg"></div>
+  </div>
+
+  <canvas id="sky"></canvas>
+
+  <div class="scene-text-wrap">
+    <p id="scene-text" class="scene-text"></p>
+  </div>
+
+  <div id="finale-caption" class="finale-caption">
+    <p class="finale-pre">Теперь ты знаешь.</p>
+    <p class="finale-main">Я люблю тебя</p>
+  </div>
+</section>
+
+<!-- ============ ФИНАЛЬНОЕ ВИДЕО (video2) — своя лента, свой звук отключён ============ -->
+<video
+  id="final-video"
+  class="final-video"
+  src="./assets/video2.mp4"
+  muted
+  playsinline
+  webkit-playsinline
+  preload="auto"
+></video>
+
+<!-- ============ ВИНИЛОВЫЙ ПРОИГРЫВАТЕЛЬ (persists) ============ -->
+<div id="vinyl" class="vinyl" role="button" tabindex="0" aria-label="Воспроизвести или остановить музыку">
+  <div class="vinyl-disc">
+    <div class="vinyl-ring"></div>
+    <div class="vinyl-label"></div>
+  </div>
+  <div class="vinyl-arm"></div>
+</div>
+
+<audio id="song" src="./assets/song.mp3" preload="auto" loop></audio>
+
+<script src="./script.js"></script>
+</body>
+</html>

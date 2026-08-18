@@ -15,6 +15,7 @@ export const uz: Dictionary = {
   ui: {
     nav: {
       templates: 'Shablonlar',
+      works: 'Bizning ishlarimiz',
       howItWorks: 'Qanday ishlaydi',
       createCard: 'Kartochka yaratish',
       viewSite: 'Saytga',
@@ -98,6 +99,7 @@ export const uz: Dictionary = {
         templates: 'Shablonlar',
         create: 'Kartochka yaratish',
         seeCard: "Tayyor kartochkani ko'rish",
+        works: 'Bizning ishlarimiz',
         shops: 'Do‘konlarga: bu qancha beradi',
         dashboard: "Do'kon paneli",
         orders: 'Buyurtmalar',
@@ -346,6 +348,27 @@ export const uz: Dictionary = {
 
     card: { madeWith: 'Yaratildi:' },
 
+    works: {
+      metaTitle: 'Bizning ishlarimiz',
+      metaDescription:
+        'Allaqachon yaratilgan va odamlarga topshirilgan kartochkalar. Namuna emas — manziliga yetib borgan ishlar.',
+      eyebrow: 'Qilingan',
+      title: 'Bizning ishlarimiz.',
+      lead: 'Egalariga yetib borgan kartochkalar. Har biri qabul qiluvchi ko‘rgan holida ochiladi — qayta yig‘ilmagan va tekislanmagan.',
+      tabTemplates: 'Shablonlar',
+      tabWorks: 'Bizning ishlarimiz',
+      open: 'Ochish',
+      openFull: 'Yangi oynada ochish',
+      year: 'Yil',
+      basedTemplate: 'Uning asosida shablon bor',
+      noteCompressedVideo:
+        'Video siqilgan: asli 123 MB edi, GitHub esa 100 MB dan katta fayllarni qabul qilmaydi. Qolgan hammasi o‘zgarishsiz.',
+      qr: 'QR-kod',
+      copyLink: 'Havolani nusxalash',
+      copied: 'Nusxalandi',
+      back: 'Barcha ishlarga',
+      original: 'Asl nusxa — qabul qiluvchi ko‘rgan holida.',
+    },
     localeSwitcher: { label: 'Til' },
   },
 

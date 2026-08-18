@@ -4,6 +4,7 @@ import { Footer } from '@/components/site/Footer';
 import { Header } from '@/components/site/Header';
 import { TemplateCard } from '@/components/marketing/TemplateCard';
 import { SectionHeading } from '@/components/marketing/SectionHeading';
+import { GalleryTabs } from '@/components/marketing/GalleryTabs';
 import { Reveal, RevealGroup } from '@/components/ui/Reveal';
 import { OCCASIONS, type OccasionId } from '@/lib/card/taxonomy';
 import { localiseTemplates, localisedOccasions, occasionLabel } from '@/lib/i18n/localise';
@@ -39,10 +40,18 @@ export default async function TemplatesPage({ searchParams }: Props) {
               lead={dict.ui.templates.lead}
             />
 
+            <Reveal preset="fade">
+              <GalleryTabs
+                active="templates"
+                templatesLabel={dict.ui.works.tabTemplates}
+                worksLabel={dict.ui.works.tabWorks}
+              />
+            </Reveal>
+
             {/* Filter by feeling. Plain links, so the filter is shareable and
                 survives a page refresh. */}
             <Reveal preset="fade">
-              <div className="mt-12 flex flex-wrap gap-2">
+              <div className="mt-8 flex flex-wrap gap-2">
                 <FilterChip href="/templates" active={!active}>
                   {dict.ui.templates.everything}
                 </FilterChip>

@@ -5,8 +5,8 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 17 August 2026 — every hand-written card ported, the
-scroll bug found, and the dashboard finished in three languages.
+**Last updated:** 18 August 2026 — the hand-made cards now also appear as
+themselves, under Our work, beside the templates ported from them.
 
 ---
 
@@ -261,6 +261,67 @@ Bear in mind the website is not the main tool while there are zero shops. The
 first ten close by walking in with a phone, showing a real card, and leaving a
 printed tag. The page is what they open after you leave, to check you are not
 a student project.
+
+---
+
+## Templates and Our work are two different things
+
+Added 18 August, and the distinction is the point.
+
+A **template** is a production system: data a new card gets composed from. A
+**work** is a card that already reached a person, and its job is to make the
+next customer say "make me one of those". Porting is right for the first and
+wrong for the second — it is a retelling, and the hand-tuned timing does not
+survive it, which STATUS.md already predicted about Aloud.
+
+That conflation is why the gallery felt weak: `aloud` took three commits (the
+port, then its look, then its choreography) while `window`, `ask` and
+`candlelight` took one each and wore the engine's default clothes.
+
+So both now exist, on two tabs:
+
+- `/templates` — the engine, unchanged.
+- `/works` — the originals, served **byte for byte** out of `public/w/<id>/`.
+
+### How a stranger's HTML is served without opening the hole
+
+STATUS.md rejected serving hand-made HTML because a script at `/c/[code]`
+shares an origin with the admin and could read an operator's session cookie.
+That objection stands for *cards*. Works are different, and the isolation is
+explicit: `sandbox="allow-scripts"` with **no** `allow-same-origin`. The two
+flags together cancel the sandbox; apart, `allow-scripts` gives the content an
+opaque origin — scripts run, cookies and the parent DOM are unreachable.
+`allow-same-origin` is the one flag that must never be added there.
+
+Raw files live under `/w/…`, not `/works/…`, so a static file can never shadow
+the Next route.
+
+### The one file that is not byte-identical
+
+`Тебе.` had a 123 MB hero video. **GitHub refuses anything over 100 MB**, so it
+is re-encoded to 34 MB — h264 CRF 28, audio dropped since the element is
+`muted` and the sound is a separate `song.mp3`. Everything else in all three
+works, including an 8.3 MB GIF and a 2560×1440 clip that are both larger than
+they need to be, is untouched: the rule was byte-for-byte, and only a hard
+platform limit overrides it. The substitution is stated in the UI, from
+`Work.note`, not hidden in a commit message.
+
+`ffmpeg` is not a dependency. It was installed with `--no-save` for that one
+job; `package.json` is unchanged, and a fresh clone neither needs nor gets it.
+
+### Known, and left alone
+
+`Пойдём?` throws `Cannot read properties of null` on load: its `script.js`
+looks up `btn-yes` by id while the markup gives it as a class. The card works
+anyway — the button carries an inline `onclick` — and it is the original's own
+bug. Fixing it would break the promise the page makes about being untouched.
+
+### Adding the next one
+
+`lib/works/index.ts` is a list. Drop the files in `public/w/<id>/`, add a row,
+generate a cover from the work itself (a real frame beats a mock-up), and it
+appears in the gallery, at `/works/<id>` and with a QR at
+`/api/works/<id>/qr`. No deploy step, no database.
 
 ---
 

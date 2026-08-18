@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>元気になってね 🌸</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+
+  html,body{
+    margin:0;
+    padding:0;
+    height:100%;
+    overflow:hidden;
+    font-family:"Noto Sans JP",sans-serif;
+  }
+
+  /* фоновое видео на весь экран */
+  #bg-video{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    object-fit:cover;
+    z-index:-2;
+    transition:transform 0.3s ease;
+  }
+
+  /* адаптация для мобильных — замедлим видео и слегка уменьшим */
+  @media (max-width:768px){
+    #bg-video{
+      object-position:center;
+      transform:scale(1.2);
+    }
+  }
+
+  .overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(255,255,255,0.35);
+    backdrop-filter:blur(5px);
+    z-index:-1;
+    transition:transform 0.3s ease;
+  }
+
+  .content{
+    position:relative;
+    z-index:2;
+    text-align:center;
+    color:#2c2c2c;
+    animation:fadeIn 2s ease-in-out;
+    transition:transform 0.3s ease;
+  }
+
+  h1{
+    font-size:3rem;
+    color:#e06666;
+    text-shadow:0 2px 8px rgba(255,255,255,0.9);
+    margin-bottom:0.8rem;
+    animation:float 3s ease-in-out infinite;
+  }
+
+  p{
+    font-size:1.2rem;
+    color:#333;
+    text-shadow:0 1px 6px rgba(255,255,255,0.8);
+    line-height:1.7;
+    margin:0.5rem 0;
+    animation:fadeUp 2s ease-in-out;
+  }
+
+  .footer{
+    position:absolute;
+    bottom:25px;
+    font-size:0.95rem;
+    color:#5c5c5c;
+    text-shadow:0 1px 4px rgba(255,255,255,0.7);
+    animation:fadeIn 4s ease-in-out;
+    z-index:2;
+    transition:transform 0.3s ease;
+  }
+
+  .petal{
+    position:fixed;
+    top:-10px;
+    background:radial-gradient(circle at 20% 20%,#ffb7c5,#ff99aa);
+    border-radius:50%;
+    width:12px;
+    height:16px;
+    opacity:0.8;
+    animation:fall linear infinite;
+    z-index:3;
+    transition:transform 0.3s ease;
+  }
+
+  @keyframes fall{
+    0%{transform:translateY(0) rotate(0deg);opacity:1;}
+    100%{transform:translateY(100vh) rotate(360deg);opacity:0.5;}
+  }
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(15px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+
+  /* на телефонах чуть меньше шрифт */
+  @media (max-width:768px){
+    h1{font-size:2.2rem;}
+    p{font-size:1rem;}
+  }
+</style>
+</head>
+<body>
+  <video autoplay muted loop playsinline id="bg-video">
+    <source src="5.mp4" type="video/mp4">
+  </video>
+
+  <div class="overlay"></div>
+
+ <div class="content">
+    <h1>🌸 元気になってね 🌸</h1>
+    <p>Даже самым сильным иногда нужно немного отдохнуть⚡ ツ</p>
+    <p>🍵 Поправляйся скорее!</p>
+  </div>
+
+  <div class="footer">P.S просто открытка\ (•◡•) /</div>
+
+  <script>
+    /* лепестки */
+    const numPetals=25;
+    for(let i=0;i<numPetals;i++){
+      const petal=document.createElement("div");
+      petal.classList.add("petal");
+      petal.style.left=Math.random()*100+"vw";
+      petal.style.animationDuration=6+Math.random()*5+"s";
+      petal.style.animationDelay=Math.random()*5+"s";
+      petal.style.width=10+Math.random()*8+"px";
+      petal.style.height=12+Math.random()*8+"px";
+      document.body.appendChild(petal);
+    }
+
+    /* анимация при движении курсора */
+    const video=document.getElementById("bg-video");
+    const overlay=document.querySelector(".overlay");
+    const content=document.querySelector(".content");
+    const footer=document.querySelector(".footer");
+
+    document.addEventListener("mousemove",e=>{
+      const x=(e.clientX/window.innerWidth-0.5)*10;
+      const y=(e.clientY/window.innerHeight-0.5)*10;
+      video.style.transform=`scale(1.05) translate(${x/3}px,${y/3}px)`;
+      overlay.style.transform=`translate(${x/4}px,${y/4}px)`;
+      content.style.transform=`translate(${x}px,${y}px)`;
+      footer.style.transform=`translate(${x/2}px,${y/2}px)`;
+    });
+
+    /* на мобильных отключаем курсорную анимацию */
+    if(/Mobi|Android/i.test(navigator.userAgent)){
+      document.removeEventListener("mousemove",()=>{});
+    }
+  </script>
+</body>
+</html>
+

@@ -9,6 +9,7 @@ export function Footer({ strings }: { strings: Dictionary['ui']['footer'] }) {
       title: strings.product,
       links: [
         { href: '/templates', label: strings.links.templates },
+        { href: '/works', label: strings.links.works },
         { href: '/create', label: strings.links.create },
         { href: '/c/8FJ29K', label: strings.links.seeCard },
       ],

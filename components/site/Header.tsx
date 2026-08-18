@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils/cn';
 
 export type HeaderStrings = {
   templates: string;
+  works: string;
   howItWorks: string;
   createCard: string;
   language: string;
@@ -31,6 +32,7 @@ export function Header({
 }) {
   const links = [
     { href: '/templates', label: strings.templates },
+    { href: '/works', label: strings.works },
     { href: '/#bouquet', label: strings.howItWorks },
   ];
 

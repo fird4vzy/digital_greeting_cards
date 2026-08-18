@@ -56,7 +56,7 @@ export type TemplateStrings = {
 
 export type Dictionary = {
   ui: {
-    nav: { templates: string; howItWorks: string; createCard: string; viewSite: string };
+    nav: { templates: string; works: string; howItWorks: string; createCard: string; viewSite: string };
     hero: {
       eyebrow: string;
       line1: string;
@@ -113,6 +113,7 @@ export type Dictionary = {
         templates: string;
         create: string;
         seeCard: string;
+        works: string;
         shops: string;
         dashboard: string;
         orders: string;
@@ -279,6 +280,29 @@ export type Dictionary = {
     };
     notFound: { title: string; lead: string; hint: string; back: string; makeOwn: string };
     card: { madeWith: string };
+    works: {
+      metaTitle: string;
+      metaDescription: string;
+      eyebrow: string;
+      title: string;
+      lead: string;
+      /** Вкладки над галереей: шаблоны или уже сделанные работы. */
+      tabTemplates: string;
+      tabWorks: string;
+      open: string;
+      openFull: string;
+      year: string;
+      /** Пометка на карточке работы, у которой есть шаблон-потомок. */
+      basedTemplate: string;
+      /** Честное примечание о единственном изменённом файле. */
+      noteCompressedVideo: string;
+      qr: string;
+      copyLink: string;
+      copied: string;
+      back: string;
+      /** Подпись под фреймом: это оригинал, а не пересборка. */
+      original: string;
+    };
     localeSwitcher: { label: string };
   };
 
