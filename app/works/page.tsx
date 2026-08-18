@@ -6,7 +6,8 @@ import { SectionHeading } from '@/components/marketing/SectionHeading';
 import { GalleryTabs } from '@/components/marketing/GalleryTabs';
 import { Reveal, RevealGroup } from '@/components/ui/Reveal';
 import { getI18n } from '@/lib/i18n/server';
-import { occasionLabel } from '@/lib/i18n/localise';
+import { localiseTemplates, occasionLabel } from '@/lib/i18n/localise';
+import { listAllTemplateSummaries } from '@/lib/card/registry';
 import { listWorks } from '@/lib/works';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -24,6 +25,17 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function WorksPage() {
   const { locale, dict } = await getI18n();
   const works = listWorks();
+
+  // Портированные работы ссылались на шаблон его идентификатором — `ask`,
+  // `window`. Это внутреннее имя, оно латиницей и одинаково во всех трёх
+  // языках; читателю нужно название. Реестр, а не словарь напрямую, потому
+  // что шаблон может быть собран оператором и в словаре его нет.
+  const templateNames = new Map(
+    localiseTemplates(await listAllTemplateSummaries(), dict).map((template) => [
+      template.id,
+      template.name,
+    ]),
+  );
 
   return (
     <>
@@ -101,7 +113,7 @@ export default async function WorksPage() {
                             href={`/templates/${work.portedTo}`}
                             className="text-ink underline decoration-line-strong underline-offset-4 transition-colors hover:text-accent"
                           >
-                            {work.portedTo}
+                            {templateNames.get(work.portedTo) ?? work.portedTo}
                           </Link>
                         </p>
                       ) : null}

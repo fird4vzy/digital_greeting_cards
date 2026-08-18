@@ -32,6 +32,12 @@ export type StageContent = {
   final: string;
   from: string;
   photos: string[];
+  /**
+   * Heading over the photographs. Optional: an override that does not set it
+   * keeps the demo story's heading, which is right for a preview of the same
+   * occasion and only wrong if the caller changed the occasion too.
+   */
+  photosLabel?: string;
 };
 
 export function TemplateStage({
@@ -40,14 +46,20 @@ export function TemplateStage({
   still = false,
   /** Override the demo story, e.g. to preview what a customer just wrote. */
   content,
-  /** Language of the *preview content*, so a Russian visitor sees Russian. */
-  locale = 'ru',
+  /**
+   * Language of the *preview content*, so a Russian visitor sees Russian.
+   *
+   * Required, not defaulted: a default here is a silent wrong answer for two
+   * of the three languages, and that is exactly how the full-size preview
+   * came to render in English on a Russian page.
+   */
+  locale,
   className,
 }: {
   template: TemplateSummary;
   still?: boolean;
   content?: StageContent;
-  locale?: string;
+  locale: string;
   className?: string;
 }) {
   const palette = getPalette(template.paletteId);
@@ -70,10 +82,17 @@ export function TemplateStage({
       final: copy.finalHeadline,
       from: story.senderName,
       photos: story.photos.slice(0, 3).map((photo) => photo.url),
+      // The same heading the real gallery beat carries, so the miniature does
+      // not label the photographs differently from the card it opens.
+      photosLabel: copy.galleryTitle,
     };
   }, [template.id, locale]);
 
   const demo = content ?? demoDefaults;
+  const photosLabel = demo.photosLabel ?? demoDefaults.photosLabel;
+  // Chrome, not content: it says the card has no photographs yet, so it
+  // follows the language and never an override.
+  const photosEmpty = cardStrings(locale).galleryEmpty;
 
   const { reduced } = useMotionPrefs();
   const [beat, setBeat] = useState(0);
@@ -111,7 +130,7 @@ export function TemplateStage({
     // 3 — the photographs
     <div key="gallery" className="flex h-full flex-col justify-center gap-3 px-6">
       <span className="eyebrow mb-1 opacity-45">
-        {demo.photos.length > 0 ? 'Together' : 'No photographs yet'}
+        {demo.photos.length > 0 ? photosLabel : photosEmpty}
       </span>
       <div className="grid grid-cols-3 gap-2">
         {demo.photos.map((url, index) => (

@@ -25,7 +25,7 @@ export async function BouquetSection({
     <BouquetArt key="bouquet" />,
     <QrCardArt key="card" qr={qr} code={demoCode} tagLine={dict.content.card.tagLine} />,
     <ScanArt key="scan" />,
-    <WorldArt key="world" />,
+    <WorldArt key="world" name={dict.content.demo.romantic.recipientName} />,
   ];
 
   const steps = dict.ui.bouquet.steps.map((step, index) => ({
@@ -158,7 +158,12 @@ function ScanArt() {
   );
 }
 
-function WorldArt() {
+/**
+ * Телефон в руке получателя. Имя на экране — то же демонстрационное, что и
+ * в галерее: рисунок decorative, но текст в нём читается, и по-английски он
+ * читался в том числе на русской и узбекской странице.
+ */
+function WorldArt({ name }: { name: string }) {
   return (
     <svg viewBox="0 0 100 140" aria-hidden="true" className="h-full w-auto text-paper/70">
       <defs>
@@ -176,7 +181,7 @@ function WorldArt() {
         fill="currentColor"
         style={{ font: 'italic 11px var(--font-display, Georgia), serif' }}
       >
-        Alina,
+        {name},
       </text>
       <g stroke="currentColor" strokeWidth="0.8" opacity="0.45">
         <path d="M37 76h26M37 82h20M37 88h24" />

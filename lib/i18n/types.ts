@@ -54,6 +54,17 @@ export type TemplateStrings = {
   animationStyle: string;
 };
 
+/** Одна демо-история — всё, что в ней написано словами. */
+export type DemoStoryStrings = {
+  recipientName: string;
+  senderName: string;
+  /** Письмо. Пустая строка — взять заготовку повода из копи-банка. */
+  story: string;
+  moments?: { date: string; title: string; text?: string }[];
+  memories?: { label: string; text: string }[];
+  wishes?: string[];
+};
+
 export type Dictionary = {
   ui: {
     nav: { templates: string; works: string; howItWorks: string; createCard: string; viewSite: string };
@@ -133,6 +144,8 @@ export type Dictionary = {
       motion: string;
       suits: string;
       sections: string;
+      /** Accessible name of the miniature. `{name}` is the template name. */
+      previewOf: string;
       preview: string;
       useThis: string;
       back: string;
@@ -296,6 +309,7 @@ export type Dictionary = {
       basedTemplate: string;
       /** Честное примечание о единственном изменённом файле. */
       noteCompressedVideo: string;
+      noteReplacedName: string;
       qr: string;
       copyLink: string;
       copied: string;
@@ -515,6 +529,8 @@ export type Dictionary = {
       pullRibbon: string;
       unfold: string;
       wishesTitle: string;
+      /** Shown in the miniature preview when a card has no photographs yet. */
+      galleryEmpty: string;
       /** The card-level music control. */
       audio: { play: string };
       /** The cake beat. Structural, like the question's. */
@@ -561,6 +577,21 @@ export type Dictionary = {
      */
     looks: Record<string, string>;
     recipients: Record<RecipientId, string>;
+    /**
+     * Демо-истории галереи, по одной на шаблон.
+     *
+     * Ключ — id шаблона. Сид в `lib/card/demo.ts` держит структуру истории —
+     * какие отношения и настроение она показывает, сколько ей нужно
+     * фотографий, — а здесь лежит каждое её слово. То же разделение, что у
+     * таксономии и реестра шаблонов, и по той же причине: превью, которое
+     * читается по-английски русскому посетителю, — это та же ошибка, что
+     * панель, печатающая сырой идентификатор.
+     *
+     * Шаблон без своей истории показывает `romantic` — поэтому запись здесь
+     * нужна не для каждого шаблона, а только для тех, кому английская
+     * заготовка не подходит по смыслу.
+     */
+    demo: Record<string, DemoStoryStrings>;
     templates: Record<string, TemplateStrings>;
     copy: Record<OccasionId, OccasionCopyStrings>;
   };

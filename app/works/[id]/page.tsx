@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { WorkViewer } from '@/components/works/WorkViewer';
 import { getI18n } from '@/lib/i18n/server';
-import { getWork, listWorks, workEntryUrl } from '@/lib/works';
+import type { Dictionary } from '@/lib/i18n/types';
+import { getWork, listWorks, workEntryUrl, type WorkNote } from '@/lib/works';
 import { siteOrigin } from '@/lib/site-origin';
 
 type Props = { params: Promise<{ id: string }> };
@@ -24,6 +25,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+/**
+ * Пометка об отличии — словами, а не признаком.
+ *
+ * Запись здесь, а не в реестре, по тому же правилу, что и у шаблонов: реестр
+ * держит структуру, словарь — слова. Разбор по всем вариантам, поэтому новый
+ * вид пометки уронит сборку, а не выйдет молча пустым абзацем.
+ */
+function noteText(note: WorkNote, strings: Dictionary['ui']['works']): string {
+  switch (note) {
+    case 'compressedVideo':
+      return strings.noteCompressedVideo;
+    case 'replacedName':
+      return strings.noteReplacedName;
+  }
+}
+
 export default async function WorkPage({ params }: Props) {
   const { id } = await params;
   const work = getWork(id);
@@ -38,7 +55,7 @@ export default async function WorkPage({ params }: Props) {
       title={work.title}
       shareUrl={`${origin}/works/${work.id}`}
       qrUrl={`/api/works/${work.id}/qr?size=320`}
-      note={work.note ? dict.ui.works.noteCompressedVideo : undefined}
+      note={work.note ? noteText(work.note, dict.ui.works) : undefined}
       strings={dict.ui.works}
     />
   );

@@ -227,7 +227,12 @@ export function EnvelopeSection({
         <motion.button
           type="button"
           onClick={handleOpen}
-          aria-label={open ? 'Envelope opened' : (section.prompt ?? 'Open the envelope')}
+          // Состояние — атрибутом, не текстом: `aria-expanded` читается на
+          // языке самой программы чтения, а строка «Envelope opened» была
+          // английской в русской и узбекской открытке всегда, а не как
+          // запасной вариант.
+          aria-label={section.prompt ?? 'Open the envelope'}
+          aria-expanded={open}
           className="group relative block w-[min(78vw,22rem)] cursor-pointer rounded-[3px] focus-visible:outline-offset-8"
           style={{ aspectRatio: '3 / 2', transformStyle: 'preserve-3d' }}
           whileHover={reduced || open ? undefined : { y: -6 }}

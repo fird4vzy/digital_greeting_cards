@@ -296,9 +296,29 @@ opaque origin — scripts run, cookies and the parent DOM are unreachable.
 Raw files live under `/w/…`, not `/works/…`, so a static file can never shadow
 the Next route.
 
-### The one file that is not byte-identical
+### The two things that are not byte-identical
 
-`Тебе.` had a 123 MB hero video. **GitHub refuses anything over 100 MB**, so it
+Both are recorded in `Work.note`, a union rather than a `modified` flag,
+because the reader needs to know *what* differs: a re-encoded video and a
+substituted name are not the same kind of change, and the second one concerns
+a real person. Both are stated in the UI, in the panel behind the QR button —
+not hidden in a commit message.
+
+**`С днём рождения!` shows a different name.** The card was made for one
+person and is now shown to everyone, so every occurrence of the original name
+was replaced with `Алина` — the demo recipient the rest of the site already
+uses. It appears in `assets/js/shared.js`, `index.html`, `card.html`,
+`create.html`, `dist/` and `tools/build-single.py`; the card builds its own
+`<title>` from it, so the tab title follows. The sender's name is the author's
+own and was left alone.
+
+Two files from that repository are **not** in `public/w/hbday/`: the 53 MB
+`Meshy_AI_…texture.glb`, which nothing references — no HTML, JS or CSS in the
+project mentions it — and `.git`. The working tree without them is 2.6 MB.
+Same principle as the video: the byte-for-byte rule bends only for a hard size
+problem, and this one was 53 MB of nothing.
+
+**`Тебе.` had a 123 MB hero video.** **GitHub refuses anything over 100 MB**, so it
 is re-encoded to 34 MB — h264 CRF 28, audio dropped since the element is
 `muted` and the sound is a separate `song.mp3`. Everything else in all three
 works, including an 8.3 MB GIF and a 2560×1440 clip that are both larger than
@@ -308,6 +328,24 @@ platform limit overrides it. The substitution is stated in the UI, from
 
 `ffmpeg` is not a dependency. It was installed with `--no-save` for that one
 job; `package.json` is unchanged, and a fresh clone neither needs nor gets it.
+
+### The header without which the works render in the wrong fonts
+
+`next.config.ts` sends `Access-Control-Allow-Origin: *` for `/w/:path*`. This
+is not decoration and it is easy to delete by accident.
+
+The works are framed with `sandbox` and deliberately **without**
+`allow-same-origin`, which gives the frame an **opaque origin** — the browser
+reports it as `null`. A webfont is subject to CORS, so a `@font-face` request
+from a `null` origin is a cross-origin request, and without that header the
+browser refuses it. Nothing breaks loudly: the work simply renders in the
+browser's fallback fonts, which for `С днём рождения!` meant a generic script
+face instead of its own rounded one. That is precisely the promise the section
+makes, quietly broken.
+
+The header opens nothing. These are static files already readable by anyone
+with the URL, and no cookies travel with them. The fix that must **never** be
+used instead is adding `allow-same-origin` to the sandbox — see WorkViewer.
 
 ### Known, and left alone
 
@@ -322,6 +360,53 @@ bug. Fixing it would break the promise the page makes about being untouched.
 generate a cover from the work itself (a real frame beats a mock-up), and it
 appears in the gallery, at `/works/<id>` and with a QR at
 `/api/works/<id>/qr`. No deploy step, no database.
+
+---
+
+## The template previews were entirely in English
+
+Reported as «убери английский на шаблонах!!!». It was not a missing
+translation — it was one omitted argument.
+
+`demoConfig(templateId, locale = 'en')` had a default, and
+`app/templates/[slug]/page.tsx` called it as `demoConfig(template.id)`. So
+every visitor, in every language, opened a template preview and read an
+English card: the letter, the dates, the captions, the sign-off, and the card
+chrome around them, on a page whose header and buttons were correctly
+Russian. The gallery underneath had the same problem in a smaller form —
+`supportedSections` was printed through a `capitalise()` helper, so the
+specification row read `Cover · Envelope · Intro` at a Russian reader.
+
+**What changed**
+
+* `locale` is now **required** on `demoStory`, `demoConfig` and the
+  `TemplateStage` prop. A default is the wrong shape for a value nobody should
+  be allowed to leave unspecified: it turns a forgotten argument into a
+  plausible-looking wrong answer for two of the three languages. TypeScript
+  now refuses the call that caused this.
+* The demo stories moved into `content.demo` in each dictionary, keyed by
+  template id. `lib/card/demo.ts` keeps only what is structural — relationship,
+  occasion, mood, photo count — the same split the taxonomy and the template
+  registry already use. Russian and Uzbek versions are written, not
+  translated; a locale missing a story falls back to English rather than to a
+  blank card.
+* `capitalise()` is gone; the row uses `beatLabel()`, which already had all
+  fourteen section kinds in all three languages.
+* `Preview of {name}` and `Together` / `No photographs yet` came out of the
+  components and into the dictionaries.
+* `/works` printed `portedTo` raw — «На её основе есть шаблон: ask». It now
+  resolves through the registry, so it reads «Пойдём?».
+* `EnvelopeSection` had `aria-label={open ? 'Envelope opened' : …}`. That one
+  was English *always*, not as a fallback; it is now `aria-expanded`, which
+  screen readers announce in their own language.
+
+The remaining `?? 'Open it'` fallbacks are intentional and stay: they only
+fire for a config that bypassed the composer, and the documented rule is to
+degrade to English rather than to a blank card.
+
+**Pre-existing, not fixed:** the Uzbek dictionary mixes typographic `‘` with
+straight `'` — `sig'maydigan`, `Ba'zi`, `bo'lmadi` sit next to `o‘n`, `qat’iy`.
+Cosmetic, visible, and a separate sweep.
 
 ---
 

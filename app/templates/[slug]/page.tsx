@@ -54,7 +54,7 @@ export default async function TemplatePreviewPage({ params }: Props) {
   const raw = await findTemplate(slug);
   if (!raw) notFound();
 
-  const { dict } = await getI18n();
+  const { locale, dict } = await getI18n();
   const template = localiseTemplate(raw, dict);
   const t = dict.ui.templates;
 
@@ -66,7 +66,7 @@ export default async function TemplatePreviewPage({ params }: Props) {
         tagline={template.tagline}
         strings={{ back: t.back, preview: t.preview, useThis: t.useThis }}
       />
-      <CardRenderer config={demoConfig(template.id)} />
+      <CardRenderer config={demoConfig(template.id, locale)} />
     </main>
   );
 }

@@ -5,7 +5,8 @@ import { ArrowGlyph } from '@/components/ui/Button';
 import type { LocalisedTemplate } from '@/lib/i18n/localise';
 import type { Dictionary } from '@/lib/i18n/types';
 import { getPalette } from '@/lib/design/palettes';
-import { moodLabel, occasionLabel } from '@/lib/i18n/localise';
+import { beatLabel, moodLabel, occasionLabel } from '@/lib/i18n/localise';
+import { t } from '@/lib/i18n';
 
 /**
  * One template in the gallery: a live miniature above the specification the
@@ -30,7 +31,7 @@ export function TemplateCard({
       <Link href={`/templates/${template.id}`} className="block">
         <PhoneFrame
           className="max-w-[15rem] transition-transform duration-[900ms] ease-[var(--ease-out-expo)] group-hover:-translate-y-1.5"
-          label={`Preview of ${template.name}`}
+          label={t(strings.previewOf, { name: template.name })}
         >
           <TemplateStage template={template} locale={locale} />
         </PhoneFrame>
@@ -69,7 +70,11 @@ export function TemplateCard({
             {template.occasions.map((occasion) => occasionLabel(occasion, dict)).join(' · ')}
           </Row>
           <Row label={strings.sections}>
-            {template.supportedSections.map(capitalise).join(' · ')}
+            {/* Section kinds are identifiers — `cover`, `letter`, `gallery`.
+                Prettifying one is not translating it, and this row was the
+                last place in the gallery still printing English at a
+                Russian reader. */}
+            {template.supportedSections.map((kind) => beatLabel(kind, dict)).join(' · ')}
           </Row>
         </dl>
 
@@ -94,7 +99,3 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
   );
 }
 
-function capitalise(value: string): string {
-  const clean = value.replace(/-/g, ' ');
-  return clean.charAt(0).toUpperCase() + clean.slice(1);
-}

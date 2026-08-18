@@ -120,7 +120,8 @@ export const uz: Dictionary = {
       mood: 'Kayfiyat',
       motion: 'Harakat',
       suits: 'Mos keladi',
-      sections: "Bo'limlar",
+      sections: 'Bo‘limlar',
+      previewOf: '«{name}» shabloni ko‘rinishi',
       preview: "Ko'rinish",
       useThis: 'Tanlash',
       back: 'Shablonlarga',
@@ -363,6 +364,8 @@ export const uz: Dictionary = {
       basedTemplate: 'Uning asosida shablon bor',
       noteCompressedVideo:
         'Video siqilgan: asli 123 MB edi, GitHub esa 100 MB dan katta fayllarni qabul qilmaydi. Qolgan hammasi o‘zgarishsiz.',
+      noteReplacedName:
+        'Qabul qiluvchining ismi namuna ism bilan almashtirilgan: kartochka bir kishi uchun qilingan, ko‘rsatilayotgani esa hammaga. Qolgan hammasi o‘zgarishsiz.',
       qr: 'QR-kod',
       copyLink: 'Havolani nusxalash',
       copied: 'Nusxalandi',
@@ -581,6 +584,7 @@ export const uz: Dictionary = {
       pullRibbon: 'Tasmani torting',
       unfold: 'Yoying',
       wishesTitle: 'Bir nechta tilak',
+      galleryEmpty: 'Hozircha suratlar yo‘q',
       audio: { play: 'Musiqani yoqish' },
       cake: {
         prompt: 'Tilak tilang.',
@@ -707,6 +711,75 @@ export const uz: Dictionary = {
       friend: "Do'stga",
       family: 'Oilaga',
       'someone-special': 'Alohida insonga',
+    },
+    demo: {
+      romantic: {
+        recipientName: 'Alina',
+        senderName: 'Firdavs',
+        story:
+          'Bu xatni o‘n bir marta boshladim. Har safar yo juda mayda, yo juda baland chiqdi — mana, oddiysi.\n\nIkki yil oldin sen kofe haqida qat’iy fikri bor notanish odam eding. Endi esa men gapni o‘ylab bo‘lmasimdan aytadigan odamsan. Shu orada, ikkalamiz ham e’lon qilmagan holda, oddiy kunlarim jimgina yaxshilanib qoldi.\n\nSenga pion oldim — bir kuni o‘tib ketayotib, ular gapning o‘rtasida to‘xtab qolganga o‘xshaydi, deganding. O‘shandan beri shu esimdan chiqmaydi.',
+        moments: [
+          { date: 'Mart 2023', title: 'Kofe haqidagi bahs', text: 'Sen haq eding. Shu paytgacha buni tan olmagandim.' },
+          { date: 'Avgust 2023', title: 'Kechikkan poyezd', text: 'O‘sha yilning eng yaxshi to‘rt soati.' },
+          { date: 'Shu hafta', title: 'Pionlar', text: 'Gapning o‘rtasida — va’da qilganimdek.' },
+        ],
+        memories: [
+          { label: 'Kulguing', text: 'O‘ylamay kuladigani, xushmuomalasi emas.' },
+          { label: 'Ko‘k palto', text: 'U senda abadiy. Almashtirma.' },
+        ],
+      },
+      birthday: {
+        recipientName: 'Marta',
+        senderName: 'Kamila',
+        story:
+          'Yana bir yil, sen esa hamon tunning yarmida telefonni ko‘tarib, uxlamagandim deb turadigan odamsan.\n\nBu yil boshqa shaharga ko‘chding, qo‘rqinchli bir ishni boshlading va baribir mening har bir tadbirimga yetib kelding. Buni qanday uddalayotganingni bilmayman. Menimcha, sen ham bilmaysan.\n\nXullas: tug‘ilgan kuning bilan. Kun o‘zing chindan xohlagandek o‘tsin, kerak deb o‘ylaganingdek emas.',
+        memories: [
+          { label: 'Ko‘chish', text: 'To‘rt qavat, liftsiz, iyulda.' },
+          { label: 'Karaoke', text: 'Karaoke haqida gaplashmaymiz.' },
+        ],
+        wishes: ['Shoshilmagan tong', 'Rejalashtirilmagan bir narsa', 'Kelib turadigan odamlar', 'Bitta juda yaxshi ovqat'],
+      },
+      mom: {
+        recipientName: 'Onajon',
+        senderName: 'Firdavs',
+        story:
+          'Yakshanba kuni qo‘ng‘iroq qildim va biz yigirma daqiqa ob-havo haqida gaplashdik — bizda boshqa gapni shunday aytishadi.\n\nShuning uchun o‘sha boshqa gapni yozib qo‘yaman.\n\nYaxshi qiladigan ishlarimning deyarli hammasini, avval sizning qilganingizni ko‘rganim uchun qilaman. Ayniqsa sabrni — bunda men hali ancha ortdaman. Sizda bularning hech biri mehnatga o‘xshamasdi. Endi tushunaman: mehnat edi.\n\nRahmat. Kattalari uchun ham, yillar o‘tib sezganim mingta maydasi uchun ham.',
+        moments: [
+          { date: 'Har sentyabrda', title: 'Maktabning birinchi kuni', text: 'Ko‘ylakni ikki marta dazmollardingiz.' },
+          { date: '2016', title: 'Hammasi joyidan qo‘zg‘algan yil', text: 'Bir marta ham charchadim demadingiz.' },
+        ],
+      },
+      anniversary: {
+        recipientName: 'Doniyor',
+        senderName: 'Sofiya',
+        story:
+          'O‘n yil. Tez o‘tdi — aytishlaricha, bu yaxshi alomat.\n\nMen esa katta sanalarga emas, oddiy kechalarga qaytaveraman — boshqa birov bilan bo‘lsa, ular hech qanday e’tiborga arzimasdi.\n\nYana shuni tanlardim. Aslida, deyarli har kuni, o‘ylab ham o‘tirmay tanlayapman.',
+        moments: [
+          { date: '2016', title: 'Yomon mehmonxona', text: 'Olti kun yomg‘ir yog‘di.' },
+          { date: '2019', title: 'Radiatori shovqin qiladigan kvartira' },
+          { date: '2022', title: 'Nihoyat tugatgan oshxonamiz' },
+          { date: 'Bugun', title: 'O‘n yil' },
+        ],
+        memories: [{ label: 'Yakshanba', text: 'Sen, gazeta va hech qanday reja yo‘q.' }],
+      },
+      memories: {
+        recipientName: 'Lola',
+        senderName: 'Timur',
+        story:
+          'Oilamizda bundan oldin buni hech kim qilmagan edi. Sen birinchi bo‘lib bording va buning uddasidan chiqsa bo‘lishini ko‘rsatding.\n\nKo‘pchilik diplomni ko‘radi. Men undan oldingi ikki yilni va turging kelmagan tonglarni ko‘rdim.\n\nRomga solishga arziydigani — o‘sha.',
+        moments: [
+          { date: 'Birinchi yil', title: 'Asosan kutubxona' },
+          { date: 'Ikkinchi yil', title: 'Sal bo‘lmasa tashlab yuborayozgan payting' },
+          { date: 'Iyun', title: 'Tamom' },
+        ],
+      },
+      sakura: {
+        recipientName: 'Haruto',
+        senderName: 'Emi',
+        story:
+          'Hech qanday sabab yo‘q. Hech narsa bo‘lgani yo‘q, oldinda ham hech narsa yo‘q.\n\nBurchakdagi gulchidan o‘tib ketayotgandim, vitrinada bitta shox turgan ekan, sen esimga tushding — va shuning o‘zi kifoya tuyuldi.\n\nXat shu, tamom.',
+        memories: [{ label: 'Burchakdagi do‘kon', text: 'Hamon o‘sha yerda. Hamon o‘sha bitta shox.' }],
+      },
     },
 
     templates: {
