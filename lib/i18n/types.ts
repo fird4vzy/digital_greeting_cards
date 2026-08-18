@@ -310,6 +310,7 @@ export type Dictionary = {
       /** Честное примечание о единственном изменённом файле. */
       noteCompressedVideo: string;
       noteReplacedName: string;
+      noteFixedSource: string;
       qr: string;
       copyLink: string;
       copied: string;

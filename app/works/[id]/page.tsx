@@ -38,6 +38,8 @@ function noteText(note: WorkNote, strings: Dictionary['ui']['works']): string {
       return strings.noteCompressedVideo;
     case 'replacedName':
       return strings.noteReplacedName;
+    case 'fixedSource':
+      return strings.noteFixedSource;
   }
 }
 

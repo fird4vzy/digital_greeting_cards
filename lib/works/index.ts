@@ -54,9 +54,41 @@ export type WorkNote =
   /** Оригинал не пролезал в лимит GitHub на файл. */
   | 'compressedVideo'
   /** Имя адресата заменено на демонстрационное — работу показывают чужим людям. */
-  | 'replacedName';
+  | 'replacedName'
+  /** Из файла убран мусор, попавший туда при сохранении, а не автором. */
+  | 'fixedSource';
 
 const WORKS: Work[] = [
+  {
+    id: 'svechi',
+    entry: 'index.html',
+    title: 'С днём рождения, Алина',
+    year: '2025',
+    occasion: 'birthday',
+    cover: '/w/_covers/svechi.jpg',
+    coverRatio: '16 / 9',
+    portedTo: 'candlelight',
+  },
+  {
+    id: 'loveis',
+    entry: 'index.html',
+    title: 'Love is…',
+    year: '2025',
+    occasion: 'love',
+    cover: '/w/_covers/loveis.jpg',
+    coverRatio: '16 / 9',
+  },
+  {
+    id: 'ilove',
+    entry: 'index.html',
+    title: 'Для тебя',
+    year: '2025',
+    occasion: 'love',
+    cover: '/w/_covers/ilove.jpg',
+    coverRatio: '16 / 9',
+    portedTo: 'aloud',
+    note: 'fixedSource',
+  },
   {
     id: 'hbday',
     entry: 'index.html',

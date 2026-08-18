@@ -1,0 +1,2591 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+>
+
+<meta name="theme-color" content="#fff5f5">
+
+<title>Для тебя ❤️</title>
+
+
+<!-- ШРИФТЫ -->
+
+<link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Manrope:wght@300;400;500&display=swap"
+    rel="stylesheet"
+>
+
+
+<style>
+
+/* =========================================================
+   ОСНОВНЫЕ НАСТРОЙКИ
+========================================================= */
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    width: 100%;
+    min-height: 100%;
+    background: #fff5f5;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+
+    width: 100%;
+    min-height: 100vh;
+
+    overflow-x: hidden;
+
+    font-family:
+        "Manrope",
+        Arial,
+        sans-serif;
+
+    color: #69434d;
+
+    background:
+        radial-gradient(
+            circle at 15% 10%,
+            rgba(255, 192, 205, 0.42),
+            transparent 35%
+        ),
+
+        radial-gradient(
+            circle at 90% 25%,
+            rgba(255, 220, 190, 0.38),
+            transparent 38%
+        ),
+
+        radial-gradient(
+            circle at 50% 100%,
+            rgba(246, 185, 200, 0.34),
+            transparent 45%
+        ),
+
+        linear-gradient(
+            145deg,
+            #fffaf7,
+            #fff1f4,
+            #fff8f3
+        );
+
+    -webkit-font-smoothing: antialiased;
+}
+
+
+/* =========================================================
+   ПЛАВАЮЩИЙ СВЕТ
+========================================================= */
+
+.background-glow {
+    position: fixed;
+
+    width: 65vw;
+    height: 65vw;
+
+    max-width: 430px;
+    max-height: 430px;
+
+    border-radius: 50%;
+
+    pointer-events: none;
+
+    filter: blur(45px);
+
+    opacity: 0.5;
+
+    z-index: 0;
+}
+
+.glow-one {
+    left: -25%;
+    top: 15%;
+
+    background:
+        rgba(255, 180, 200, 0.27);
+
+    animation:
+        glowOne
+        12s
+        ease-in-out
+        infinite
+        alternate;
+}
+
+.glow-two {
+    right: -25%;
+    bottom: 5%;
+
+    background:
+        rgba(255, 210, 175, 0.24);
+
+    animation:
+        glowTwo
+        15s
+        ease-in-out
+        infinite
+        alternate;
+}
+
+@keyframes glowOne {
+
+    from {
+        transform:
+            translate(0, 0)
+            scale(0.9);
+    }
+
+    to {
+        transform:
+            translate(25vw, -10vh)
+            scale(1.2);
+    }
+}
+
+@keyframes glowTwo {
+
+    from {
+        transform:
+            translate(0, 0)
+            scale(0.9);
+    }
+
+    to {
+        transform:
+            translate(-20vw, 8vh)
+            scale(1.15);
+    }
+}
+
+
+/* =========================================================
+   ПЛАВАЮЩИЕ ЧАСТИЦЫ
+========================================================= */
+
+.particles {
+    position: fixed;
+
+    inset: 0;
+
+    overflow: hidden;
+
+    pointer-events: none;
+
+    z-index: 1;
+}
+
+.particle {
+    position: absolute;
+
+    width: 5px;
+    height: 5px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(210, 120, 140, 0.20);
+
+    filter: blur(1px);
+
+    animation:
+        particleFloat
+        linear
+        infinite;
+}
+
+@keyframes particleFloat {
+
+    0% {
+        transform:
+            translateY(110vh)
+            translateX(0)
+            scale(0.6);
+
+        opacity: 0;
+    }
+
+    15% {
+        opacity: 0.5;
+    }
+
+    50% {
+        transform:
+            translateY(50vh)
+            translateX(25px)
+            scale(1);
+    }
+
+    85% {
+        opacity: 0.2;
+    }
+
+    100% {
+        transform:
+            translateY(-10vh)
+            translateX(-25px)
+            scale(0.7);
+
+        opacity: 0;
+    }
+}
+
+
+/* =========================================================
+   ПЕРВАЯ СТРАНИЦА
+========================================================= */
+
+.first-screen {
+
+    position: relative;
+
+    z-index: 5;
+
+    width: 100%;
+
+    min-height: 100vh;
+    min-height: 100svh;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding:
+        30px
+        20px;
+
+    transition:
+        opacity 1.2s ease,
+        transform 1.2s ease;
+
+}
+
+.first-screen.hide {
+
+    opacity: 0;
+
+    transform:
+        scale(1.08);
+
+    pointer-events: none;
+
+}
+
+
+/* =========================================================
+   КОНТЕНТ ПЕРВОЙ СТРАНИЦЫ
+========================================================= */
+
+.first-content {
+
+    width: 100%;
+
+    max-width: 600px;
+
+    text-align: center;
+
+}
+
+
+/* маленькая надпись */
+
+.small-text {
+
+    margin-bottom: 15px;
+
+    font-size: 10px;
+
+    letter-spacing: 5px;
+
+    text-transform: uppercase;
+
+    color:
+        rgba(
+            105,
+            67,
+            77,
+            0.48
+        );
+
+    animation:
+        fadeDown
+        1.5s
+        ease;
+
+}
+
+
+/* главный заголовок */
+
+.main-title {
+
+    margin: 0;
+
+    font-family:
+        "Cormorant Garamond",
+        Georgia,
+        serif;
+
+    font-size:
+        clamp(
+            62px,
+            16vw,
+            105px
+        );
+
+    line-height: 0.9;
+
+    font-weight: 400;
+
+    letter-spacing: -4px;
+
+    background:
+
+        linear-gradient(
+            90deg,
+            #9b596b,
+            #d77c91,
+            #b75e76,
+            #9b596b
+        );
+
+    background-size: 300%;
+
+    -webkit-background-clip: text;
+
+    color: transparent;
+
+    animation:
+        gradientText
+        7s
+        ease
+        infinite,
+
+        fadeUp
+        1.5s
+        ease;
+
+}
+
+
+.subtitle {
+
+    margin-top: 23px;
+
+    font-size: 16px;
+
+    line-height: 1.7;
+
+    color:
+        rgba(
+            105,
+            67,
+            77,
+            0.62
+        );
+
+    animation:
+        fadeUp
+        2s
+        ease;
+
+}
+
+
+@keyframes gradientText {
+
+    0% {
+        background-position: 0%;
+    }
+
+    50% {
+        background-position: 100%;
+    }
+
+    100% {
+        background-position: 0%;
+    }
+}
+
+@keyframes fadeUp {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+}
+
+@keyframes fadeDown {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+}
+
+
+/* =========================================================
+   КОНВЕРТ-СЕРДЦЕ
+========================================================= */
+
+.envelope-wrapper {
+
+    position: relative;
+
+    width: 200px;
+    height: 185px;
+
+    margin:
+        65px
+        auto
+        30px;
+
+    cursor: pointer;
+
+    animation:
+        envelopeAppear
+        1.5s
+        ease,
+
+        gentleFloat
+        4s
+        ease-in-out
+        infinite
+        1.5s;
+
+}
+
+
+/* основа сердца */
+
+.envelope {
+
+    position: absolute;
+
+    width: 125px;
+    height: 125px;
+
+    left: 37px;
+    top: 25px;
+
+    transform:
+        rotate(-45deg);
+
+    border-radius:
+        18px
+        18px
+        18px
+        0;
+
+    background:
+
+        linear-gradient(
+            145deg,
+            #f7a3b3,
+            #e87e96
+        );
+
+    box-shadow:
+
+        0 25px 55px
+        rgba(
+            202,
+            103,
+            126,
+            0.28
+        ),
+
+        0 0 65px
+        rgba(
+            255,
+            180,
+            195,
+            0.35
+        );
+
+    transition:
+
+        transform
+        0.8s
+        cubic-bezier(
+            .68,
+            -0.55,
+            .27,
+            1.55
+        );
+
+}
+
+
+/* круглые верхушки сердца */
+
+.envelope::before,
+.envelope::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 125px;
+    height: 125px;
+
+    border-radius: 50%;
+
+    background:
+
+        linear-gradient(
+            145deg,
+            #f7a3b3,
+            #e87e96
+        );
+
+}
+
+.envelope::before {
+
+    top: -62px;
+
+    left: 0;
+
+}
+
+.envelope::after {
+
+    left: 62px;
+
+    top: 0;
+
+}
+
+
+/* =========================================================
+   ПИСЬМО ВНУТРИ
+========================================================= */
+
+.letter {
+
+    position: absolute;
+
+    width: 100px;
+    height: 70px;
+
+    left: 12px;
+    top: 28px;
+
+    z-index: 10;
+
+    border-radius: 10px;
+
+    background:
+
+        linear-gradient(
+            135deg,
+            #fffefc,
+            #fff4f0
+        );
+
+    box-shadow:
+
+        0 8px 25px
+        rgba(
+            100,
+            40,
+            55,
+            0.13
+        );
+
+    transform:
+        rotate(45deg);
+
+    transition:
+
+        transform
+        1s
+        cubic-bezier(
+            .68,
+            -0.55,
+            .27,
+            1.55
+        );
+
+}
+
+.letter::after {
+
+    content: "♡";
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(
+            -50%,
+            -50%
+        );
+
+    font-size: 32px;
+
+    color: #e47c93;
+
+}
+
+
+/* =========================================================
+   НАВЕДЕНИЕ / НАЖАТИЕ
+========================================================= */
+
+.envelope-wrapper:hover
+.envelope {
+
+    transform:
+        rotate(-45deg)
+        scale(1.08);
+
+}
+
+.envelope-wrapper:active
+.envelope {
+
+    transform:
+        rotate(-45deg)
+        scale(0.94);
+
+}
+
+
+/* открытие */
+
+.envelope.open {
+
+    transform:
+        rotate(-45deg)
+        scale(0.78);
+
+}
+
+.envelope.open
+.letter {
+
+    transform:
+        rotate(45deg)
+        translateY(-90px)
+        scale(1.12);
+
+}
+
+
+/* =========================================================
+   ПОДСКАЗКА
+========================================================= */
+
+.open-text {
+
+    font-size: 11px;
+
+    letter-spacing: 3px;
+
+    text-transform: uppercase;
+
+    color:
+        rgba(
+            105,
+            67,
+            77,
+            0.45
+        );
+
+    animation:
+        pulseText
+        2.5s
+        ease-in-out
+        infinite;
+
+}
+
+@keyframes pulseText {
+
+    0%,
+    100% {
+        opacity: 0.35;
+    }
+
+    50% {
+        opacity: 0.85;
+    }
+}
+
+@keyframes envelopeAppear {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            scale(0.5)
+            translateY(40px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            scale(1)
+            translateY(0);
+
+    }
+
+}
+
+@keyframes gentleFloat {
+
+    0%,
+    100% {
+
+        transform:
+            translateY(0);
+
+    }
+
+    50% {
+
+        transform:
+            translateY(-11px);
+
+    }
+
+}
+
+
+/* =========================================================
+   ЛЕТЯЩИЕ СЕРДЕЧКИ ПОСЛЕ НАЖАТИЯ
+========================================================= */
+
+.flying-heart {
+
+    position: fixed;
+
+    left: 50%;
+    top: 50%;
+
+    z-index: 100;
+
+    pointer-events: none;
+
+    font-size:
+        calc(
+            14px +
+            var(--size)
+        );
+
+    color:
+        rgba(
+            213,
+            110,
+            135,
+            0.7
+        );
+
+    opacity: 0;
+
+    animation:
+        heartFly
+        2.2s
+        cubic-bezier(
+            .15,
+            .8,
+            .2,
+            1
+        )
+        forwards;
+
+}
+
+@keyframes heartFly {
+
+    0% {
+
+        opacity: 0;
+
+        transform:
+            translate(
+                -50%,
+                -50%
+            )
+            scale(0.2)
+            rotate(0deg);
+
+    }
+
+    15% {
+
+        opacity: 0.8;
+
+    }
+
+    100% {
+
+        opacity: 0;
+
+        transform:
+
+            translate(
+                var(--x),
+                var(--y)
+            )
+
+            scale(1)
+
+            rotate(
+                var(--rotation)
+            );
+
+    }
+
+}
+
+
+/* =========================================================
+   ЭКРАН ВИДЕО
+========================================================= */
+
+.video-screen {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 20;
+
+    width: 100%;
+
+    min-height: 100vh;
+    min-height: 100svh;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding:
+        max(
+            30px,
+            env(safe-area-inset-top)
+        )
+
+        16px
+
+        max(
+            30px,
+            env(safe-area-inset-bottom)
+        );
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transform:
+        scale(1.04);
+
+    transition:
+
+        opacity 1.3s ease,
+
+        transform 1.3s ease,
+
+        visibility 1.3s;
+
+}
+
+.video-screen.show {
+
+    opacity: 1;
+
+    visibility: visible;
+
+    transform:
+        scale(1);
+
+}
+
+
+.video-container {
+
+    width: 100%;
+
+    max-width: 850px;
+
+    text-align: center;
+
+}
+
+
+/* =========================================================
+   ЗАГОЛОВОК ВИДЕО
+========================================================= */
+
+.video-title {
+
+    margin-bottom: 20px;
+
+    font-family:
+        "Cormorant Garamond",
+        Georgia,
+        serif;
+
+    font-size:
+        clamp(
+            38px,
+            11vw,
+            60px
+        );
+
+    line-height: 1;
+
+    font-weight: 400;
+
+    color: #704653;
+
+    opacity: 0;
+
+    transform:
+        translateY(-20px);
+
+    transition:
+
+        opacity 1s ease 0.5s,
+
+        transform 1s ease 0.5s;
+
+}
+
+.video-screen.show
+.video-title {
+
+    opacity: 1;
+
+    transform:
+        translateY(0);
+
+}
+
+
+/* =========================================================
+   ВИДЕО
+========================================================= */
+
+.video-box {
+
+    width: 100%;
+
+    overflow: hidden;
+
+    border-radius: 20px;
+
+    background: #21171b;
+
+    box-shadow:
+
+        0 30px 80px
+        rgba(
+            100,
+            45,
+            60,
+            0.25
+        ),
+
+        0 0 55px
+        rgba(
+            255,
+            170,
+            190,
+            0.20
+        );
+
+    opacity: 0;
+
+    transform:
+        translateY(25px)
+        scale(0.97);
+
+    transition:
+
+        opacity 1.2s ease 0.8s,
+
+        transform 1.2s ease 0.8s;
+
+}
+
+.video-screen.show
+.video-box {
+
+    opacity: 1;
+
+    transform:
+        translateY(0)
+        scale(1);
+
+}
+
+video {
+
+    display: block;
+
+    width: 100%;
+
+    max-height:
+        70vh;
+
+    max-height:
+        70svh;
+
+    object-fit: contain;
+
+    background: #21171b;
+
+}
+
+
+.video-hint {
+
+    margin-top: 16px;
+
+    font-size: 10px;
+
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
+
+    color:
+        rgba(
+            105,
+            67,
+            77,
+            0.4
+        );
+
+    opacity: 0;
+
+    transition:
+        opacity
+        1s
+        ease
+        1.4s;
+
+}
+
+.video-screen.show
+.video-hint {
+
+    opacity: 1;
+
+}
+
+
+/* =========================================================
+   ПИСЬМО
+========================================================= */
+
+.letter-screen {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 30;
+
+    width: 100%;
+
+    min-height: 100vh;
+    min-height: 100svh;
+
+    overflow-y: auto;
+
+    overflow-x: hidden;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transform:
+        scale(1.04);
+
+    background:
+
+        radial-gradient(
+            circle at 20% 10%,
+            rgba(
+                255,
+                194,
+                207,
+                0.34
+            ),
+            transparent 35%
+        ),
+
+        radial-gradient(
+            circle at 90% 80%,
+            rgba(
+                255,
+                218,
+                190,
+                0.30
+            ),
+            transparent 40%
+        ),
+
+        linear-gradient(
+            145deg,
+            #fffaf8,
+            #fff1f4,
+            #fff9f5
+        );
+
+    transition:
+
+        opacity 1.3s ease,
+
+        transform 1.3s ease,
+
+        visibility 1.3s;
+
+}
+
+.letter-screen.show {
+
+    opacity: 1;
+
+    visibility: visible;
+
+    transform:
+        scale(1);
+
+}
+
+
+.letter-content {
+
+    width: 100%;
+
+    max-width: 680px;
+
+    margin:
+        0 auto;
+
+    padding:
+
+        65px
+
+        22px
+
+        90px;
+
+    text-align: center;
+
+}
+
+
+/* =========================================================
+   ВЕРХНЯЯ НАДПИСЬ
+========================================================= */
+
+.letter-top {
+
+    margin-bottom: 25px;
+
+    font-size: 9px;
+
+    letter-spacing: 4px;
+
+    text-transform: uppercase;
+
+    color:
+        rgba(
+            105,
+            67,
+            77,
+            0.4
+        );
+
+    opacity: 0;
+
+    transform:
+        translateY(-15px);
+
+}
+
+.letter-screen.show
+.letter-top {
+
+    animation:
+        letterTop
+        1.2s
+        ease
+        0.4s
+        forwards;
+
+}
+
+@keyframes letterTop {
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0);
+
+    }
+
+}
+
+
+/* =========================================================
+   ТЕКСТ
+========================================================= */
+
+.letter-text {
+
+    font-family:
+        "Cormorant Garamond",
+        Georgia,
+        serif;
+
+    font-size:
+        clamp(
+            22px,
+            6vw,
+            31px
+        );
+
+    line-height: 1.5;
+
+    font-weight: 400;
+
+    color: #704653;
+
+}
+
+
+.text-line {
+
+    margin:
+        0 0 7px;
+
+    opacity: 0;
+
+    transform:
+        translateY(22px);
+
+    filter:
+        blur(5px);
+
+    transition:
+
+        opacity 1s ease,
+
+        transform 1s ease,
+
+        filter 1s ease;
+
+}
+
+.letter-screen.show
+.text-line {
+
+    opacity: 1;
+
+    transform:
+        translateY(0);
+
+    filter:
+        blur(0);
+
+}
+
+
+/* =========================================================
+   АНИМАЦИЯ СТРОК
+========================================================= */
+
+.letter-screen.show
+.text-line:nth-child(1) {
+    transition-delay: 0.6s;
+}
+
+.letter-screen.show
+.text-line:nth-child(2) {
+    transition-delay: 0.9s;
+}
+
+.letter-screen.show
+.text-line:nth-child(3) {
+    transition-delay: 1.2s;
+}
+
+.letter-screen.show
+.text-line:nth-child(4) {
+    transition-delay: 1.5s;
+}
+
+.letter-screen.show
+.text-line:nth-child(5) {
+    transition-delay: 1.8s;
+}
+
+.letter-screen.show
+.text-line:nth-child(6) {
+    transition-delay: 2.1s;
+}
+
+.letter-screen.show
+.text-line:nth-child(7) {
+    transition-delay: 2.4s;
+}
+
+.letter-screen.show
+.text-line:nth-child(8) {
+    transition-delay: 2.7s;
+}
+
+.letter-screen.show
+.text-line:nth-child(9) {
+    transition-delay: 3s;
+}
+
+.letter-screen.show
+.text-line:nth-child(10) {
+    transition-delay: 3.3s;
+}
+
+.letter-screen.show
+.text-line:nth-child(11) {
+    transition-delay: 3.6s;
+}
+
+.letter-screen.show
+.text-line:nth-child(12) {
+    transition-delay: 3.9s;
+}
+
+.letter-screen.show
+.text-line:nth-child(13) {
+    transition-delay: 4.2s;
+}
+
+.letter-screen.show
+.text-line:nth-child(14) {
+    transition-delay: 4.5s;
+}
+
+.letter-screen.show
+.text-line:nth-child(15) {
+    transition-delay: 4.8s;
+}
+
+.letter-screen.show
+.text-line:nth-child(16) {
+    transition-delay: 5.1s;
+}
+
+.letter-screen.show
+.text-line:nth-child(17) {
+    transition-delay: 5.4s;
+}
+
+.letter-screen.show
+.text-line:nth-child(18) {
+    transition-delay: 5.7s;
+}
+
+.letter-screen.show
+.text-line:nth-child(19) {
+    transition-delay: 6s;
+}
+
+.letter-screen.show
+.text-line:nth-child(20) {
+    transition-delay: 6.3s;
+}
+
+.letter-screen.show
+.text-line:nth-child(21) {
+    transition-delay: 6.6s;
+}
+
+.letter-screen.show
+.text-line:nth-child(22) {
+    transition-delay: 6.9s;
+}
+
+.letter-screen.show
+.text-line:nth-child(23) {
+    transition-delay: 7.2s;
+}
+
+.letter-screen.show
+.text-line:nth-child(24) {
+    transition-delay: 7.5s;
+}
+
+.letter-screen.show
+.text-line:nth-child(25) {
+    transition-delay: 7.8s;
+}
+
+.letter-screen.show
+.text-line:nth-child(26) {
+    transition-delay: 8.1s;
+}
+
+.letter-screen.show
+.text-line:nth-child(27) {
+    transition-delay: 8.4s;
+}
+
+.letter-screen.show
+.text-line:nth-child(28) {
+    transition-delay: 8.7s;
+}
+
+.letter-screen.show
+.text-line:nth-child(29) {
+    transition-delay: 9s;
+}
+
+.letter-screen.show
+.text-line:nth-child(30) {
+    transition-delay: 9.3s;
+}
+
+.letter-screen.show
+.text-line:nth-child(31) {
+    transition-delay: 9.6s;
+}
+
+.letter-screen.show
+.text-line:nth-child(32) {
+    transition-delay: 9.9s;
+}
+
+.letter-screen.show
+.text-line:nth-child(33) {
+    transition-delay: 10.2s;
+}
+
+.letter-screen.show
+.text-line:nth-child(34) {
+    transition-delay: 10.5s;
+}
+
+.letter-screen.show
+.text-line:nth-child(35) {
+    transition-delay: 10.8s;
+}
+
+.letter-screen.show
+.text-line:nth-child(36) {
+    transition-delay: 11.1s;
+}
+
+
+/* =========================================================
+   ПРОБЕЛЫ
+========================================================= */
+
+.space {
+
+    height: 24px;
+
+}
+
+
+/* =========================================================
+   ВЫДЕЛЕНИЕ
+========================================================= */
+
+.highlight {
+
+    color: #ad5870;
+
+}
+
+
+/* =========================================================
+   ФИНАЛ
+========================================================= */
+
+.ending {
+
+    margin-top: 8px;
+
+    font-size:
+        clamp(
+            27px,
+            7vw,
+            38px
+        );
+
+    line-height: 1.3;
+
+    color: #a94f68;
+
+}
+
+
+.final-heart {
+
+    margin-top: 35px;
+
+    font-family:
+        "Cormorant Garamond",
+        Georgia,
+        serif;
+
+    font-size: 34px;
+
+    color: #d87891;
+
+    opacity: 0;
+
+    transform:
+        scale(0.5);
+
+}
+
+.letter-screen.show
+.final-heart {
+
+    animation:
+
+        finalHeart
+        1.5s
+        ease
+        11.5s
+        forwards;
+
+}
+
+@keyframes finalHeart {
+
+    0% {
+
+        opacity: 0;
+
+        transform:
+            scale(0.5);
+
+    }
+
+    60% {
+
+        opacity: 1;
+
+        transform:
+            scale(1.2);
+
+    }
+
+    100% {
+
+        opacity: 1;
+
+        transform:
+            scale(1);
+
+    }
+
+}
+
+
+/* =========================================================
+   МОБИЛЬНАЯ ВЕРСИЯ
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .first-screen {
+
+        padding:
+            25px
+            18px;
+
+    }
+
+
+    .main-title {
+
+        font-size:
+            68px;
+
+    }
+
+
+    .subtitle {
+
+        font-size:
+            15px;
+
+    }
+
+
+    .envelope-wrapper {
+
+        margin-top:
+            60px;
+
+    }
+
+
+    .video-screen {
+
+        padding-left:
+            12px;
+
+        padding-right:
+            12px;
+
+    }
+
+
+    .video-box {
+
+        border-radius:
+            16px;
+
+    }
+
+
+    video {
+
+        max-height:
+            68svh;
+
+    }
+
+
+    .letter-content {
+
+        padding:
+
+            55px
+
+            18px
+
+            85px;
+
+    }
+
+
+    .letter-text {
+
+        font-size:
+            23px;
+
+        line-height:
+            1.5;
+
+    }
+
+
+    .space {
+
+        height:
+            25px;
+
+    }
+
+}
+
+
+/* =========================================================
+   МАЛЕНЬКИЕ ТЕЛЕФОНЫ
+========================================================= */
+
+@media (max-width: 380px) {
+
+    .main-title {
+
+        font-size:
+            58px;
+
+    }
+
+
+    .letter-content {
+
+        padding-left:
+            16px;
+
+        padding-right:
+            16px;
+
+    }
+
+
+    .letter-text {
+
+        font-size:
+            21px;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+
+
+<body>
+
+
+<!-- =========================================================
+     ФОН
+========================================================= -->
+
+<div class="background-glow glow-one"></div>
+
+<div class="background-glow glow-two"></div>
+
+<div
+    class="particles"
+    id="particles"
+></div>
+
+
+
+<!-- =========================================================
+     ПЕРВАЯ СТРАНИЦА
+========================================================= -->
+
+<section
+    class="first-screen"
+    id="firstScreen"
+>
+
+    <div class="first-content">
+
+
+        <div class="small-text">
+
+            маленький сюрприз
+
+        </div>
+
+
+        <h1 class="main-title">
+
+            Для тебя
+
+        </h1>
+
+
+        <div class="subtitle">
+
+            Иногда один маленький момент<br>
+
+            может сказать больше тысячи слов.
+
+        </div>
+
+
+
+        <!-- =================================================
+             СЕРДЦЕ-КОНВЕРТ
+        ================================================== -->
+
+        <div
+            class="envelope-wrapper"
+            id="envelopeWrapper"
+        >
+
+            <div
+                class="envelope"
+                id="envelope"
+            >
+
+                <div class="letter"></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="open-text">
+
+            Нажми на сердце
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     ВИДЕО
+========================================================= -->
+
+<section
+    class="video-screen"
+    id="videoScreen"
+>
+
+    <div class="video-container">
+
+
+        <div class="video-title">
+
+            Просто посмотри ❤️
+
+        </div>
+
+
+        <div class="video-box">
+
+            <video
+                id="video"
+                controls
+                playsinline
+                preload="metadata"
+            >
+
+                <source
+                    src="video.mp4"
+                    type="video/mp4"
+                >
+
+                Ваш браузер не поддерживает видео.
+
+            </video>
+
+        </div>
+
+
+        <div class="video-hint">
+
+            досмотри до конца
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     ПИСЬМО
+========================================================= -->
+
+<section
+    class="letter-screen"
+    id="letterScreen"
+>
+
+    <div class="letter-content">
+
+
+        <div class="letter-top">
+
+            немного от меня
+
+        </div>
+
+
+
+        <div class="letter-text">
+
+
+            <div class="text-line">
+
+                Мы знакомы совсем недолго,
+
+            </div>
+
+
+            <div class="text-line">
+
+                и, наверное, ещё так мало знаем
+                друг о друге.
+
+            </div>
+
+
+            <div class="space"></div>
+
+
+            <div class="text-line">
+
+                Но иногда человеку не нужно
+                много времени,
+
+            </div>
+
+
+            <div class="text-line">
+
+                чтобы оставить после себя
+                какое-то особенное чувство.
+
+            </div>
+
+
+            <div class="space"></div>
+
+
+            <div class="text-line highlight">
+
+                Ты почему-то запомнилась мне.
+
+            </div>
+
+
+            <div class="space"></div>
+
+
+            <div class="text-line">
+
+                Мне нравится смотреть на тебя —
+
+            </div>
+
+
+            <div class="text-line">
+
+                на твою улыбку, на то,
+                как ты смеёшься,
+
+            </div>
+
+
+            <div class="text-line">
+
+                на то, как ты говоришь
+                и просто ведёшь себя.
+
+            </div>
+
+
+            <div class="space"></div>
+
+
+            <div class="text-line">
+
+                вывы
+
+            </div>
+
+
+            <div class="text-line">
+
+                В том, как ты играешь с ним,
+
+            </div>
+
+
+            <div class="text-line">
+
+                как смеёшься рядом с ним,
+
+            </div>
+
+
+            <div class="text-line">
+
+                есть что-то такое настоящее
+                и тёплое,
+
+            </div>
+
+
+            <div class="text-line">
+
+                что невольно хочется
+                улыбаться вместе с тобой.
+
+            </div>
+
+
+            <div class="space"></div>
+
+
+            <div class="text-line">
+
+                Наверное, именно из таких
+                маленьких моментов
+
+            </div>
+
+
+            <div class="text-line">
+
+                и складывается впечатление
+                о человеке.
+
+            </div>
+
+
+            <div class="text-line highlight">
+
+                И моё впечатление о тебе
+                становится всё теплее.
+
+            </div>
+
+
+            <div class="space"></div>
+
+
+            <div class="text-line highlight">
+
+                Ты очень красивая.
+
+            </div>
+
+
+            <div class="text-line">
+
+                Но мне кажется, что дело
+                совсем не только во внешности.
+
+            </div>
+
+
+            <div class="space"></div>
+
+
+            <div class="text-line">
+
+                В тебе есть что-то,
+
+            </div>
+
+
+            <div class="text-line">
+
+                что хочется замечать дальше.
+
+            </div>
+
+
+            <div class="space"></div>
+
+
+            <div class="text-line">
+
+                Узнавать тебя постепенно —
+
+            </div>
+
+
+            <div class="text-line">
+
+                без спешки, без ожиданий,
+
+            </div>
+
+
+            <div class="text-line">
+
+                просто разговаривать, смеяться,
+
+            </div>
+
+
+            <div class="text-line">
+
+                проводить вместе немного времени
+
+            </div>
+
+
+            <div class="text-line">
+
+                и смотреть, что из этого получится.
+
+            </div>
+
+
+            <div class="space"></div>
+
+
+            <div class="text-line">
+
+                Я не знаю, куда нас приведёт
+                это знакомство.
+
+            </div>
+
+
+            <div class="text-line">
+
+                И, наверное, сейчас даже
+                не нужно это знать.
+
+            </div>
+
+
+            <div class="space"></div>
+
+
+            <div class="text-line">
+
+                Мне просто интересно,
+
+            </div>
+
+
+            <div class="text-line">
+
+                какой ты окажешься для меня
+                ещё дальше.
+
+            </div>
+
+
+            <div class="space"></div>
+
+
+            <div class="text-line highlight">
+
+                Потому что сейчас мне хочется
+                узнать тебя немного ближе.
+
+            </div>
+
+
+            <div class="space"></div>
+
+
+            <div class="text-line">
+
+                Без громких слов.
+
+            </div>
+
+
+            <div class="text-line">
+
+                Без спешки.
+
+            </div>
+
+
+            <div class="space"></div>
+
+
+            <div class="text-line ending">
+
+                Просто дать этому маленькому
+                знакомству
+
+            </div>
+
+
+            <div class="text-line ending">
+
+                возможность стать
+                чем-то большим. ❤️
+
+            </div>
+
+
+        </div>
+
+
+        <div class="final-heart">
+
+            ♡
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+<script>
+
+
+/* =========================================================
+   ЭЛЕМЕНТЫ
+========================================================= */
+
+const firstScreen =
+    document.getElementById(
+        "firstScreen"
+    );
+
+const envelopeWrapper =
+    document.getElementById(
+        "envelopeWrapper"
+    );
+
+const envelope =
+    document.getElementById(
+        "envelope"
+    );
+
+const videoScreen =
+    document.getElementById(
+        "videoScreen"
+    );
+
+const video =
+    document.getElementById(
+        "video"
+    );
+
+const letterScreen =
+    document.getElementById(
+        "letterScreen"
+    );
+
+const particles =
+    document.getElementById(
+        "particles"
+    );
+
+
+
+/* =========================================================
+   ПЛАВАЮЩИЕ ЧАСТИЦЫ
+========================================================= */
+
+for (
+    let i = 0;
+    i < 18;
+    i++
+) {
+
+    const particle =
+        document.createElement(
+            "div"
+        );
+
+    particle.className =
+        "particle";
+
+    particle.style.left =
+        Math.random() * 100 + "%";
+
+    particle.style.animationDuration =
+        (
+            15 +
+            Math.random() * 18
+        ) + "s";
+
+    particle.style.animationDelay =
+        (
+            Math.random() * 15
+        ) + "s";
+
+    const size =
+        3 +
+        Math.random() * 5;
+
+    particle.style.width =
+        size + "px";
+
+    particle.style.height =
+        size + "px";
+
+    particles.appendChild(
+        particle
+    );
+
+}
+
+
+
+/* =========================================================
+   НАЖАТИЕ НА СЕРДЦЕ
+========================================================= */
+
+envelopeWrapper.addEventListener(
+    "click",
+    function () {
+
+        /* защита от повторного нажатия */
+
+        if (
+            envelope.classList.contains(
+                "open"
+            )
+        ) {
+            return;
+        }
+
+
+        /* открываем конверт */
+
+        envelope.classList.add(
+            "open"
+        );
+
+
+        /* запускаем разлёт сердечек */
+
+        createFlyingHearts();
+
+
+        /*
+         * Через 1.4 секунды
+         * начинаем переход.
+         */
+
+        setTimeout(
+            function () {
+
+                firstScreen.classList.add(
+                    "hide"
+                );
+
+            },
+            1400
+        );
+
+
+        /*
+         * Через 2.1 секунды
+         * показываем видео.
+         */
+
+        setTimeout(
+            function () {
+
+                videoScreen.classList.add(
+                    "show"
+                );
+
+            },
+            2100
+        );
+
+    }
+);
+
+
+
+/* =========================================================
+   ЛЕТЯЩИЕ СЕРДЕЧКИ
+========================================================= */
+
+function createFlyingHearts() {
+
+    for (
+        let i = 0;
+        i < 18;
+        i++
+    ) {
+
+        const heart =
+            document.createElement(
+                "div"
+            );
+
+        heart.className =
+            "flying-heart";
+
+        heart.textContent =
+            Math.random() > 0.35
+                ? "♡"
+                : "·";
+
+
+        const angle =
+            Math.random() *
+            Math.PI *
+            2;
+
+        const distance =
+            100 +
+            Math.random() *
+            220;
+
+
+        const x =
+            Math.cos(angle) *
+            distance;
+
+        const y =
+            Math.sin(angle) *
+            distance;
+
+
+        const rotation =
+            (
+                Math.random() *
+                360
+            ) - 180;
+
+
+        const size =
+            Math.random() *
+            10;
+
+
+        heart.style.setProperty(
+            "--x",
+            `calc(-50% + ${x}px)`
+        );
+
+        heart.style.setProperty(
+            "--y",
+            `calc(-50% + ${y}px)`
+        );
+
+        heart.style.setProperty(
+            "--rotation",
+            rotation + "deg"
+        );
+
+        heart.style.setProperty(
+            "--size",
+            size + "px"
+        );
+
+
+        heart.style.animationDelay =
+            (
+                Math.random() *
+                0.35
+            ) + "s";
+
+
+        document.body.appendChild(
+            heart
+        );
+
+
+        setTimeout(
+            function () {
+
+                heart.remove();
+
+            },
+            2800
+        );
+
+    }
+
+}
+
+
+
+/* =========================================================
+   ПОСЛЕ ОКОНЧАНИЯ ВИДЕО
+========================================================= */
+
+video.addEventListener(
+    "ended",
+    function () {
+
+        /*
+         * Маленькая пауза,
+         * чтобы конец видео не выглядел
+         * слишком резким.
+         */
+
+        setTimeout(
+            function () {
+
+
+                /*
+                 * Видео исчезает.
+                 */
+
+                videoScreen.classList.remove(
+                    "show"
+                );
+
+
+                /*
+                 * Через 1.1 секунды
+                 * появляется письмо.
+                 */
+
+                setTimeout(
+                    function () {
+
+                        letterScreen.classList.add(
+                            "show"
+                        );
+
+
+                        /*
+                         * Возвращаем текст
+                         * в самое начало.
+                         */
+
+                        letterScreen.scrollTop =
+                            0;
+
+
+                    },
+                    1100
+                );
+
+
+            },
+            700
+        );
+
+    }
+);
+
+
+</script>
+
+
+</body>
+
+</html>

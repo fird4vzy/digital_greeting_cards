@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Love is...</title>
+<meta name="theme-color" content="#F3E4DF">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   LOVE IS... — Editorial Cinematic Edition
+   Палитра сохранена: cream / blush / rose / rose-deep / gold / ink
+   ============================================================ */
+:root{
+  --cream:#FAF7F2;
+  --blush:#F3E4DF;
+  --rose:#C97B7B;
+  --rose-deep:#A85D5D;
+  --gold:#C9A87C;
+  --gold-soft:#E4D3B4;
+  --ink:#2C2424;
+  --ink-soft:#5C4F4F;
+  --paper:#FFFDF8;
+  --white:#FFFFFF;
+
+  --shadow-lg:0 40px 90px rgba(44,36,36,.16), 0 8px 24px rgba(44,36,36,.08);
+  --shadow-md:0 22px 54px rgba(44,36,36,.12);
+  --shadow-sm:0 8px 22px rgba(44,36,36,.08);
+
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --ease-spring:cubic-bezier(.34,1.56,.64,1);
+  --ease-soft:cubic-bezier(.22,1,.36,1);
+
+  --font-serif:'Cormorant Garamond', Georgia, serif;
+  --font-sans:'Outfit', system-ui, sans-serif;
+
+  --vh:1vh;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{
+  min-height:100dvh;
+  min-height:calc(var(--vh) * 100);
+  font-family:var(--font-sans);
+  color:var(--ink);
+  background:var(--cream);
+  overflow-x:hidden;
+  cursor:none;
+}
+@media (hover:none), (pointer:coarse){ body{ cursor:auto; } }
+
+::selection{ background:var(--rose); color:var(--white); }
+
+a{color:inherit}
+
+/* ============ ATMOSPHERIC BACKGROUND ============ */
+.ambient{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; background:
+  linear-gradient(175deg, var(--cream) 0%, var(--blush) 52%, #EDE3D9 100%);
+}
+.ambient .blob{
+  position:absolute;
+  border-radius:50%;
+  filter:blur(70px);
+  opacity:.55;
+  will-change:transform;
+}
+.blob-a{ width:52vw; height:52vw; left:-14vw; top:-16vw; background:radial-gradient(circle at 30% 30%, rgba(201,123,123,.35), transparent 70%); animation:driftA 34s ease-in-out infinite; }
+.blob-b{ width:46vw; height:46vw; right:-16vw; bottom:-14vw; background:radial-gradient(circle at 60% 60%, rgba(201,168,124,.32), transparent 70%); animation:driftB 40s ease-in-out infinite; }
+.blob-c{ width:34vw; height:34vw; left:38%; top:32%; background:radial-gradient(circle, rgba(255,255,255,.4), transparent 72%); animation:driftC 28s ease-in-out infinite; }
+
+@keyframes driftA{ 0%,100%{ transform:translate(0,0) scale(1);} 50%{ transform:translate(4vw,6vw) scale(1.08);} }
+@keyframes driftB{ 0%,100%{ transform:translate(0,0) scale(1);} 50%{ transform:translate(-5vw,-4vw) scale(1.06);} }
+@keyframes driftC{ 0%,100%{ transform:translate(-50%,-50%) scale(1); opacity:.35;} 50%{ transform:translate(-46%,-54%) scale(1.15); opacity:.55;} }
+
+.ambient::after{
+  content:'';
+  position:absolute; inset:0;
+  opacity:.05;
+  mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.ambient .vignette{
+  position:absolute; inset:0;
+  background:radial-gradient(ellipse 90% 80% at 50% 50%, transparent 55%, rgba(44,36,36,.10) 100%);
+}
+
+@media (prefers-reduced-motion:reduce){
+  .blob-a,.blob-b,.blob-c{ animation:none; }
+}
+
+/* ============ CUSTOM CURSOR ============ */
+.cursor{ position:fixed; top:0; left:0; z-index:999; pointer-events:none; }
+.cursor-dot,.cursor-ring{
+  position:fixed; top:0; left:0; border-radius:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+  will-change:transform,width,height,opacity;
+}
+.cursor-dot{ width:6px; height:6px; background:var(--rose-deep); z-index:1000; transition:opacity .3s var(--ease-soft); }
+.cursor-ring{
+  width:38px; height:38px;
+  border:1px solid rgba(168,93,93,.55);
+  z-index:999;
+  transition:width .4s var(--ease-spring), height .4s var(--ease-spring),
+             border-color .35s var(--ease-soft), background .35s var(--ease-soft),
+             opacity .3s var(--ease-soft);
+}
+.cursor-ring.hover{ width:64px; height:64px; background:rgba(201,123,123,.10); border-color:rgba(168,93,93,.75); }
+.cursor-ring.press{ width:30px; height:30px; }
+body.cursor-hidden .cursor-dot,
+body.cursor-hidden .cursor-ring{ opacity:0; }
+@media (hover:none), (pointer:coarse){ .cursor{ display:none; } }
+
+/* ============ RUBRIC (signature element) ============ */
+.rubric{
+  position:fixed;
+  left:clamp(14px,3.4vw,34px);
+  top:50%;
+  transform:translateY(-50%) rotate(180deg);
+  writing-mode:vertical-rl;
+  z-index:30;
+  display:flex;
+  align-items:center;
+  gap:.9rem;
+  font-family:var(--font-sans);
+  font-size:.68rem;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  opacity:.75;
+  pointer-events:none;
+  transition:opacity .5s var(--ease-soft);
+}
+.rubric::before{
+  content:'';
+  width:1px; height:34px;
+  background:linear-gradient(var(--gold), transparent);
+}
+.rubric b{ color:var(--rose-deep); font-weight:500; letter-spacing:.16em; }
+
+@media (max-width:680px){
+  .rubric{
+    left:auto; right:16px; top:16px; bottom:auto;
+    transform:none; writing-mode:horizontal-tb;
+    gap:.5rem; font-size:.6rem;
+  }
+  .rubric::before{ width:16px; height:1px; }
+}
+
+/* ============ SCREENS ============ */
+.screen{
+  position:fixed; inset:0; z-index:10;
+  display:flex; align-items:center; justify-content:center;
+  padding:clamp(1.4rem,5vw,3rem);
+  opacity:0; visibility:hidden;
+  filter:blur(14px);
+  transform:scale(1.04);
+  transition:opacity .9s var(--ease-out), filter .9s var(--ease-out),
+             transform 1s var(--ease-out), visibility .9s;
+  will-change:opacity,filter,transform;
+}
+.screen.active{ opacity:1; visibility:visible; filter:blur(0); transform:scale(1); }
+.screen.leaving{ opacity:0; filter:blur(18px); transform:scale(.96); pointer-events:none; }
+
+#screen-3{ align-items:flex-start; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+
+.screen-content{
+  width:100%; max-width:540px;
+  display:flex; flex-direction:column; align-items:center;
+  gap:clamp(1.5rem,3.4vw,2.25rem);
+}
+#screen-3 .screen-content{ max-width:580px; padding:clamp(2rem,6vw,3.5rem) 0 4rem; margin:auto; }
+
+/* reveal children stagger */
+.reveal{
+  opacity:0; transform:translateY(22px) scale(.985); filter:blur(6px);
+  transition:opacity .9s var(--ease-out), transform .9s var(--ease-out), filter .9s var(--ease-out);
+}
+.screen.active .reveal{ opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
+.screen.active .reveal:nth-child(1){ transition-delay:.05s; }
+.screen.active .reveal:nth-child(2){ transition-delay:.18s; }
+.screen.active .reveal:nth-child(3){ transition-delay:.32s; }
+.screen.active .reveal:nth-child(4){ transition-delay:.46s; }
+.screen.active .reveal:nth-child(5){ transition-delay:.6s; }
+
+@media (prefers-reduced-motion:reduce){
+  .screen{ transition:opacity .3s linear; filter:none !important; transform:none !important; }
+  .reveal{ transition:opacity .3s linear; transform:none !important; filter:none !important; }
+}
+
+/* ============ EYEBROW / HEADING ============ */
+.eyebrow{
+  display:inline-flex; align-items:center; gap:.6rem;
+  font-size:.68rem; letter-spacing:.28em; text-transform:uppercase;
+  color:var(--rose-deep); font-weight:500;
+}
+.eyebrow::before{ content:''; width:22px; height:1px; background:var(--gold); }
+
+.love-heading{ text-align:center; max-width:440px; display:flex; flex-direction:column; align-items:center; gap:.55rem; }
+.love-heading .brand{
+  font-family:var(--font-serif); font-style:italic; font-weight:500;
+  font-size:clamp(2.1rem,6.4vw,2.9rem);
+  color:var(--ink);
+  letter-spacing:.01em; line-height:1.05;
+}
+.love-heading .tagline{
+  font-size:clamp(.86rem,2.3vw,.98rem);
+  font-weight:300; color:var(--ink-soft);
+  letter-spacing:.04em;
+}
+
+/* ============ FRAME / GIF COMPOSITION ============ */
+.frame-wrap{
+  position:relative; perspective:900px;
+}
+.frame-wrap::before{
+  content:'';
+  position:absolute; inset:-20px; z-index:-1; border-radius:50%;
+  background:radial-gradient(circle, rgba(201,123,123,.24), transparent 70%);
+  filter:blur(28px); opacity:.5;
+  animation:frameGlow 6.5s ease-in-out infinite;
+}
+@keyframes frameGlow{ 0%,100%{ transform:scale(1); opacity:.42;} 50%{ transform:scale(1.09); opacity:.68;} }
+@media (prefers-reduced-motion:reduce){ .frame-wrap::before{ animation:none; } }
+.frame{
+  position:relative;
+  background:var(--white);
+  padding:16px 16px 58px;
+  box-shadow:var(--shadow-md), 0 1px 0 rgba(255,255,255,.9) inset;
+  transform-style:preserve-3d;
+  transition:transform .5s var(--ease-soft), box-shadow .5s var(--ease-soft);
+  cursor:pointer;
+}
+.frame::before{
+  content:''; position:absolute; inset:6px; border:1px solid rgba(201,123,123,.28); pointer-events:none;
+}
+.frame:hover{ box-shadow:var(--shadow-lg); }
+
+.frame-media{
+  position:relative; width:min(288px,72vw); aspect-ratio:3/4; overflow:hidden; background:var(--blush);
+}
+.frame-media img{
+  display:block; width:100%; height:100%; object-fit:cover;
+  transform:scale(1.05);
+  transition:transform .8s var(--ease-soft), filter .8s var(--ease-soft);
+  opacity:0;
+}
+.frame-media img.loaded{ opacity:1; }
+.frame:hover .frame-media img{ transform:scale(1.12); }
+
+.frame-placeholder{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(150deg, var(--blush), #ECE0D6);
+}
+.frame-placeholder svg{ width:46%; opacity:.55; }
+
+.frame-sweep{
+  position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(115deg, transparent 40%, rgba(255,255,255,.55) 50%, transparent 60%);
+  transform:translateX(-120%);
+}
+.frame:hover .frame-sweep{ transition:transform .9s var(--ease-soft); transform:translateX(120%); }
+
+.frame-caption{
+  position:absolute; bottom:18px; left:0; right:0; text-align:center;
+  font-family:var(--font-serif); font-style:italic; font-size:.98rem; color:var(--ink-soft);
+}
+
+.frame-hint{
+  position:absolute; inset:16px 16px 58px; display:flex; flex-direction:column;
+  align-items:center; justify-content:flex-end; padding-bottom:1.1rem;
+  background:linear-gradient(to top, rgba(44,36,36,.5) 0%, transparent 55%);
+  opacity:0; transition:opacity .4s var(--ease-soft);
+}
+.frame:hover .frame-hint, .frame:focus-visible .frame-hint{ opacity:1; }
+.frame-hint span{
+  color:var(--white); font-size:.76rem; font-weight:500; letter-spacing:.16em; text-transform:uppercase;
+  display:flex; align-items:center; gap:.4rem;
+}
+.frame-hint svg{ width:13px; height:13px; }
+
+/* ============ BUTTONS ============ */
+.btn{
+  appearance:none; border:none; cursor:pointer; position:relative; overflow:hidden;
+  font-family:var(--font-sans); font-weight:500; letter-spacing:.03em;
+  transition:transform .45s var(--ease-spring), box-shadow .4s var(--ease-soft), background .35s var(--ease-soft), border-color .35s var(--ease-soft);
+  isolation:isolate;
+}
+.btn-primary{
+  background:var(--rose-deep); color:var(--white);
+  padding:1rem 2.5rem; border-radius:100px; font-size:.94rem;
+  box-shadow:0 10px 28px rgba(168,93,93,.3);
+}
+.btn-primary::before{
+  content:''; position:absolute; inset:0; z-index:-1;
+  background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,.35) 48%, transparent 66%);
+  transform:translateX(-140%);
+}
+.btn-primary:hover::before{ transition:transform .8s var(--ease-soft); transform:translateX(140%); }
+.btn-primary:hover{ background:var(--rose); box-shadow:0 14px 34px rgba(168,93,93,.38); }
+.btn-primary:active{ transform:scale(.96) !important; }
+
+.btn-ghost{
+  background:transparent; color:var(--ink-soft);
+  padding:.9rem 1.9rem; border-radius:100px; font-size:.9rem;
+  border:1px solid rgba(92,79,79,.28);
+}
+.btn-ghost:hover{ border-color:var(--rose); color:var(--rose-deep); }
+
+/* ripple */
+.ripple{
+  position:absolute; border-radius:50%; background:rgba(255,255,255,.55);
+  transform:scale(0); opacity:.9; pointer-events:none;
+  animation:rippleAnim .7s var(--ease-out) forwards;
+}
+@keyframes rippleAnim{ to{ transform:scale(2.6); opacity:0; } }
+
+[data-magnetic]{ transition:transform .35s var(--ease-spring); }
+
+/* ============ SCREEN 2 — QUESTION ============ */
+.question-block{ text-align:center; display:flex; flex-direction:column; align-items:center; gap:1.1rem; }
+.question-text{
+  font-family:var(--font-serif); font-weight:500;
+  font-size:clamp(1.55rem,5vw,2.15rem);
+  line-height:1.42; color:var(--ink); max-width:480px;
+  position:relative;
+}
+.question-text .hl{
+  font-style:italic; color:var(--rose-deep); position:relative; white-space:nowrap;
+}
+.question-text .hl::after{
+  content:''; position:absolute; left:0; right:0; bottom:.05em; height:2px;
+  background:linear-gradient(90deg, var(--gold), var(--rose));
+  transform:scaleX(0); transform-origin:left;
+  transition:transform .8s var(--ease-out) .5s;
+}
+.screen.active .question-text .hl::after{ transform:scaleX(1); }
+
+.answers{
+  display:flex; flex-direction:column; align-items:center; gap:.9rem;
+  width:100%; position:relative;
+}
+
+/* ---- scene 2: the "wrong answer" beat ---- */
+.scene-veil{
+  position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:radial-gradient(ellipse 80% 65% at 50% 55%, rgba(168,93,93,.14), rgba(44,36,36,.20) 130%);
+  opacity:0;
+  transition:opacity 1.2s var(--ease-soft);
+}
+#screen-2.veil .scene-veil{ opacity:1; }
+
+.scene2{ position:relative; width:100%; min-height:150px; }
+
+#s2Question{
+  transition:opacity .85s var(--ease-out), filter .85s var(--ease-out), transform .85s var(--ease-out);
+}
+#screen-2.question-exit #s2Question{
+  opacity:0; filter:blur(12px); transform:scale(.95) translateY(-10px);
+  pointer-events:none;
+}
+
+.btn-primary.dissolving{
+  opacity:0 !important; transform:scale(.8) translateY(4px) !important; filter:blur(7px);
+  pointer-events:none;
+  transition:opacity .75s var(--ease-soft), transform .75s var(--ease-soft), filter .75s var(--ease-soft);
+}
+
+.reply-block{
+  position:absolute; inset:0; z-index:2;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:1.1rem; text-align:center; padding:0 1rem;
+  pointer-events:none;
+}
+.reply-line{
+  font-family:var(--font-serif); font-style:italic; font-weight:500;
+  font-size:clamp(1.5rem,5.2vw,2.1rem); line-height:1.35; color:var(--ink);
+  opacity:0; transform:translateY(18px) scale(.98); filter:blur(7px);
+  transition:opacity 1s var(--ease-out), transform 1s var(--ease-out), filter 1s var(--ease-out);
+}
+.reply-line:nth-child(2){ color:var(--rose-deep); transition-delay:.55s; }
+.reply-block.show .reply-line{ opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
+
+@media (prefers-reduced-motion:reduce){
+  .scene-veil{ transition:opacity .25s linear; }
+  #s2Question{ transition:opacity .25s linear; transform:none !important; filter:none !important; }
+  .reply-line{ transition:opacity .25s linear; transform:none !important; filter:none !important; }
+}
+
+/* ============ LETTER ============ */
+.letter{
+  width:100%; position:relative;
+  background:
+    linear-gradient(180deg, var(--paper) 0%, #FBF4E9 100%);
+  border-radius:2px;
+  padding:clamp(1.8rem,4.6vw,2.6rem) clamp(1.8rem,4.6vw,2.75rem);
+  box-shadow:var(--shadow-md);
+}
+.letter::before{
+  content:''; position:absolute; left:0; top:14px; bottom:14px; width:3px;
+  background:linear-gradient(var(--gold), var(--rose-deep));
+}
+.letter::after{
+  content:'♥'; position:absolute; top:1.2rem; right:1.4rem;
+  font-size:.7rem; color:var(--rose); opacity:.4;
+}
+.letter .drop{
+  float:left; font-family:var(--font-serif); font-style:italic; font-weight:600;
+  font-size:3.1rem; line-height:.8; color:var(--rose-deep); padding:.1rem .35rem 0 0;
+}
+.letter p{
+  font-family:var(--font-serif); font-size:clamp(1.08rem,2.7vw,1.22rem);
+  line-height:1.85; color:var(--ink-soft);
+}
+.letter .salutation{
+  font-style:italic; color:var(--rose-deep); margin-bottom:.7rem; display:block;
+  font-size:clamp(1.15rem,2.9vw,1.3rem);
+}
+
+/* ============ STORY LEAD (bridge line) ============ */
+.story-lead{
+  font-family:var(--font-serif); font-style:italic;
+  font-size:clamp(1.05rem,2.7vw,1.22rem); color:var(--rose-deep);
+  text-align:center; opacity:.92;
+}
+
+/* ============ STORY — editorial scroll-reveal fragments ============ */
+.story{
+  width:100%; display:flex; flex-direction:column;
+  gap:clamp(2.6rem,7.5vw,3.8rem);
+  padding:.25rem 0;
+}
+.story-frag{
+  opacity:0; transform:translateY(30px); filter:blur(8px);
+  transition:opacity 1.05s var(--ease-out), transform 1.05s var(--ease-out), filter 1.05s var(--ease-out);
+}
+.story-frag.in{ opacity:1; transform:translateY(0); filter:blur(0); }
+
+.frag-label{
+  display:block; font-size:.7rem; letter-spacing:.24em; text-transform:uppercase;
+  color:var(--rose-deep); font-weight:500; margin-bottom:.55rem;
+}
+.frag-text{
+  font-family:var(--font-serif); font-size:clamp(1.1rem,3vw,1.32rem);
+  line-height:1.78; color:var(--ink-soft);
+}
+
+.story-frag--pause{ padding-top:.4rem; }
+.story-frag--pause .frag-text{
+  font-style:italic; color:var(--ink); text-align:center;
+  font-size:clamp(1.12rem,3.1vw,1.3rem);
+}
+.story-frag--climax .frag-text{
+  font-style:italic; color:var(--rose-deep); text-align:center;
+  font-size:clamp(1.3rem,3.8vw,1.6rem); line-height:1.55;
+}
+
+/* ============ FINAL CTA LINE ============ */
+.final-cta{
+  display:inline-flex; align-items:center; gap:.65rem;
+  background:none; border:none; cursor:pointer;
+  font-family:var(--font-serif); font-style:italic; font-size:1.2rem; color:var(--rose-deep);
+  padding:.6rem .2rem; position:relative; align-self:center;
+  margin-top:clamp(.5rem,2vw,1rem);
+  opacity:0; transform:translateY(16px);
+  transition:opacity 1s var(--ease-out), transform 1s var(--ease-out);
+  pointer-events:none;
+}
+.final-cta.ready{ opacity:1; transform:translateY(0); pointer-events:auto; }
+.final-cta .arrow{ transition:transform .4s var(--ease-spring); }
+.final-cta:hover .arrow{ transform:translateX(6px); }
+.final-cta::after{
+  content:''; position:absolute; left:0; right:0; bottom:0; height:1px;
+  background:var(--rose-deep); transform:scaleX(0); transform-origin:right;
+  transition:transform .45s var(--ease-out);
+}
+.final-cta:hover::after{ transform:scaleX(1); transform-origin:left; }
+.final-cta.ready::before{
+  content:''; position:absolute; left:0; right:0; bottom:-1px; height:1px;
+  background:var(--gold); opacity:.35;
+  animation:ctaBreathe 3.2s ease-in-out infinite;
+}
+@keyframes ctaBreathe{ 0%,100%{ opacity:.2; } 50%{ opacity:.55; } }
+
+@media (prefers-reduced-motion:reduce){
+  .story-frag{ transition:opacity .25s linear; transform:none !important; filter:none !important; }
+  .final-cta{ transition:opacity .25s linear; transform:none !important; }
+  .final-cta.ready::before{ animation:none; }
+}
+
+/* ============ MODAL ============ */
+.modal{
+  position:fixed; inset:0; z-index:100;
+  display:flex; align-items:center; justify-content:center;
+  padding:1.5rem;
+  background:rgba(30,22,22,.42);
+  backdrop-filter:blur(0px);
+  opacity:0; visibility:hidden;
+  transition:opacity .5s var(--ease-soft), visibility .5s, backdrop-filter .5s var(--ease-soft);
+}
+.modal.show{ opacity:1; visibility:visible; backdrop-filter:blur(10px); }
+
+.modal-panel{
+  width:100%; max-width:420px;
+  background:rgba(255,253,248,.88);
+  padding:clamp(2.2rem,5.5vw,3rem);
+  text-align:center; border-radius:6px;
+  box-shadow:var(--shadow-lg);
+  position:relative;
+  transform:translateY(26px) scale(.94); filter:blur(10px);
+  transition:transform .55s var(--ease-spring), filter .55s var(--ease-soft);
+}
+.modal-panel::after{
+  content:''; position:absolute; inset:0; border:1px solid rgba(201,168,124,.55); border-radius:6px; pointer-events:none;
+}
+.modal.show .modal-panel{ transform:translateY(0) scale(1); filter:blur(0); }
+
+.modal .eyebrow{ margin-bottom:.9rem; justify-content:center; }
+.modal h2{
+  font-family:var(--font-serif); font-weight:500; font-style:italic;
+  font-size:clamp(1.5rem,4.6vw,1.9rem); color:var(--ink); line-height:1.4; margin-bottom:1.9rem;
+}
+.modal-actions{ display:flex; align-items:center; flex-wrap:wrap; gap:1.1rem; justify-content:center; }
+.text-answer{
+  appearance:none; background:none; border:none; cursor:pointer; position:relative;
+  font-family:var(--font-serif); font-style:italic; font-size:1.14rem; color:var(--rose-deep);
+  padding:.35rem .15rem; transition:transform .35s var(--ease-spring), color .3s var(--ease-soft);
+}
+.text-answer::after{
+  content:''; position:absolute; left:0; right:0; bottom:0; height:1px;
+  background:var(--rose-deep); transform:scaleX(0); transform-origin:right;
+  transition:transform .45s var(--ease-out);
+}
+.text-answer:hover::after{ transform:scaleX(1); transform-origin:left; }
+.text-answer:active{ transform:scale(.96); }
+.text-answer--emph{ font-weight:500; color:var(--gold-soft); font-size:1.22rem; }
+.text-answer--emph{ color:#B98F52; }
+.text-answer--emph::after{ background:#B98F52; }
+.modal-divider{ color:var(--ink-soft); opacity:.35; font-size:.75rem; }
+
+/* ============ FINALE ============ */
+body.finale-pre .screen.active{
+  transition:opacity 1.3s var(--ease-soft), filter 1.3s var(--ease-soft), transform 1.3s var(--ease-soft);
+  opacity:.28; filter:blur(22px); transform:scale(1.035);
+}
+body.finale-pre .rubric,
+body.finale-pre .steps{
+  opacity:0 !important; transition:opacity .8s var(--ease-soft);
+}
+
+.finale{
+  position:fixed; inset:0; z-index:200; pointer-events:none;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; transition:opacity 1.4s var(--ease-soft);
+  background:radial-gradient(ellipse 70% 60% at 50% 50%, rgba(250,247,242,.97) 0%, rgba(243,228,223,.98) 60%, rgba(237,227,217,.99) 100%);
+}
+.finale.show{ opacity:1; }
+.finale-glow{
+  position:absolute; width:60vw; height:60vw; max-width:640px; max-height:640px; border-radius:50%;
+  background:radial-gradient(circle, rgba(201,123,123,.28), transparent 70%);
+  filter:blur(40px);
+  animation:breathe 5s ease-in-out infinite;
+}
+@keyframes breathe{ 0%,100%{ transform:scale(1); opacity:.7;} 50%{ transform:scale(1.12); opacity:1;} }
+
+.finale-particles{ position:absolute; inset:0; overflow:hidden; }
+.fp{
+  position:absolute; border-radius:50%;
+  background:radial-gradient(circle, rgba(255,255,255,.9), rgba(201,123,123,.35));
+  opacity:0;
+  animation:floatUp 6.5s ease-in-out forwards;
+}
+@keyframes floatUp{
+  0%{ opacity:0; transform:translateY(0) scale(.5); }
+  12%{ opacity:.85; }
+  85%{ opacity:.5; }
+  100%{ opacity:0; transform:translateY(-160px) scale(1.1); }
+}
+
+.finale-text{
+  font-family:var(--font-serif); font-style:italic; font-weight:500;
+  font-size:clamp(2.1rem,7.5vw,3.3rem); color:var(--rose-deep); text-align:center;
+  padding:1rem; position:relative; z-index:2;
+  opacity:0; filter:blur(16px); transform:translateY(10px) scale(.94);
+  text-shadow:0 0 0 rgba(201,123,123,0);
+  transition:opacity 1.4s var(--ease-out) 1.15s, filter 1.4s var(--ease-out) 1.15s,
+             transform 1.4s var(--ease-out) 1.15s, text-shadow 1.6s var(--ease-out) 1.4s;
+}
+.finale.show .finale-text{
+  opacity:1; filter:blur(0); transform:translateY(0) scale(1);
+  text-shadow:0 0 34px rgba(201,123,123,.38);
+  animation:breatheText 4.5s ease-in-out 2.6s infinite;
+}
+@keyframes breatheText{
+  0%,100%{ transform:scale(1); text-shadow:0 0 34px rgba(201,123,123,.38); }
+  50%{ transform:scale(1.025); text-shadow:0 0 46px rgba(201,123,123,.5); }
+}
+
+/* ============ MICRO BURST (answer confirmation) ============ */
+.burst{ position:fixed; inset:0; z-index:150; pointer-events:none; overflow:hidden; }
+.burst-dot{
+  position:absolute; width:5px; height:5px; border-radius:50%;
+  background:var(--rose); opacity:0;
+  animation:burstFly 1.2s var(--ease-out) forwards;
+}
+@keyframes burstFly{
+  0%{ opacity:1; transform:translate(0,0) scale(1); }
+  100%{ opacity:0; transform:translate(var(--tx),var(--ty)) scale(.25); }
+}
+
+/* ============ PROGRESS DOTS ============ */
+.steps{
+  position:fixed; bottom:clamp(1.2rem,3vh,1.9rem); left:50%; transform:translateX(-50%);
+  display:flex; gap:.55rem; z-index:20;
+}
+.step-dot{
+  width:5px; height:5px; border-radius:50%; background:rgba(168,93,93,.22);
+  transition:background .5s var(--ease-soft), transform .5s var(--ease-soft), width .5s var(--ease-soft);
+}
+.step-dot.active{ background:var(--rose-deep); width:16px; border-radius:3px; }
+
+/* ============ VINYL PLAYER ============ */
+.vinyl{
+  position:fixed;
+  right:clamp(14px,3.4vw,30px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + clamp(14px,3.4vw,30px));
+  z-index:220;
+  width:58px; height:58px;
+  border:none; padding:0; margin:0; cursor:pointer;
+  border-radius:50%;
+  background:none;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:var(--shadow-sm);
+  transition:transform .45s var(--ease-spring), box-shadow .4s var(--ease-soft);
+}
+.vinyl:hover{ transform:scale(1.07); box-shadow:var(--shadow-md); }
+.vinyl:active{ transform:scale(.92); }
+.vinyl:focus-visible{ outline-offset:4px; }
+
+.vinyl-disc{
+  position:relative; width:100%; height:100%; border-radius:50%; display:block;
+  background:
+    radial-gradient(circle at 38% 32%, rgba(255,255,255,.16), transparent 42%),
+    repeating-radial-gradient(circle at 50% 50%, rgba(250,247,242,.09) 0 1.5px, transparent 1.5px 4.5px),
+    radial-gradient(circle at 50% 50%, var(--ink) 0 17%, #221c1c 17.5% 100%);
+  box-shadow:0 1px 0 rgba(255,255,255,.06) inset, 0 0 0 1px rgba(255,255,255,.05) inset;
+  animation:vinylSpin 7s linear infinite;
+  animation-play-state:paused;
+}
+.vinyl-disc::after{
+  content:''; position:absolute; inset:0; margin:auto;
+  width:32%; height:32%; border-radius:50%;
+  background:radial-gradient(circle at 40% 35%, var(--gold-soft), var(--gold) 75%);
+  box-shadow:0 0 0 2px rgba(255,253,248,.55) inset, 0 1px 3px rgba(44,36,36,.35);
+}
+.vinyl.playing .vinyl-disc{ animation-play-state:running; }
+@keyframes vinylSpin{ to{ transform:rotate(360deg); } }
+
+@media (max-width:680px){
+  .vinyl{ width:44px; height:44px; right:12px; bottom:calc(env(safe-area-inset-bottom,0px) + 12px); }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .vinyl-disc{ animation:none !important; }
+  .vinyl{ transition:opacity .25s linear; }
+}
+
+/* ============ A11Y ============ */
+:focus-visible{ outline:2px solid var(--rose-deep); outline-offset:3px; border-radius:2px; }
+
+@media (max-width:480px){
+  .frame{ padding-bottom:50px; }
+  .frame-hint{ inset:16px 16px 50px; }
+  .letter .drop{ font-size:2.5rem; }
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.2s !important; }
+  .finale-particles{ display:none; }
+}
+</style>
+</head>
+<body>
+
+<div class="ambient" aria-hidden="true">
+  <div class="blob blob-a"></div>
+  <div class="blob blob-b"></div>
+  <div class="blob blob-c"></div>
+  <div class="vignette"></div>
+</div>
+
+<div class="cursor" aria-hidden="true">
+  <div class="cursor-ring" id="cursorRing"></div>
+  <div class="cursor-dot" id="cursorDot"></div>
+</div>
+
+<div class="burst" id="burst" aria-hidden="true"></div>
+
+<div class="finale" id="finale" aria-hidden="true">
+  <div class="finale-glow"></div>
+  <div class="finale-particles" id="finaleParticles"></div>
+  <p class="finale-text">Я тебя люблю</p>
+</div>
+
+<div class="rubric" id="rubric" aria-hidden="true"><b>Act I</b> — Секрет</div>
+
+<nav class="steps" aria-label="Прогресс">
+  <span class="step-dot active" data-step="1"></span>
+  <span class="step-dot" data-step="2"></span>
+  <span class="step-dot" data-step="3"></span>
+</nav>
+
+<audio id="bgAudio" src="./song.mp3" loop preload="none"></audio>
+<button class="vinyl" id="vinylBtn" type="button" aria-pressed="false" aria-label="Включить музыку" data-magnetic data-strength="6">
+  <span class="vinyl-disc" aria-hidden="true"></span>
+</button>
+
+<!-- ЭКРАН 1 -->
+<section class="screen active" id="screen-1">
+  <div class="screen-content">
+    <header class="love-heading reveal">
+      <span class="eyebrow">Для тебя</span>
+      <span class="brand">Love is...</span>
+      <span class="tagline">когда есть один секрет — только для тебя</span>
+    </header>
+
+    <div class="frame-wrap reveal">
+      <div class="frame" id="gifTrigger" role="button" tabindex="0" aria-label="Открыть послание" data-magnetic data-strength="14">
+        <div class="frame-media">
+          <div class="frame-placeholder" id="framePlaceholder">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M50 78C50 78 14 55 14 32C14 20 23 12 34 12C41 12 47 16 50 22C53 16 59 12 66 12C77 12 86 20 86 32C86 55 50 78 50 78Z" stroke="#A85D5D" stroke-width="1.4"/>
+            </svg>
+          </div>
+          <img id="heroGif" alt="Love is..." width="288" height="384">
+          <div class="frame-sweep"></div>
+        </div>
+        <p class="frame-caption">for you</p>
+        <div class="frame-hint">
+          <span>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 10h12M11 5l5 5-5 5"/></svg>
+            Открыть
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary reveal" id="btnOpen" data-magnetic data-strength="18">Открыть послание</button>
+  </div>
+</section>
+
+<!-- ЭКРАН 2 -->
+<section class="screen" id="screen-2">
+  <div class="scene-veil" aria-hidden="true"></div>
+  <div class="screen-content">
+    <header class="love-heading reveal">
+      <span class="eyebrow">Вопрос, который я давно хотел задать</span>
+      <span class="brand">Love is...</span>
+    </header>
+
+    <div class="scene2" id="scene2">
+      <div class="question-block reveal" id="s2Question">
+        <p class="question-text">Ты правда знаешь, <span class="hl">почему</span> из всех — именно ты стала самой особенной для меня?</p>
+        <div class="answers">
+          <button class="btn btn-primary" id="btnYes" data-magnetic data-strength="16">Конечно знаю</button>
+        </div>
+      </div>
+
+      <div class="reply-block" id="s2Reply" aria-live="polite">
+        <p class="reply-line">Правда?..</p>
+        <p class="reply-line">Тогда, кажется, придётся рассказать тебе самому.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ЭКРАН 3 -->
+<section class="screen" id="screen-3">
+  <div class="screen-content">
+    <header class="love-heading reveal">
+      <span class="eyebrow">Признание</span>
+      <span class="brand">Love is...</span>
+      <span class="tagline">быть рядом с тобой</span>
+    </header>
+
+    <article class="letter reveal">
+      <p><span class="drop">К</span><span class="salutation">Моей самой дорогой,</span>
+        Каждый день рядом с тобой — это маленькое чудо. Ты наполняешь мою жизнь
+        теплом, светом и бесконечной нежностью. Когда я смотрю на тебя, мир
+        становится ярче, а сердце — спокойнее.<br><br>
+        Я бесконечно благодарен судьбе за то, что ты есть в моей жизни.
+        Ты — моё самое большое счастье.
+      </p>
+    </article>
+
+    <p class="story-lead reveal">Но письмо — это только начало. Вот, что я хотел бы, чтобы ты знала.</p>
+
+    <div class="story" id="story">
+      <div class="story-frag" data-frag>
+        <span class="frag-label">Твоя улыбка</span>
+        <p class="frag-text">Она способна вытащить меня из самого серого дня — я замечаю её раньше, чем успеваю подумать о чём-то другом.</p>
+      </div>
+
+      <div class="story-frag" data-frag>
+        <span class="frag-label">То, как ты заботишься</span>
+        <p class="frag-text">В мелочах, которые ты никогда не подчёркиваешь: в тёплом взгляде, в нужном слове в нужный момент, в том, что ты просто рядом.</p>
+      </div>
+
+      <div class="story-frag" data-frag>
+        <span class="frag-label">Наши моменты</span>
+        <p class="frag-text">Обычные прогулки и случайный смех — я почему-то помню их отчётливее всего важного, что происходило в те же дни.</p>
+      </div>
+
+      <div class="story-frag story-frag--pause" data-frag>
+        <p class="frag-text">Но даже всё это — ещё не самое главное.</p>
+      </div>
+
+      <div class="story-frag story-frag--climax" data-frag>
+        <p class="frag-text">Есть кое-что, о чём я уже давно хотел тебя спросить.</p>
+      </div>
+    </div>
+
+    <button class="final-cta" id="btnQuestion" data-magnetic data-strength="10">
+      <span>Спросить</span>
+      <svg class="arrow" width="18" height="12" viewBox="0 0 18 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M0 6h16M11 1l5 5-5 5"/></svg>
+    </button>
+  </div>
+</section>
+
+<!-- MODAL -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-panel">
+    <span class="eyebrow">Главный вопрос</span>
+    <h2 id="modalTitle">Пойдёшь со мной на самое лучшее свидание?</h2>
+    <div class="modal-actions">
+      <button class="text-answer modal-answer" data-magnetic data-strength="8">Да</button>
+      <span class="modal-divider" aria-hidden="true">•</span>
+      <button class="text-answer text-answer--emph modal-answer" data-magnetic data-strength="8">Тысячу раз да</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var isCoarse = window.matchMedia('(hover:none), (pointer:coarse)').matches;
+
+  function setVH(){ document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px'); }
+  setVH();
+  window.addEventListener('resize', setVH);
+
+  /* ============================================================
+     GIF loader — ищем реальный файл рядом с index.html.
+     Если гифки нет в проекте, показываем элегантный placeholder
+     вместо пустого <img>.
+     ============================================================ */
+  var GIF_FILE = null;
+  var GIF_CANDIDATES = [
+    'my_gif.gif','love.gif','love_is.gif','gif.gif','photo.gif',
+    'image.gif','animation.gif','1.gif','IMG.gif','sticker.gif',
+    'mo.gif','img.gif'
+  ];
+  var heroGif = document.getElementById('heroGif');
+  var placeholder = document.getElementById('framePlaceholder');
+
+  function loadGif(){
+    var list = GIF_FILE ? [GIF_FILE] : GIF_CANDIDATES;
+    var i = 0;
+    (function next(){
+      if(i >= list.length) return;
+      var img = new Image();
+      img.onload = function(){
+        heroGif.src = list[i];
+        heroGif.classList.add('loaded');
+        placeholder.style.display = 'none';
+      };
+      img.onerror = function(){ i++; next(); };
+      img.src = list[i];
+    })();
+  }
+  loadGif();
+
+  /* ---------- 3D tilt on the frame ---------- */
+  var gifTrigger = document.getElementById('gifTrigger');
+  if(!isCoarse && !reduceMotion){
+    gifTrigger.addEventListener('mousemove', function(e){
+      var r = gifTrigger.getBoundingClientRect();
+      var px = (e.clientX - r.left) / r.width - 0.5;
+      var py = (e.clientY - r.top) / r.height - 0.5;
+      gifTrigger.style.transform = 'rotateY(' + (px * 10) + 'deg) rotateX(' + (py * -10) + 'deg)';
+    });
+    gifTrigger.addEventListener('mouseleave', function(){
+      gifTrigger.style.transform = 'rotateY(0) rotateX(0)';
+    });
+  }
+
+  /* ============================================================
+     Custom cursor — маленькая точка + кольцо c интерполяцией
+     ============================================================ */
+  var cursorDot = document.getElementById('cursorDot');
+  var cursorRing = document.getElementById('cursorRing');
+
+  if(!isCoarse){
+    var mouse = {x:window.innerWidth/2, y:window.innerHeight/2};
+    var ring = {x:mouse.x, y:mouse.y};
+    var visible = false;
+
+    window.addEventListener('mousemove', function(e){
+      mouse.x = e.clientX; mouse.y = e.clientY;
+      cursorDot.style.transform = 'translate(' + mouse.x + 'px,' + mouse.y + 'px) translate(-50%,-50%)';
+      if(!visible){ visible = true; document.body.classList.remove('cursor-hidden'); }
+    });
+    window.addEventListener('mouseleave', function(){ document.body.classList.add('cursor-hidden'); });
+
+    function raf(){
+      ring.x += (mouse.x - ring.x) * 0.16;
+      ring.y += (mouse.y - ring.y) * 0.16;
+      cursorRing.style.transform = 'translate(' + ring.x + 'px,' + ring.y + 'px) translate(-50%,-50%)';
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    document.addEventListener('mousedown', function(){ cursorRing.classList.add('press'); });
+    document.addEventListener('mouseup', function(){ cursorRing.classList.remove('press'); });
+
+    var hoverables = 'a, button, [role="button"], input, .frame';
+    document.addEventListener('mouseover', function(e){
+      if(e.target.closest(hoverables)) cursorRing.classList.add('hover');
+    });
+    document.addEventListener('mouseout', function(e){
+      if(e.target.closest(hoverables)) cursorRing.classList.remove('hover');
+    });
+  } else {
+    document.body.classList.add('cursor-hidden');
+  }
+
+  /* ============================================================
+     Vinyl player — один <audio>, живёт на всех экранах.
+     Клик по пластинке включает/выключает музыку. Если браузер
+     блокирует autoplay, запускаем при первом взаимодействии
+     пользователя со страницей (кроме клика по самой пластинке —
+     там уже есть собственный обработчик, чтобы не было двойного
+     toggle).
+     ============================================================ */
+  var bgAudio = document.getElementById('bgAudio');
+  var vinylBtn = document.getElementById('vinylBtn');
+  var musicWantsPlay = false;
+  var autoplayAttempted = false;
+
+  function setVinylUI(isPlaying){
+    vinylBtn.classList.toggle('playing', isPlaying);
+    vinylBtn.setAttribute('aria-pressed', isPlaying ? 'true' : 'false');
+    vinylBtn.setAttribute('aria-label', isPlaying ? 'Выключить музыку' : 'Включить музыку');
+  }
+
+  function playMusic(){
+    var p = bgAudio.play();
+    if(p && p.catch){ p.catch(function(){ setVinylUI(false); }); }
+  }
+  function pauseMusic(){ bgAudio.pause(); }
+
+  bgAudio.addEventListener('play', function(){ setVinylUI(true); });
+  bgAudio.addEventListener('pause', function(){ setVinylUI(false); });
+
+  vinylBtn.addEventListener('click', function(){
+    autoplayAttempted = true;
+    musicWantsPlay = !musicWantsPlay;
+    if(musicWantsPlay){ playMusic(); } else { pauseMusic(); }
+  });
+
+  function tryAutoplayOnce(e){
+    if(autoplayAttempted) return;
+    if(e && e.target && e.target.closest && e.target.closest('.vinyl')) return;
+    autoplayAttempted = true;
+    musicWantsPlay = true;
+    playMusic();
+    document.removeEventListener('pointerdown', tryAutoplayOnce);
+    document.removeEventListener('keydown', tryAutoplayOnce);
+  }
+  document.addEventListener('pointerdown', tryAutoplayOnce, { passive:true });
+  document.addEventListener('keydown', tryAutoplayOnce);
+
+  /* ============================================================
+     Magnetic elements — кнопки слегка притягиваются к курсору
+     ============================================================ */
+  if(!isCoarse && !reduceMotion){
+    document.querySelectorAll('[data-magnetic]').forEach(function(el){
+      var strength = parseFloat(el.dataset.strength || '14');
+      el.addEventListener('mousemove', function(e){
+        var r = el.getBoundingClientRect();
+        var mx = e.clientX - (r.left + r.width/2);
+        var my = e.clientY - (r.top + r.height/2);
+        el.style.transform = 'translate(' + (mx/r.width*strength) + 'px,' + (my/r.height*strength) + 'px)';
+      });
+      el.addEventListener('mouseleave', function(){ el.style.transform = 'translate(0,0)'; });
+    });
+  }
+
+  /* ---------- ripple on primary buttons ---------- */
+  document.querySelectorAll('.btn-primary').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      var r = btn.getBoundingClientRect();
+      var d = Math.max(r.width, r.height) * 1.4;
+      var span = document.createElement('span');
+      span.className = 'ripple';
+      span.style.width = span.style.height = d + 'px';
+      span.style.left = (e.clientX - r.left - d/2) + 'px';
+      span.style.top = (e.clientY - r.top - d/2) + 'px';
+      btn.appendChild(span);
+      span.addEventListener('animationend', function(){ span.remove(); });
+    });
+  });
+
+  /* ============================================================
+     Screen navigation — cinematic blur/scale/mask transition
+     ============================================================ */
+  var screens = { 1: document.getElementById('screen-1'), 2: document.getElementById('screen-2'), 3: document.getElementById('screen-3') };
+  var stepDots = document.querySelectorAll('.step-dot');
+  var rubric = document.getElementById('rubric');
+  var current = 1;
+
+  var rubricText = { 1: '<b>Act I</b> — Секрет', 2: '<b>Act II</b> — Правда', 3: '<b>Act III</b> — Признание' };
+
+  function goTo(from, to){
+    screens[from].classList.add('leaving');
+    screens[from].classList.remove('active');
+    rubric.style.opacity = '0';
+
+    var delay = reduceMotion ? 60 : 520;
+    setTimeout(function(){
+      screens[from].classList.remove('leaving');
+      screens[to].classList.add('active');
+      current = to;
+      stepDots.forEach(function(d){ d.classList.toggle('active', +d.dataset.step === to); });
+      rubric.innerHTML = rubricText[to];
+      requestAnimationFrame(function(){ rubric.style.opacity = '.75'; });
+      if(to === 3) startStoryReveal();
+    }, delay);
+  }
+
+  function openScreen2(){ if(current === 1) goTo(1,2); }
+  gifTrigger.addEventListener('click', openScreen2);
+  document.getElementById('btnOpen').addEventListener('click', openScreen2);
+  gifTrigger.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openScreen2(); }
+  });
+
+  /* ---------- particle burst on confirmations ---------- */
+  var burstEl = document.getElementById('burst');
+  function burst(x, y){
+    var colors = ['#C97B7B','#A85D5D','#C9A87C','#F3E4DF'];
+    var count = reduceMotion ? 0 : 16;
+    for(var i = 0; i < count; i++){
+      var dot = document.createElement('span');
+      dot.className = 'burst-dot';
+      dot.style.left = x + 'px';
+      dot.style.top = y + 'px';
+      dot.style.background = colors[i % colors.length];
+      var angle = (Math.PI * 2 * i) / count + Math.random() * 0.4;
+      var dist = 55 + Math.random() * 75;
+      dot.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+      dot.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+      burstEl.appendChild(dot);
+      dot.addEventListener('animationend', function(){ this.remove(); });
+    }
+  }
+
+  /* ============================================================
+     Экран 2 — маленькая сцена.
+     «Конечно знаю» растворяется → пауза → фон теплеет/темнеет →
+     появляется реплика в две строки → пауза для чтения →
+     переход на экран 3.
+     ============================================================ */
+  var btnYes = document.getElementById('btnYes');
+  var screen2El = document.getElementById('screen-2');
+  var s2Reply = document.getElementById('s2Reply');
+  var s2Advanced = false;
+
+  function afterDelay(ms, fn){ setTimeout(fn, reduceMotion ? Math.min(ms, 90) : ms); }
+
+  btnYes.addEventListener('click', function(){
+    if(s2Advanced) return;
+    s2Advanced = true;
+
+    var r = btnYes.getBoundingClientRect();
+    burst(r.left + r.width/2, r.top + r.height/2);
+    btnYes.classList.add('dissolving');
+
+    afterDelay(450, function(){
+      screen2El.classList.add('veil');
+    });
+
+    afterDelay(1150, function(){
+      screen2El.classList.add('question-exit');
+      s2Reply.classList.add('show');
+    });
+
+    afterDelay(3600, function(){
+      goTo(2,3);
+    });
+  });
+
+  /* когда возвращаемся к экрану 2 (на случай будущей навигации назад) —
+     состояние сцены сбрасывается вместе с остальным экраном */
+
+  /* ============================================================
+     Экран 3 — editorial storytelling reveal.
+     Фрагменты проявляются по мере прокрутки/появления в кадре.
+     Когда доходим до кульминационной фразы — с паузой проявляется
+     тонкая ссылка-приглашение к финальному вопросу.
+     ============================================================ */
+  var storyFrags = document.querySelectorAll('.story-frag');
+  var btnQuestion = document.getElementById('btnQuestion');
+  var ctaRevealed = false;
+  var storyStarted = false;
+
+  function revealCta(){
+    if(ctaRevealed) return;
+    ctaRevealed = true;
+    afterDelay(900, function(){ btnQuestion.classList.add('ready'); });
+  }
+
+  function startStoryReveal(){
+    if(storyStarted || !storyFrags.length) return;
+    storyStarted = true;
+
+    if('IntersectionObserver' in window){
+      var fragObserver = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if(entry.isIntersecting){
+            entry.target.classList.add('in');
+            fragObserver.unobserve(entry.target);
+            if(entry.target.classList.contains('story-frag--climax')) revealCta();
+          }
+        });
+      }, { root: screens[3], threshold:.5, rootMargin:'0px 0px -8% 0px' });
+
+      storyFrags.forEach(function(f){ fragObserver.observe(f); });
+    } else {
+      storyFrags.forEach(function(f){ f.classList.add('in'); });
+      revealCta();
+    }
+  }
+
+  /* ---------- modal ---------- */
+  var modal = document.getElementById('modal');
+  document.getElementById('btnQuestion').addEventListener('click', function(){
+    modal.classList.add('show');
+  });
+  modal.addEventListener('click', function(e){ if(e.target === modal) modal.classList.remove('show'); });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && modal.classList.contains('show')) modal.classList.remove('show');
+  });
+
+  /* ---------- finale particles ---------- */
+  var finale = document.getElementById('finale');
+  var finaleParticles = document.getElementById('finaleParticles');
+
+  function spawnParticles(){
+    finaleParticles.innerHTML = '';
+    if(reduceMotion) return;
+    var count = 10;
+    for(var i = 0; i < count; i++){
+      var p = document.createElement('span');
+      p.className = 'fp';
+      var size = 4 + Math.random() * 7;
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.left = (10 + Math.random() * 80) + '%';
+      p.style.top = (55 + Math.random() * 30) + '%';
+      p.style.animationDelay = (Math.random() * 1.6) + 's';
+      p.style.animationDuration = (5 + Math.random() * 3) + 's';
+      finaleParticles.appendChild(p);
+    }
+  }
+
+  document.querySelectorAll('.modal-answer').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      modal.classList.remove('show');
+      var r = btn.getBoundingClientRect();
+      burst(r.left + r.width/2, r.top + r.height/2);
+
+      /* интерфейс постепенно растворяется, музыка и пластинка не останавливаются */
+      afterDelay(280, function(){
+        document.body.classList.add('finale-pre');
+      });
+
+      afterDelay(1550, function(){
+        spawnParticles();
+        finale.classList.add('show');
+        finale.setAttribute('aria-hidden','false');
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>

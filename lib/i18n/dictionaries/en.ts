@@ -362,6 +362,8 @@ export const en: Dictionary = {
         'The video is re-encoded: the original was 123 MB and GitHub refuses anything over 100 MB. Everything else is untouched.',
       noteReplacedName:
         'The recipient’s name is replaced with a demo one: the card was made for one person and is shown to everyone. Everything else is untouched.',
+      noteFixedSource:
+        'Two stray lines that got into the file when it was saved are removed: they showed up on the page and put the browser into quirks mode. Not a word of the card was touched.',
       qr: 'QR code',
       copyLink: 'Copy link',
       copied: 'Copied',

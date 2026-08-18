@@ -296,13 +296,25 @@ opaque origin — scripts run, cookies and the parent DOM are unreachable.
 Raw files live under `/w/…`, not `/works/…`, so a static file can never shadow
 the Next route.
 
-### The two things that are not byte-identical
+### What is in the section
 
-Both are recorded in `Work.note`, a union rather than a `modified` flag,
-because the reader needs to know *what* differs: a re-encoded video and a
-substituted name are not the same kind of change, and the second one concerns
-a real person. Both are stated in the UI, in the panel behind the QR button —
-not hidden in a commit message.
+Seven works, newest first: `svechi`, `loveis`, `ilove`, `hbday`, `tebe`,
+`poydem`, `genki`. Four of them are the originals the engine's templates were
+ported from, and each links to its template by name — `ilove` → *Вслух*,
+`svechi` → *При свечах*, `poydem` → *Пойдём?*, `genki` → *За окном*.
+
+**The years on `svechi`, `loveis` and `ilove` are a guess.** None of the three
+folders had a `.git`, every file carried today's mtime from OneDrive sync, and
+nothing inside them is dated. `2025` is a middle estimate placed between the
+2024 works and the 2026 one — one line each in `lib/works/index.ts` to correct.
+
+### The three things that are not byte-identical
+
+All three are recorded in `Work.note`, a union rather than a `modified` flag,
+because the reader needs to know *what* differs: a re-encoded video, a
+substituted name and a repaired file are not the same kind of change, and the
+second one concerns a real person. All three are stated in the UI, in the
+panel behind the QR button — not hidden in a commit message.
 
 **`С днём рождения!` shows a different name.** The card was made for one
 person and is now shown to everyone, so every occurrence of the original name
@@ -318,13 +330,36 @@ project mentions it — and `.git`. The working tree without them is 2.6 MB.
 Same principle as the video: the byte-for-byte rule bends only for a hard size
 problem, and this one was 53 MB of nothing.
 
+**`Для тебя` had a broken first line.** Its `index.html` opened with a markdown
+fence — ```` ```html ```` — and closed with ```` ``` ````, saved into the file
+when it was pasted out of a chat. This was recorded here in August as "two
+lines to delete" and had not been done. It was not cosmetic: the opening fence
+sits *before* the doctype, so the browser dropped into **quirks mode**
+(`document.compatMode === 'BackCompat'`), and the text `​```html` rendered in the
+top-left corner of the card. Both lines removed; the page is now `CSS1Compat`
+and the corner is clean. Not a word of the card itself was touched.
+
+The same work referenced `video.mp4` while the file on disk was `video.MP4`.
+Windows does not care and Linux does, so on Vercel the video would have 404'd
+and the card's whole point — a recording — would have been a dead box. The
+**file** was renamed rather than the reference, so the change is to a name and
+not to content.
+
 **`Тебе.` had a 123 MB hero video.** **GitHub refuses anything over 100 MB**, so it
 is re-encoded to 34 MB — h264 CRF 28, audio dropped since the element is
-`muted` and the sound is a separate `song.mp3`. Everything else in all three
-works, including an 8.3 MB GIF and a 2560×1440 clip that are both larger than
+`muted` and the sound is a separate `song.mp3`. Everything else in every
+work, including an 8.3 MB GIF and a 2560×1440 clip that are both larger than
 they need to be, is untouched: the rule was byte-for-byte, and only a hard
 platform limit overrides it. The substitution is stated in the UI, from
 `Work.note`, not hidden in a commit message.
+
+Two changes deliberately carry **no** note in the UI, because they alter
+nothing a visitor can see, and the panel should not fill with trivia: `Love
+is…` arrived as `index (1).html`, a browser download artifact, renamed to
+`index.html`; and its `assets/song.mp3` was a byte-identical duplicate of
+`song.mp3` (same md5) that nothing referenced — the page loads `./song.mp3` —
+so 3.2 MB of it was dropped. `С днём рождения, Алина` needed nothing at all
+and is exactly as it was.
 
 `ffmpeg` is not a dependency. It was installed with `--no-save` for that one
 job; `package.json` is unchanged, and a fresh clone neither needs nor gets it.
@@ -713,6 +748,10 @@ That fits in a database row and a form — no file, no deploy.
    | `1` | **За окном / The Window** | `cover: film` — video *behind* the type |
    | `invite` | **Пойдём? / Shall We** | the `question` beat |
    | `BirthdayParty` | **При свечах / Candlelight** | the `cake` beat, card-level music |
+
+   **All four originals are now also in «Наши работы»**, so the section shows
+   both the card that was made for a person and the template it became. The
+   table above doubles as the mapping `Work.portedTo` renders.
 
    Ten templates now, four of them ported. **Every port turned up vocabulary
    the engine did not have**, which is the same thing the importer's

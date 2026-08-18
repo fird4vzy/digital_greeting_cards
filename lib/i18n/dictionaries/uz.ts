@@ -366,6 +366,8 @@ export const uz: Dictionary = {
         'Video siqilgan: asli 123 MB edi, GitHub esa 100 MB dan katta fayllarni qabul qilmaydi. Qolgan hammasi o‘zgarishsiz.',
       noteReplacedName:
         'Qabul qiluvchining ismi namuna ism bilan almashtirilgan: kartochka bir kishi uchun qilingan, ko‘rsatilayotgani esa hammaga. Qolgan hammasi o‘zgarishsiz.',
+      noteFixedSource:
+        'Fayl saqlanayotganda unga tushib qolgan ikkita ortiqcha qator olib tashlandi: ular sahifada ko‘rinib turardi va brauzerni moslik rejimiga o‘tkazardi. Kartochkaning birorta so‘ziga tegilmadi.',
       qr: 'QR-kod',
       copyLink: 'Havolani nusxalash',
       copied: 'Nusxalandi',

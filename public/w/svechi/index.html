@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>С днём рождения, Алина</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+  <div id="bg"></div>
+  <div class="sparkles" id="sparkles"></div>
+  <div class="motes" id="motes"></div>
+
+  <div id="cakeLayer" class="layer">
+    <div class="cakeFloat" id="cakeFloat">
+      <div class="cakeWrap" id="cakeWrap">
+        <div class="cakeGlow" id="cakeGlow"></div>
+        <div class="cakeGlowPulse"></div>
+        <div class="gustFlash" id="gustFlash"></div>
+        <div class="cakeSvgWrap" id="cakeSvgWrap">
+          <svg viewBox="0 0 320 250" class="cakeSvg" aria-hidden="true">
+            <defs>
+              <linearGradient id="tierGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#fdf1da"/>
+                <stop offset="55%" stop-color="#f0d3a3"/>
+                <stop offset="100%" stop-color="#d8ac78"/>
+              </linearGradient>
+              <linearGradient id="tierGradTop" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#fff6e6"/>
+                <stop offset="55%" stop-color="#f3dab0"/>
+                <stop offset="100%" stop-color="#e2b689"/>
+              </linearGradient>
+              <linearGradient id="frostGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#fffaf0"/>
+                <stop offset="100%" stop-color="#f0dab3"/>
+              </linearGradient>
+              <radialGradient id="berryGrad" cx="35%" cy="30%" r="75%">
+                <stop offset="0%" stop-color="#f0a8b8"/>
+                <stop offset="100%" stop-color="#c76c82"/>
+              </radialGradient>
+              <linearGradient id="sheenGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity=".38"/>
+                <stop offset="35%" stop-color="#ffffff" stop-opacity="0"/>
+                <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+              </linearGradient>
+              <radialGradient id="shadowGrad" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#1a0e14" stop-opacity=".38"/>
+                <stop offset="100%" stop-color="#1a0e14" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <g id="cakeBody"></g>
+          </svg>
+          <div class="candles" id="candles"></div>
+        </div>
+        <div class="plate"></div>
+      </div>
+    </div>
+    <div id="finalGreeting" class="finalGreeting"></div>
+  </div>
+
+  <div id="countdownLayer" class="layer"></div>
+  <div id="photoLayer" class="layer"></div>
+  <div id="textLayer" class="layer"></div>
+
+  <div class="finalParticles" id="finalParticles"></div>
+
+  <div id="player">
+    <div id="vinyl" title="Музыка"></div>
+    <div id="playerLabel">song</div>
+  </div>
+
+  <audio id="song" src="./assets/song.mp3" loop preload="auto"></audio>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
