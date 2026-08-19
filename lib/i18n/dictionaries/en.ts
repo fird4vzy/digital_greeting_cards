@@ -495,7 +495,7 @@ export const en: Dictionary = {
         beats: 'What it is made of',
         beatsHint: 'Tick the parts it plays and choose a look for each. A part with no data disappears on its own: no photographs, no gallery.',
         order: 'Order',
-        orderHint: 'One part can move ahead of another. That is exactly what separates Aloud from Nocturne: the recording comes before the letter, so the letter reads as the reply.',
+        orderHint: 'One part can move ahead of another, and that changes what the card means: put the recording before the letter and the letter reads as the reply.',
         orderNone: 'Standard order',
         orderMove: 'Move',
         orderBefore: 'Ahead of',
@@ -819,35 +819,7 @@ export const en: Dictionary = {
         description:
           'Borrowed from Japanese print composition rather than Japanese decoration: enormous margins, a deliberately off-centre column, and a single sakura branch that sheds petals as you read. The quietest template in the library, and the one that ages best.',
         animationStyle: 'Falling sakura, asymmetric columns, ink-wash transitions',
-      },
-      aloud: {
-        name: 'Aloud',
-        tagline: 'A recording first, then the words.',
-        description:
-          'The shortest card in the library, and the only one that opens its mouth. A title over soft light, an envelope to tap, then the sender on camera before a single line is read — the letter arrives afterwards, one line at a time, as the reply. For the message that is easier said than written.',
-        animationStyle: 'Drifting light, a tapped envelope, the letter line by line',
-      },
-      window: {
-        name: 'The Window',
-        tagline: 'A few words over something moving.',
-        description:
-          'The video plays behind the words rather than beside them, like a view somebody is half-watching. There is little text and it is large, because nobody reads for long across a moving picture. For the things said quietly: rest, get better, I am here.',
-        animationStyle: 'Movement behind the type, falling petals, nothing hurried',
-      },
-      ask: {
-        name: 'Shall We',
-        tagline: 'Asks a question and will not take no.',
-        description:
-          'The only template that asks for something instead of telling you something. Photographs, a short run-up, and a question with two buttons — except that "no" runs away from the cursor. There is no way to decline, and that is the joke: the card is not requesting a decision, it is performing one.',
-        animationStyle: 'Bright, a button that flees, an answer instead of a question',
-      },
-      candlelight: {
-        name: 'Candlelight',
-        tagline: 'A dark room, a cake, and one wish.',
-        description:
-          'A birthday card that does not shout. It happens in the dark: a few words first, then a cake whose candles have to be blown out, and only afterwards the photographs. The one card with something to do rather than only something to read.',
-        animationStyle: 'Candlelight, flames going out one by one, music if you want it',
-      },
+      },
     },
 
     copy: {

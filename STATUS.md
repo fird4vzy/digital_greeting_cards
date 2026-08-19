@@ -5,8 +5,8 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 18 August 2026 — the hand-made cards now also appear as
-themselves, under Our work, beside the templates ported from them.
+**Last updated:** 19 August 2026 — the ported templates were removed and the
+Our work gallery now plays the originals instead of photographing them.
 
 ---
 
@@ -136,6 +136,13 @@ long version.
   height is still changing. Anchor links jump now, which is what links do.
   Anything that wants smooth asks at the call site, the way `EnvelopeSection`
   does.
+- **`AnimatePresence mode="wait"` leaves the box empty.** The template
+  previews spent up to half of every 3.4s beat showing a blank phone: `wait`
+  holds the outgoing beat's exit and the incoming beat's entrance apart, and
+  each was 0.85s. Because a row of previews hydrates together they all blanked
+  in unison, which reads as broken rather than as animating — it was reported
+  as "the new templates don't render", and the templates were fine. The beats
+  are `absolute inset-0`, so they can simply crossfade.
 - **Stop the dev server before pulling.** The admin pages moved into the route
   group `app/admin/(dashboard)/`, and on Windows git could not remove the old
   directories while a watcher held them open. It asks
@@ -307,6 +314,38 @@ ported from, and each links to its template by name — `ilove` → *Вслух*
 folders had a `.git`, every file carried today's mtime from OneDrive sync, and
 nothing inside them is dated. `2025` is a middle estimate placed between the
 2024 works and the 2026 one — one line each in `lib/works/index.ts` to correct.
+
+### The gallery plays the works, it does not photograph them
+
+Added 19 August. The cards on `/works` used to be static covers, and a cover
+cannot show the one thing that separates these from a picture: they move. Each
+card now runs the real work in an iframe. Three things keep that from being a
+bad idea, all in `components/works/WorkPreview.tsx`:
+
+- **Width.** The works read their own media queries. An iframe 240px wide would
+  hand them a desktop layout squeezed into a card — a lie. The frame is always
+  390px internally and is scaled down by transform, so inside it stays a phone.
+  The factor is measured with a `ResizeObserver`, because CSS cannot divide one
+  length by another.
+- **Weight.** No iframe exists until its card comes near the viewport; the cover
+  lies underneath until then. `allow` is deliberately unset, so the permissions
+  policy blocks autoplay and the gallery never starts seven videos at once.
+  Measured in a real browser with all seven cards in view: **4.4 MB**, of which
+  2.1 MB is media — the video elements answer with ranges, not whole files.
+- **Isolation.** `sandbox="allow-scripts"` — shorter than the viewer's list,
+  because a preview is not for clicking. Pointer events are off so the click
+  reaches the card's own link. Verified on the rendered page:
+  `allow-same-origin` appears zero times.
+
+`livePreview: false` opts a work out, and `tebe` uses it. It opens on
+full-screen video, so with autoplay blocked its card was simply black — which
+reads as broken rather than as quiet. Its cover is a real frame too, just taken
+in advance.
+
+One consequence worth knowing: `genki` pulls a webfont from
+`fonts.googleapis.com`, so the gallery now makes that third-party request for
+every visitor rather than only for people who open that one work. It is the
+original's own behaviour, preserved along with everything else.
 
 ### The three things that are not byte-identical
 
@@ -587,6 +626,36 @@ admin and can read an operator's session cookie.
 
 Porting removes that entirely. Nothing of theirs is ever served — it is read,
 and what comes out is data.
+
+### Reversed 19 August: the ports are gone
+
+The four templates ported from these cards — Aloud, The Window, Ask,
+Candlelight — were deleted. They were data pretending to be one specific card,
+and they could never be it: a template is beats and variants run through the
+engine, while the originals are hand-written HTML with hand-tuned timings. The
+gallery promises that *every template below is playing itself*; four of them
+were playing something else under the original's name.
+
+Nothing that mattered was lost. The vocabulary the port taught — the `video`,
+`question` and `cake` beats, the four look-carrying variants, and `reorder` in
+`lib/card/recipe.ts` — lives in the schema and the variant table, not in those
+four files, and all of it stayed. What went was 222 lines of template, four
+`portedTo` links, twelve dictionary blocks across three languages, and a
+builder hint that used Aloud as its example.
+
+The originals are still on the site, byte for byte, under Our work. That is
+where they belonged; porting them was the long way round to finding it out.
+
+Two things deliberately left standing:
+
+- `portedTo` stays in the `Work` type with no users. Three lines, and it
+  records a real possibility — what was wrong was these four ports, not the
+  idea of recording one. The works page now only reaches for the template
+  registry when some work actually has the field, so it no longer queries the
+  database for nothing.
+- The `blush`, `daylight`, `confetti` and `candlelight` palettes now have no
+  template, but they are not dead: the admin builder offers every palette to an
+  operator building a stored one.
 
 ### Why this is cheaper than it looks
 

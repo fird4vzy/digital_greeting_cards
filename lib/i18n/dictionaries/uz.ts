@@ -501,7 +501,7 @@ export const uz: Dictionary = {
         beats: 'Nimalardan iborat',
         beatsHint: 'Shablon o‘ynaydigan qismlarni belgilang va har biriga ko‘rinish tanlang. Ma’lumotsiz qism o‘zi yo‘qoladi: surat bo‘lmasa, galereya ham bo‘lmaydi.',
         order: 'Tartib',
-        orderHint: 'Bitta qismni boshqasidan oldinga surish mumkin. «Ovoz bilan»ni «Nokturn»dan aynan shu ajratadi: yozuv xatdan oldin keladi va xat unga javob bo‘lib o‘qiladi.',
+        orderHint: 'Bitta qismni boshqasidan oldinga surish mumkin va bu otkritka ma’nosini o‘zgartiradi: yozuv xatdan oldin kelsa, xat unga javob bo‘lib o‘qiladi.',
         orderNone: 'Oddiy tartib',
         orderMove: 'Oldinga surish',
         orderBefore: 'Nimadan oldin',
@@ -826,35 +826,7 @@ export const uz: Dictionary = {
         description:
           "Yapon bezagidan emas, yapon bosma kompozitsiyasidan olingan: ulkan chekkalar, ataylab markazdan siljitilgan ustun va siz o'qiyotganingizda gulbarglarini to'kadigan bitta sakura shoxi. Kutubxonadagi eng tinch shablon va eng yaxshi qariydigani.",
         animationStyle: "Tushayotgan sakura, assimetrik ustunlar, siyoh o'tishlari",
-      },
-      aloud: {
-        name: 'Ovoz bilan',
-        tagline: 'Avval yozuv, keyin so‘zlar.',
-        description:
-          'Kutubxonadagi eng qisqa otkritka va og‘iz ochadigan yagonasi. Yumshoq yorug‘likdagi sarlavha, tegib ochiladigan konvert va birinchi satr o‘qilmasdan oldin kameradagi odam. Xat keyin keladi — satrma-satr, javob kabi. Yozishdan ko‘ra aytish osonroq bo‘lgan gap uchun.',
-        animationStyle: 'Suzuvchi yorug‘lik, tegib ochiladigan konvert, satrma-satr xat',
-      },
-      window: {
-        name: 'Deraza ortida',
-        tagline: 'Harakat ustida bir necha so‘z.',
-        description:
-          'Video matnning yonida emas, orqasida ketadi — go‘yo kimdir yarim ko‘z bilan qarab turgan manzara. So‘z kam va yirik, chunki harakatlanayotgan tasvir ustidan uzoq o‘qib bo‘lmaydi. Sekin aytiladigan gaplar uchun: dam ol, tuzalib ket, men yoningdaman.',
-        animationStyle: 'Matn ortidagi harakat, tushayotgan gulbarglar, shoshilmasdan',
-      },
-      ask: {
-        name: 'Boramizmi?',
-        tagline: 'Savol beradi va rad javobini olmaydi.',
-        description:
-          'Aytib beradigan emas, so‘raydigan yagona shablon. Suratlar, qisqa kirish va ikkita tugmali savol — faqat «yo‘q» kursordan qochadi. Rad etib bo‘lmaydi, hazil ham shunda: otkritka ruxsat so‘ramaydi, uni o‘ynab ko‘rsatadi.',
-        animationStyle: 'Yorqin, qochadigan tugma, savol o‘rniga javob',
-      },
-      candlelight: {
-        name: 'Sham yorug‘ida',
-        tagline: 'Qorong‘i xona, tort va bitta tilak.',
-        description:
-          'Baqirmaydigan tug‘ilgan kun otkritkasi. Hammasi qorong‘ida bo‘ladi: avval bir necha so‘z, keyin shamlari o‘chirilishi kerak bo‘lgan tort, va shundan keyingina suratlar. O‘qish emas, qilish mumkin bo‘lgan yagona otkritka.',
-        animationStyle: 'Sham yorug‘i, birma-bir o‘chadigan olovlar, xohlasangiz musiqa',
-      },
+      },
     },
 
     copy: {

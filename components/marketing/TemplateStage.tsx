@@ -172,7 +172,13 @@ export function TemplateStage({
         style={{ background: 'radial-gradient(circle, var(--card-glow) 0%, transparent 62%)' }}
       />
 
-      <AnimatePresence mode="wait">
+      {/* Crossfade, not `mode="wait"`.
+          `wait` holds the outgoing beat's exit and the incoming beat's entrance
+          apart, so with 0.85s each way a 3.4s beat spent half its life showing
+          an empty phone — and because a row of previews hydrates together, they
+          all went blank in unison and read as broken rather than as animating.
+          The beats are `absolute inset-0`, so they overlap without layout cost. */}
+      <AnimatePresence initial={false}>
         <motion.div
           key={beat}
           className="absolute inset-0"

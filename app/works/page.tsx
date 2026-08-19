@@ -8,7 +8,9 @@ import { Reveal, RevealGroup } from '@/components/ui/Reveal';
 import { getI18n } from '@/lib/i18n/server';
 import { localiseTemplates, occasionLabel } from '@/lib/i18n/localise';
 import { listAllTemplateSummaries } from '@/lib/card/registry';
-import { listWorks } from '@/lib/works';
+import { listWorks, workEntryUrl } from '@/lib/works';
+import { PhoneFrame, PHONE_SCREEN_RATIO } from '@/components/marketing/PhoneFrame';
+import { WorkPreview } from '@/components/works/WorkPreview';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { dict } = await getI18n();
@@ -18,9 +20,14 @@ export async function generateMetadata(): Promise<Metadata> {
 /**
  * НАШИ РАБОТЫ.
  *
- * Обложки — статичные кадры из самих работ, а не живые фреймы: три открытки
- * разом потянули бы десятки мегабайт видео ради галереи. Живой оригинал
- * открывается на странице работы, куда человек заходит осознанно.
+ * В карточках крутятся сами работы, а не их фотографии: единственное, что
+ * отличает эти открытки от картинки, — что они двигаются, и обложка ровно это
+ * и скрывала.
+ *
+ * Цена известна и удержана в `WorkPreview`: фрейм не существует, пока карточка
+ * не подошла к экрану, до тех пор лежит обложка, а автовоспроизведение
+ * заглушено политикой разрешений, чтобы галерея не запускала семь видео разом.
+ * Звук и видео — на странице работы, куда заходят осознанно.
  */
 export default async function WorksPage() {
   const { locale, dict } = await getI18n();
@@ -30,12 +37,16 @@ export default async function WorksPage() {
   // `window`. Это внутреннее имя, оно латиницей и одинаково во всех трёх
   // языках; читателю нужно название. Реестр, а не словарь напрямую, потому
   // что шаблон может быть собран оператором и в словаре его нет.
-  const templateNames = new Map(
-    localiseTemplates(await listAllTemplateSummaries(), dict).map((template) => [
-      template.id,
-      template.name,
-    ]),
-  );
+  // Сейчас ни одна работа никуда не портирована, а реестр — обращение к базе.
+  // Спрашиваем только тогда, когда есть чьё имя переводить.
+  const templateNames = works.some((work) => work.portedTo)
+    ? new Map(
+        localiseTemplates(await listAllTemplateSummaries(), dict).map((template) => [
+          template.id,
+          template.name,
+        ]),
+      )
+    : new Map<string, string>();
 
   return (
     <>
@@ -64,27 +75,19 @@ export default async function WorksPage() {
               {works.map((work) => (
                 <Reveal key={work.id} preset="fade">
                   <article className="group flex h-full flex-col">
-                    <Link
-                      href={`/works/${work.id}`}
-                      className="block overflow-hidden rounded-[var(--radius-petal)] bg-paper-deep"
-                    >
-                      <span
-                        className="relative block w-full overflow-hidden"
-                        style={{ aspectRatio: work.coverRatio }}
+                    <Link href={`/works/${work.id}`} className="block">
+                      <PhoneFrame
+                        className="max-w-[15rem] transition-transform duration-[900ms] ease-[var(--ease-out-expo)] group-hover:-translate-y-1.5"
+                        label={work.title}
                       >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={work.cover}
-                          alt={work.title}
-                          loading="lazy"
-                          decoding="async"
-                          className="h-full w-full scale-[1.04] object-cover transition-transform duration-[1400ms] ease-[var(--ease-out-expo)] group-hover:scale-100"
+                        <WorkPreview
+                          src={workEntryUrl(work)}
+                          cover={work.cover}
+                          title={work.title}
+                          ratio={PHONE_SCREEN_RATIO}
+                          enabled={work.livePreview !== false}
                         />
-                        <span
-                          aria-hidden="true"
-                          className="absolute inset-0 bg-gradient-to-t from-noir/55 via-transparent to-transparent"
-                        />
-                      </span>
+                      </PhoneFrame>
                     </Link>
 
                     <div className="mt-6 flex flex-1 flex-col">

@@ -8,6 +8,15 @@ import { cn } from '@/lib/utils/cn';
  * deliberately plain — no glossy bezel highlights, no drop shadow theatre —
  * because the content inside is what should draw the eye.
  */
+/**
+ * Соотношение экрана — высота к ширине.
+ *
+ * Экспортируется, потому что живое превью работы должно отрисовать чужой
+ * документ ровно в эту пропорцию: разъедься эти два числа, и работа окажется
+ * обрезанной внутри собственной рамки.
+ */
+export const PHONE_SCREEN_RATIO = 19.5 / 9;
+
 export function PhoneFrame({
   children,
   className,
@@ -31,7 +40,7 @@ export function PhoneFrame({
             'relative isolate overflow-hidden rounded-[2.4rem] bg-paper',
             screenClassName,
           )}
-          style={{ aspectRatio: '9 / 19.5' }}
+          style={{ aspectRatio: `1 / ${PHONE_SCREEN_RATIO}` }}
         >
           {children}
 

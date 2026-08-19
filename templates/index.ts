@@ -1,15 +1,11 @@
 import type { StoryInput, TemplateDefinition, TemplateSummary } from '@/lib/card/template';
 import { toSummary } from '@/lib/card/template';
-import { aloudTemplate } from './aloud';
 import { anniversaryTemplate } from './anniversary';
-import { askTemplate } from './ask';
 import { birthdayTemplate } from './birthday';
-import { candlelightTemplate } from './candlelight';
 import { memoriesTemplate } from './memories';
 import { momTemplate } from './mom';
 import { romanticTemplate } from './romantic';
 import { sakuraTemplate } from './sakura';
-import { windowTemplate } from './window';
 
 /**
  * THE TEMPLATE REGISTRY
@@ -23,10 +19,6 @@ const registry: TemplateDefinition[] = [
   anniversaryTemplate,
   memoriesTemplate,
   sakuraTemplate,
-  aloudTemplate,
-  windowTemplate,
-  askTemplate,
-  candlelightTemplate,
 ];
 
 const byId = new Map(registry.map((template) => [template.id, template]));

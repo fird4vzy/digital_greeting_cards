@@ -38,6 +38,16 @@ export type Work = {
   coverRatio: string;
   /** Шаблон, в который её уже портировали, если это делали. */
   portedTo?: string;
+  /**
+   * Оживлять ли карточку в галерее живым фреймом.
+   *
+   * По умолчанию оживляется — в этом весь смысл раздела. Выключается только
+   * для работ, которые открываются видео: автовоспроизведение в галерее
+   * намеренно заглушено политикой разрешений, поэтому такая работа показывает
+   * чёрный экран, то есть выглядит сломанной, а не тихой. Для них честнее
+   * обложка — это тоже настоящий кадр, просто снятый заранее.
+   */
+  livePreview?: false;
   /** Честная пометка о любом отличии от оригинала. */
   note?: WorkNote;
 };
@@ -67,7 +77,6 @@ const WORKS: Work[] = [
     occasion: 'birthday',
     cover: '/w/_covers/svechi.jpg',
     coverRatio: '16 / 9',
-    portedTo: 'candlelight',
   },
   {
     id: 'loveis',
@@ -86,7 +95,6 @@ const WORKS: Work[] = [
     occasion: 'love',
     cover: '/w/_covers/ilove.jpg',
     coverRatio: '16 / 9',
-    portedTo: 'aloud',
     note: 'fixedSource',
   },
   {
@@ -107,6 +115,9 @@ const WORKS: Work[] = [
     occasion: 'love',
     cover: '/w/_covers/tebe.jpg',
     coverRatio: '16 / 9',
+    // Открывается полноэкранным видео: без автовоспроизведения карточка была
+    // просто чёрной.
+    livePreview: false,
     note: 'compressedVideo',
   },
   {
@@ -117,7 +128,6 @@ const WORKS: Work[] = [
     occasion: 'love',
     cover: '/w/_covers/poydem.jpg',
     coverRatio: '16 / 9',
-    portedTo: 'ask',
   },
   {
     id: 'genki',
@@ -127,7 +137,6 @@ const WORKS: Work[] = [
     occasion: 'just-because',
     cover: '/w/_covers/genki.jpg',
     coverRatio: '16 / 9',
-    portedTo: 'window',
   },
 ];
 
