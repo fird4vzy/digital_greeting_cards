@@ -5,8 +5,10 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 19 August 2026 — the ported templates were removed and the
-Our work gallery now plays the originals instead of photographing them.
+**Last updated:** 19 August 2026 — the ported templates were removed, the Our
+work gallery now plays the originals instead of photographing them, and the two
+ways this repository can quietly mislead you across machines are written down
+under Things that will bite.
 
 ---
 
@@ -68,6 +70,21 @@ as `NEW`, and stored its brief.
 6. **The card published as `5HZKCH` still shows English wishes.** Cards are
    composed once and stored, so fixing the code does not rewrite them —
    "Собрать открытку" on the order regenerates it.
+7. **The demo name and a real one may be the same person.** `svechi` — «С днём
+   рождения, Алина» — carries `Алина` in its `<title>` and in `script.js:4`,
+   untouched, because that work needed no changes at all. Anonymising `hbday`
+   then replaced *its* recipient's name with `Алина` as well, that being the
+   demo recipient the rest of the site already uses. So if the Алина in
+   `svechi` is a real person, the substitution did not remove her name — it
+   spread it from 2 occurrences to 12, and it now sits in a public gallery as a
+   card's title.
+   **One answer decides it.** Real → change both: `<title>`, `script.js` and
+   the title in `lib/works/index.ts` for `svechi`, and a plainly invented name
+   for `hbday`. Not real → nothing to do, and this entry closes saying the
+   collision is deliberate, so it stops being rediscovered.
+8. **The years on `svechi`, `loveis` and `ilove` are still guesses.** `2025` is
+   a middle estimate placed between the 2024 works and the 2026 one. One line
+   each in `lib/works/index.ts` corrects them.
 
 ---
 
@@ -143,6 +160,29 @@ long version.
   in unison, which reads as broken rather than as animating — it was reported
   as "the new templates don't render", and the templates were fine. The beats
   are `absolute inset-0`, so they can simply crossfade.
+- **A plain `git fetch` fails on this repository.** It hangs, or dies with
+  `fatal: fetch-pack: invalid index-pack output`, because `public/` is 87 MB —
+  `tebe` alone is 50 MB, 43 of that two mp4 files. What gets through:
+
+  ```
+  git -c core.compression=0 -c http.postBuffer=524288000 fetch origin <branch>
+  ```
+
+  This bit on 19 August, and the failure mode is the dangerous part: work
+  pushed from the other machine looked pulled but had never arrived, so the
+  session started three commits behind while appearing current, and read stale
+  files as though they were the latest. **Before trusting a machine, compare
+  `git rev-parse HEAD` with `git ls-remote --heads origin <branch>`** — they
+  either match or they do not, which is a fact, unlike the absence of an error
+  message from a fetch that quietly did nothing.
+- **Staging can rewrite a whole file's line endings.** `core.autocrlf` is `true`
+  from the global config, and some blobs here were committed with CRLF, so
+  staging normalises them to LF and every line reads as changed. The three
+  dictionaries did exactly this on 19 August: about 5,600 lines of diff around
+  6 real insertions and 90 real deletions. `git diff --cached --ignore-cr-at-eol`
+  shows what actually changed. Setting `core.autocrlf false` locally does **not**
+  fix it — it makes every *other* file diff whole instead; that was tried on the
+  same day and reverted, and the git configuration is unchanged.
 - **Stop the dev server before pulling.** The admin pages moved into the route
   group `app/admin/(dashboard)/`, and on Windows git could not remove the old
   directories while a watcher held them open. It asks
