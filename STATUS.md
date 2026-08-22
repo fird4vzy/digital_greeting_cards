@@ -5,9 +5,9 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 22 August 2026 — headings finally have Cyrillic, a bouquet
-assembles behind the landing page as you scroll, and **both migrations are
-applied**: the database is level with the code.
+**Last updated:** 22 August 2026 — both migrations applied, headings finally
+have Cyrillic, and the landing redesign the bouquet was built for is now in
+the repository as a reference: `design/preview/bir-dunyo-v10.html`.
 
 ---
 
@@ -713,6 +713,63 @@ The four files stay in the tree, unused and building. What is missing is not
 code but a place to put it: a section built as a stage — tall, sticky, nothing
 opaque in front — or the dark landing edit this was designed against. Wiring
 it back is one line in `app/page.tsx`.
+
+---
+
+## The landing redesign this was all for
+
+`design/preview/bir-dunyo-v10.html` — a complete, self-contained preview of
+where the landing page is going. Committed to the repository on 22 August so it
+survives the machine it was made on; it lives outside `public/`, so it is never
+served. `design/preview/DEPLOY-bouquet.md` is the note that came with the
+bouquet files.
+
+**It is dark.** `--bg #17130F`, `--fg #F0E7DA`, with `--paper #EDE3D3`,
+`--bloom #C2404E`, `--gold #AC8B57`, `--dusk #3A2A28`. That single fact
+explains the whole failed deploy earlier the same day: the bouquet canvas is
+lit for this page — exposure 0.82, tinted sheen, colours that need a dark
+ground — and it was put behind the light one, where it could only show through
+the gaps between opaque cards.
+
+**Seven sections, and three of them are stages.** `hero` · `step1` · `works` ·
+`memories` · `bridge` · `steps` · `closing`. Three carry `class="tall"` with a
+`sticky` block inside — `step1`, `works`, `bridge` — and those are exactly the
+scroll stages the current page does not have. This is the *place* that was
+missing, not more code: `BouquetStage` needs a section taller than the viewport
+with nothing opaque in front of it, and here there are three.
+
+What is genuinely new against the site as it stands:
+
+- **`works` is on the homepage** — «02 — Сделано. Наши работы.», the seven
+  cards with year · occasion, as a sticky stage rather than a separate page.
+- **`bridge`** — «04 — Мост. Прикрепите к букету.», carrying the line the
+  product has needed since the beginning: *«QR — это всего лишь дверь. Дверь
+  никто не запоминает.»*
+- **A preloader** — «СОБИРАЕМ» with a counter, gated on the scene being ready
+  rather than on a timer.
+- **Four families** in the preview — Prata, Cormorant Garamond, Playfair
+  Display, Inter. Production now ships Cormorant Garamond; the other two are
+  the preview still deciding.
+
+Two details to settle before building it, both visible in the copy: the section
+numbering mixes labels (`01 Шаг первый`, `02 Сделано`, `03 Шаг третий`,
+`04 Мост`), and the `works` cards name «С днём рождения, Алина» — the same
+real-name question that is open under Open items.
+
+**Not verified: how it looks.** Its preloader waits for the scene, and software
+rasterisation never got past 22 of 100 in any workable timeout. Open the file
+in a browser — it is one self-contained page, three.js inlined, no server
+needed.
+
+### What building it actually means
+
+Not a port of that HTML. The site is a Next app with typed trilingual
+dictionaries and a rule that no user-visible string lives in a component, so
+the work is: a dark theme in `globals.css` tokens, three new stage sections,
+every string into `ru`/`en`/`uz`, and only then `BouquetStage` wired to the
+stages it was written for. The four bouquet files are already in the tree,
+building, unused — wiring them back is one line in `app/page.tsx`, and it
+should be the *last* step, not the first.
 
 ---
 
