@@ -5,9 +5,9 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 22 August 2026 — headings finally have Cyrillic, and a
-bouquet assembles behind the landing page as you scroll. Migrations 004 and
-005 are still waiting.
+**Last updated:** 22 August 2026 — headings finally have Cyrillic, a bouquet
+assembles behind the landing page as you scroll, and **both migrations are
+applied**: the database is level with the code.
 
 ---
 
@@ -66,9 +66,12 @@ as `NEW`, and stored its brief.
 5. **That VPS publishes PostgreSQL on `5432`** with credentials that are in its
    public repository. Worth checking from outside (`nc -vz <ip> 5432`) and
    binding to `127.0.0.1` if it answers.
-6. **The card published as `5HZKCH` still shows English wishes.** Cards are
-   composed once and stored, so fixing the code does not rewrite them —
-   "Собрать открытку" on the order regenerates it.
+6. ~~**The card published as `5HZKCH` still shows English wishes.**~~ **Gone,
+   verified 22 August.** A card *is* an order — `toPublishedCard(order)`, and
+   there is no separate cards table — so deleting the order deleted the card.
+   Only `SGNZ99` remains in the database. The lesson survives the item: cards
+   are composed once and stored, so fixing the code never rewrites an existing
+   one, and "Собрать открытку" on the order is what regenerates it.
 7. **The demo name and a real one may be the same person.** `svechi` — «С днём
    рождения, Алина» — carries `Алина` in its `<title>` and in `script.js:4`,
    untouched, because that work needed no changes at all. Anonymising `hbday`
@@ -583,7 +586,8 @@ Choosing a second mood used to silently cancel the first. "Смешно и те�
 an ordinary order, so the step is multi-select, every match counts in the
 template ranking, and the operator sees all of them rather than one.
 
-**Migration 004 adds `orders.moods`. Run `npm run db:migrate`.**
+**Migration 004 adds `orders.moods`.** Applied 22 August — `orders.moods`
+verified present.
 
 The script reads `.env.local` now. It is a plain node script, so it never
 inherited Next’s env loading and used to demand the connection string be
@@ -642,8 +646,8 @@ this file. The card renders in an iframe with `sandbox="allow-scripts"` and
 **never** `allow-same-origin`; those two together cancel the sandbox. Same pair
 as the works viewer, same reason.
 
-**Migration 005 adds `card_files` and `orders.custom_entry`.** Like 004, it can
-be run whenever: the store probes once per process for the table, the order
+**Migration 005 adds `card_files` and `orders.custom_entry`.** Applied
+22 August — both verified present. Like 004, it could be run whenever: the store probes once per process for the table, the order
 columns are probed the same way, and until both run everything behaves as if no
 uploaded card exists. Without that probe the gap between a push and a migration
 would have taken down the whole admin order page, which reads the file list on
