@@ -1,6 +1,7 @@
 import { Footer } from '@/components/site/Footer';
 import { Header } from '@/components/site/Header';
 import { BouquetSection } from '@/components/marketing/BouquetSection';
+import { BouquetScrollStage } from '@/components/marketing/BouquetScrollStage';
 import { ClosingCta } from '@/components/marketing/ClosingCta';
 import { FeelingSection } from '@/components/marketing/FeelingSection';
 import { Hero } from '@/components/marketing/Hero';
@@ -34,7 +35,12 @@ export default async function HomePage() {
       />
       <main id="main">
         <Hero strings={dict.ui.hero} />
-        <FeelingSection dict={dict} />
+        {/* Собирающийся букет живёт позади этой секции: она прозрачная и
+            выше экрана, то есть есть и чему просвечивать, и откуда взяться прогрессу.
+            Убрать сцену = снять эту обёртку. */}
+        <BouquetScrollStage>
+          <FeelingSection dict={dict} />
+        </BouquetScrollStage>
         <StorySection templates={templates} strings={dict.ui.story} locale={locale} />
         <MemoriesSection dict={dict} />
         <BouquetSection dict={dict} />
