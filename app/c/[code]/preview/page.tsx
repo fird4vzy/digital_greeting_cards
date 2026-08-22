@@ -35,7 +35,18 @@ export default async function CardPreviewPage({ params }: Props) {
   const order = await getOrderByCode(code);
   if (!order || order.status === 'CANCELLED') notFound();
 
-  const parsed = parseCardConfig(order.config ?? await composeConfigForOrderAnywhere(order));
+  // Собранное раньше — первый выбор, но не единственный.
+  //
+  // Раньше неразобравшаяся конфигурация отправляла оператора на «открытка не
+  // найдена» — сообщение неверное и нечитаемое: заказ найден, это его
+  // сохранённая сборка устарела или битая. Черновик для того и нужен, чтобы
+  // показать текущее состояние, поэтому при неудаче он пересобирает заново из
+  // самого заказа, а не сдаётся.
+  const stored = order.config ? parseCardConfig(order.config) : null;
+  const parsed = stored?.ok
+    ? stored
+    : parseCardConfig(await composeConfigForOrderAnywhere(order));
+
   if (!parsed.ok) notFound();
 
   const { dict } = await getI18n();
