@@ -5,9 +5,9 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 21 August 2026 — a card written by hand can finally be
-attached to an order, so the QR on the tag resolves to it. Migrations 004 and
-005 are waiting.
+**Last updated:** 22 August 2026 — headings finally have Cyrillic, and a
+bouquet assembles behind the landing page as you scroll. Migrations 004 and
+005 are still waiting.
 
 ---
 
@@ -648,6 +648,55 @@ columns are probed the same way, and until both run everything behaves as if no
 uploaded card exists. Without that probe the gap between a push and a migration
 would have taken down the whole admin order page, which reads the file list on
 every open — not just the new feature.
+
+---
+
+## The headings were never in the right typeface
+
+Fixed 22 August, and it had been wrong on the live site the whole time.
+`Instrument Serif` has **no Cyrillic at all** — its subsets are `latin` and
+`latin-ext` — and `layout.tsx` asked for `subsets: ['latin']` on both families
+anyway. Every Russian and Uzbek-Cyrillic heading was being drawn by the
+fallback, Georgia: wrong face, wrong weight, wrong rhythm, on two of the three
+languages this product ships in.
+
+`Cormorant Garamond` replaces it, for two reasons at once: Cyrillic, and a
+**real italic**. The italic is not decoration here — whole landing lines lean
+on it («в сообщение.», «чувство.») and a face without one gets slanted
+algorithmically by the browser, which on Cyrillic looks bad. That is also why
+`Prata`, closest in character, was rejected: no italic.
+
+The CSS variable is still `--font-instrument-serif`. `globals.css` is wired to
+that name and renaming it would have inflated the diff for nothing.
+
+## A bouquet that assembles as you scroll
+
+Three files arrived from outside as a design update and were taken in as they
+came: `components/three/scenes/BouquetAssembly.tsx`,
+`components/three/BouquetAssemblyCanvas.tsx`,
+`components/marketing/BouquetStage.tsx`. Seven flower heads, the same five-ring
+table and the same `curvedPetalGeometry()` as `BloomFlower`, the existing
+`BrandTag`, 266 petals in three instanced meshes, and scroll read into a ref
+inside a rAF loop so the canvas never re-renders React.
+
+`BouquetScrollStage` is the only thing added around them: the sections are
+server components and a ref needs a client one, and this way the whole scene
+comes out of `app/page.tsx` in one line.
+
+**It hangs on one section, not two, and that is a compromise.** The intent was
+two acts — petals on «Выберите чувство», wrapping and tag on «Прикрепите к
+букету». The second is impossible today: `BouquetStage` paints at `-z-10` and
+that section is filled with opaque `bg-noir`, which simply covers it. The
+canvas was also lit for a dark stage — exposure 0.82, tinted sheen — so it
+really belongs to the dark landing edit its author explicitly deferred. When
+that arrives, `range` splits the timeline back into two.
+
+**Verified:** `tsc` clean, `next build` clean, the canvas mounts in a real
+browser (two `<canvas>` on the page, zero server errors), and the page is
+unharmed where WebGL is absent. **Not verified: the scene's own pixels.**
+Software rasterisation could not finish a frame of 266 instanced petals inside
+any workable timeout — the same wall the author hit. Run `npm run dev` and
+scroll through «Выберите чувство».
 
 ---
 

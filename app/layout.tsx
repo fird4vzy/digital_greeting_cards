@@ -1,18 +1,31 @@
 import type { Metadata, Viewport } from 'next';
 import { SITE } from '@/lib/site';
-import { Instrument_Serif, Inter } from 'next/font/google';
+import { Cormorant_Garamond, Inter } from 'next/font/google';
 import { LOCALE_META } from '@/lib/i18n/config';
 import { getLocale } from '@/lib/i18n/server';
 import './globals.css';
 
 /**
- * Two families, no more. Instrument Serif carries every emotional line in the
+ * Two families, no more. The display face carries every emotional line in the
  * product; Inter carries every functional one. The contrast between them is
  * the entire typographic system.
+ *
+ * **Не Instrument Serif, хотя была она.** У неё нет кириллицы вообще, а
+ * сайт трёхязычный и два языка из трёх пишут кириллицей. Все русские и
+ * узбекские заголовки рисовались запасным Georgia — не тот шрифт, не та
+ * толщина, не тот ритм, и вся типографика держалась на случайности.
+ *
+ * Cormorant Garamond взята ради двух вещей сразу: кириллица и **курсив**.
+ * Курсив здесь не украшение — на нём держатся целые строки лендинга, и
+ * шрифт без настоящего курсива браузер наклонит алгоритмом, что на кириллице
+ * выглядит плохо. По этой же причине не взята Prata, близкая по характеру.
+ *
+ * Имя переменной осталось прежним: на неё завязан `globals.css`, и
+ * переименование раздуло бы диф на пустом месте.
  */
-const display = Instrument_Serif({
-  subsets: ['latin'],
-  weight: '400',
+const display = Cormorant_Garamond({
+  subsets: ['latin', 'cyrillic'],
+  weight: ['400', '600'],
   style: ['normal', 'italic'],
   variable: '--font-instrument-serif',
   display: 'swap',
@@ -20,7 +33,7 @@ const display = Instrument_Serif({
 });
 
 const sans = Inter({
-  subsets: ['latin'],
+  subsets: ['latin', 'cyrillic'],
   variable: '--font-inter',
   display: 'swap',
   fallback: ['system-ui', 'sans-serif'],
