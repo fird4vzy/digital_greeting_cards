@@ -2,6 +2,7 @@ import 'server-only';
 
 import { fileStore } from './file-store';
 import { fileTemplateStore, type TemplateStore } from './templates';
+import { memoryCardFileStore, type CardFileStore } from './card-files';
 import { createPostgresStore } from './postgres';
 import type { OrderRepository } from './repository';
 import type { Order, PublishedCard } from './types';
@@ -16,7 +17,7 @@ import type { Order, PublishedCard } from './types';
  * Resolved once per process and memoised on the promise, not the value, so
  * concurrent first requests share a single connection pool.
  */
-type Stores = { orders: OrderRepository; templates: TemplateStore };
+type Stores = { orders: OrderRepository; templates: TemplateStore; cardFiles: CardFileStore };
 
 let storesPromise: Promise<Stores> | null = null;
 
@@ -31,7 +32,7 @@ async function resolveStores(): Promise<Stores> {
     );
   }
 
-  return { orders: fileStore, templates: fileTemplateStore };
+  return { orders: fileStore, templates: fileTemplateStore, cardFiles: memoryCardFileStore };
 }
 
 function getStores(): Promise<Stores> {
@@ -51,6 +52,15 @@ export async function getRepository(): Promise<OrderRepository> {
  */
 export async function getTemplateStore(): Promise<TemplateStore> {
   return (await getStores()).templates;
+}
+
+/**
+ * Файлы открыток, написанных руками.
+ *
+ * Та же пара реализаций и тот же пул, что у заказов и шаблонов.
+ */
+export async function getCardFileStore(): Promise<CardFileStore> {
+  return (await getStores()).cardFiles;
 }
 
 /** Convenience wrappers so pages do not repeat the await dance. */

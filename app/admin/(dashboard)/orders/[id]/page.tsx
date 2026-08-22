@@ -4,7 +4,8 @@ import { deleteOrder, regenerateCard, saveOrderNotes, setOrderStatus } from '../
 import { StatusPill } from '@/components/admin/StatusPill';
 import { CopyButton } from '@/components/admin/CopyButton';
 import { DeleteOrderButton } from '@/components/admin/DeleteOrderButton';
-import { getOrder } from '@/lib/db';
+import { getCardFileStore, getOrder } from '@/lib/db';
+import { CustomCardUpload } from '@/components/admin/CustomCardUpload';
 import { ORDER_STATUSES, isDeletable } from '@/lib/db/types';
 import { getI18n } from '@/lib/i18n/server';
 import {
@@ -258,6 +259,18 @@ export default async function OrderDetail({ params }: Props) {
               looking at a composed card with a dead preview button had no way
               to find out that the card is not a file, is never uploaded, and
               only starts resolving when the status changes. */}
+          {/* Своя открытка стоит выше порядка действий и сразу под блоком
+              открытки: это развилка, а не дополнение — либо открытку собирает
+              движок, либо её написали руками, и оператор должен видеть оба пути рядом. */}
+          <Panel title={t.custom.title}>
+            <CustomCardUpload
+              orderId={order.id}
+              files={await (await getCardFileStore()).list(order.id)}
+              entry={order.customEntry}
+              strings={t.custom}
+            />
+          </Panel>
+
           <Panel title={t.howTitle}>
             <ol className="space-y-3 text-caption leading-relaxed text-ink-soft">
               {t.howSteps.map((line, index) => (

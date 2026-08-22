@@ -512,6 +512,29 @@ export type Dictionary = {
       /** Same button before publishing — it opens the draft, not the live card. */
       previewDraft: string;
       /**
+       * Открытка, написанная руками и загруженная оператором.
+       *
+       * Со своими единицами размера: «МБ» читает человек, а значит это такой же
+       * переводимый текст, как всё остальное.
+       */
+      custom: {
+        title: string;
+        lead: string;
+        pick: string;
+        replace: string;
+        uploading: string;
+        entryLabel: string;
+        entryNone: string;
+        empty: string;
+        summary: string;
+        removeAll: string;
+        removeConfirm: string;
+        showing: string;
+        showingEngine: string;
+        unitMb: string;
+        unitKb: string;
+      };
+      /**
        * The order of operations, spelled out on the page.
        *
        * Here rather than in a README because the question it answers — "what

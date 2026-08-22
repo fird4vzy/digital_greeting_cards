@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { CustomCardFrame } from '@/components/cards/CustomCardFrame';
 import { CardRenderer } from '@/components/cards/CardRenderer';
 import { parseCardConfig } from '@/lib/card/schema';
 import { composeConfigForOrderAnywhere } from '@/lib/card/compose-server';
@@ -34,6 +35,19 @@ export default async function CardPreviewPage({ params }: Props) {
   const { code } = await params;
   const order = await getOrderByCode(code);
   if (!order || order.status === 'CANCELLED') notFound();
+
+  // Ручная открытка перебивает сборку движка: если оператор сел и написал
+  // открытку сам, показывать надо её, а не то, что собралось из шаблона.
+  if (order.customEntry) {
+    return (
+      <main>
+        <CustomCardFrame
+          src={`/u/${order.code}/${order.customEntry}`}
+          title={order.recipient.name}
+        />
+      </main>
+    );
+  }
 
   // Собранное раньше — первый выбор, но не единственный.
   //

@@ -1,6 +1,7 @@
 ﻿import { generateCode, generateId, type OrderRepository } from './repository';
 import type { Order, OrderDraft, OrderFilter, OrderPatch } from './types';
 import { createPostgresTemplateStore, type TemplateStore } from './templates';
+import { createPostgresCardFileStore, type CardFileStore } from './card-files';
 
 /**
  * PostgreSQL implementation of `OrderRepository`, against lib/db/schema.sql.
@@ -36,6 +37,7 @@ type OrderRow = {
   occasion: string;
   mood: string;
   moods: string[] | null;
+  custom_entry: string | null;
   locale: string;
   message: string;
   photos: Order['photos'];
@@ -104,6 +106,7 @@ function toOrder(row: OrderRow): Order {
     // единственный выбор восстанавливается из `mood`, чтобы читающий код
     // никогда не встречал заказ вообще без настроений.
     moods: row.moods?.length ? row.moods : row.mood ? [row.mood] : [],
+    customEntry: row.custom_entry ?? null,
     locale: row.locale ?? 'ru',
     message: row.message,
     photos: row.photos ?? [],
@@ -139,24 +142,43 @@ const BASE_COLUMNS = `id, code, customer_name, customer_email, customer_phone, s
  * Ошибка при самой проверке трактуется как «колонки нет»: это всегда рабочее
  * поведение, просто без множественных настроений.
  */
-let moodsColumn: Promise<boolean> | null = null;
+const columnCache = new Map<string, Promise<boolean>>();
 
-function hasMoods(pool: Pool): Promise<boolean> {
-  moodsColumn ??= pool
-    .query<{ present: boolean }>(
-      `SELECT EXISTS (
-         SELECT 1 FROM information_schema.columns
-          WHERE table_name = 'orders' AND column_name = 'moods'
-       ) AS present`,
-    )
-    .then((result) => Boolean((result.rows[0] as { present?: boolean } | undefined)?.present))
-    .catch(() => false);
+function hasColumn(pool: Pool, column: string): Promise<boolean> {
+  let probe = columnCache.get(column);
 
-  return moodsColumn;
+  if (!probe) {
+    probe = pool
+      .query<{ present: boolean }>(
+        `SELECT EXISTS (
+           SELECT 1 FROM information_schema.columns
+            WHERE table_name = 'orders' AND column_name = $1
+         ) AS present`,
+        [column],
+      )
+      .then((result) => Boolean((result.rows[0] as { present?: boolean } | undefined)?.present))
+      .catch(() => false);
+
+    columnCache.set(column, probe);
+  }
+
+  return probe;
+}
+
+/** Какие из необязательных колонок уже есть. Спрашивается раз за процесс. */
+async function optionalColumns(pool: Pool) {
+  const [moods, customEntry] = await Promise.all([
+    hasColumn(pool, 'moods'),
+    hasColumn(pool, 'custom_entry'),
+  ]);
+  return { moods, customEntry };
 }
 
 /** Список колонок для SELECT и RETURNING, с `moods` только если он есть. */
-const columnsFor = (moods: boolean) => (moods ? `${BASE_COLUMNS}, moods` : BASE_COLUMNS);
+const columnsFor = (present: { moods: boolean; customEntry: boolean }) =>
+  [BASE_COLUMNS, present.moods ? 'moods' : null, present.customEntry ? 'custom_entry' : null]
+    .filter(Boolean)
+    .join(', ');
 
 /**
  * Both stores, on one pool.
@@ -167,7 +189,11 @@ const columnsFor = (moods: boolean) => (moods ? `${BASE_COLUMNS}, moods` : BASE_
  */
 export async function createPostgresStore(
   connectionString: string,
-): Promise<{ orders: OrderRepository; templates: TemplateStore } | null> {
+): Promise<{
+  orders: OrderRepository;
+  templates: TemplateStore;
+  cardFiles: CardFileStore;
+} | null> {
   let pool: Pool;
 
   try {
@@ -212,7 +238,7 @@ export async function createPostgresStore(
       const limit = filter.limit ? `LIMIT ${Number(filter.limit)}` : '';
 
       const result = await pool.query<OrderRow>(
-        `SELECT ${columnsFor(await hasMoods(pool))} FROM orders ${where} ORDER BY created_at DESC ${limit}`,
+        `SELECT ${columnsFor(await optionalColumns(pool))} FROM orders ${where} ORDER BY created_at DESC ${limit}`,
         values,
       );
       return result.rows.map(toOrder);
@@ -220,7 +246,7 @@ export async function createPostgresStore(
 
     async get(id: string) {
       const result = await pool.query<OrderRow>(
-        `SELECT ${columnsFor(await hasMoods(pool))} FROM orders WHERE id = $1`,
+        `SELECT ${columnsFor(await optionalColumns(pool))} FROM orders WHERE id = $1`,
         [id],
       );
       return result.rows[0] ? toOrder(result.rows[0]) : null;
@@ -228,7 +254,7 @@ export async function createPostgresStore(
 
     async getByCode(code: string) {
       const result = await pool.query<OrderRow>(
-        `SELECT ${columnsFor(await hasMoods(pool))} FROM orders WHERE upper(code) = upper($1)`,
+        `SELECT ${columnsFor(await optionalColumns(pool))} FROM orders WHERE upper(code) = upper($1)`,
         [code.trim()],
       );
       return result.rows[0] ? toOrder(result.rows[0]) : null;
@@ -236,7 +262,8 @@ export async function createPostgresStore(
 
     async create(draft: OrderDraft) {
       const status = draft.status ?? 'NEW';
-      const moods = await hasMoods(pool);
+      const present = await optionalColumns(pool);
+      const moods = present.moods;
 
       // `moods` вставляется только когда колонка есть, поэтому номера
       // плейсхолдеров после неё сдвигаются. Считаются, а не пишутся руками
@@ -268,7 +295,7 @@ export async function createPostgresStore(
                -- keeps them agreeing.
                CASE WHEN $${statusIndex}::order_status = 'PUBLISHED' THEN now() ELSE NULL END
              )
-             RETURNING ${columnsFor(moods)}`,
+             RETURNING ${columnsFor(present)}`,
             [
               generateId('ord'),
               generateCode(),
@@ -325,7 +352,10 @@ export async function createPostgresStore(
       if (patch.mood !== undefined) push('mood', patch.mood);
       // Обновляется только при наличии колонки — до миграции правка просто
       // не записывается, а не роняет весь заказ.
-      if (patch.moods !== undefined && (await hasMoods(pool))) push('moods', patch.moods);
+      if (patch.moods !== undefined && (await hasColumn(pool, 'moods'))) push('moods', patch.moods);
+      if (patch.customEntry !== undefined && (await hasColumn(pool, 'custom_entry'))) {
+        push('custom_entry', patch.customEntry);
+      }
       if (patch.locale !== undefined) push('locale', patch.locale);
       if (patch.message !== undefined) push('message', patch.message);
       if (patch.photos !== undefined) push('photos', JSON.stringify(patch.photos));
@@ -349,7 +379,7 @@ export async function createPostgresStore(
       values.push(id);
       const result = await pool.query<OrderRow>(
         `UPDATE orders SET ${sets.join(', ')} WHERE id = $${values.length} RETURNING ${columnsFor(
-          await hasMoods(pool),
+          await optionalColumns(pool),
         )}`,
         values,
       );
@@ -362,5 +392,9 @@ export async function createPostgresStore(
     },
   };
 
-  return { orders: store, templates: createPostgresTemplateStore(pool) };
+  return {
+    orders: store,
+    templates: createPostgresTemplateStore(pool),
+    cardFiles: createPostgresCardFileStore(pool),
+  };
 }

@@ -65,6 +65,13 @@ export type Order = {
    */
   moods: string[];
   /**
+   * Файл, с которого открывается открытка, написанная руками.
+   *
+   * Наличие этого поля — единственный признак того, что `/c/<код>` покажет
+   * загруженную папку, а не сборку движка. Пусто — всё как раньше.
+   */
+  customEntry: string | null;
+  /**
    * The language the card is written in. Independent of the language the
    * customer ordered in — a Tashkent shop browsing in Uzbek routinely sends
    * a Russian card, and the recipient's phone language is irrelevant to both.

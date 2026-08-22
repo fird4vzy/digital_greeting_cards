@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { CustomCardFrame } from '@/components/cards/CustomCardFrame';
 import { CardRenderer } from '@/components/cards/CardRenderer';
 import { parseCardConfig } from '@/lib/card/schema';
 import { composeConfigForOrderAnywhere } from '@/lib/card/compose-server';
@@ -53,6 +54,19 @@ export default async function CardPage({ params }: Props) {
   const order = await getOrderByCode(code);
 
   if (!order || order.status !== 'PUBLISHED') notFound();
+
+  // Ручная открытка перебивает сборку движка: если оператор сел и написал
+  // открытку сам, показывать надо её, а не то, что собралось из шаблона.
+  if (order.customEntry) {
+    return (
+      <main>
+        <CustomCardFrame
+          src={`/u/${order.code}/${order.customEntry}`}
+          title={order.recipient.name}
+        />
+      </main>
+    );
+  }
 
   // Fall back to composing on the fly: a published order with no stored
   // config is a data bug, not a reason to show the recipient an error page.

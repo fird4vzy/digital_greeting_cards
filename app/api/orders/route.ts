@@ -84,6 +84,8 @@ export async function POST(request: Request) {
   const created = await createOrder({
     ...draft,
     moods: draft.moods ?? [draft.mood],
+    // Ручная открытка привязывается позже, оператором и вручную.
+    customEntry: null,
     status: 'NEW',
     config: null,
   });

@@ -5,9 +5,9 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 20 August 2026 — an order now explains on its own page what
-to do with it, the customer can see the template they are choosing and pick
-more than one mood, and migration 004 is waiting.
+**Last updated:** 21 August 2026 — a card written by hand can finally be
+attached to an order, so the QR on the tag resolves to it. Migrations 004 and
+005 are waiting.
 
 ---
 
@@ -190,6 +190,15 @@ long version.
   whole; that was tried and reverted, and the git configuration is unchanged.
   Nothing is broken by this — the committed content is correct — so it is
   recorded as noise to see through, not as a fix to apply.
+- **`.env.local` on this machine points at production.** Once it exists,
+  `npm run dev`, `next start` and every script that loads env files talk to the
+  live Neon database — there is no separate local one. On 21 August two test
+  orders were created against production by an assistant probing the order API
+  locally; both were deleted the same session, leaving only the real order. If
+  you need to poke at order creation, either point `DATABASE_URL` at a scratch
+  database for that run or delete what you make, and check
+  `SELECT code, customer_name FROM orders` before assuming nothing was left
+  behind.
 - **Stop the dev server before pulling.** The admin pages moved into the route
   group `app/admin/(dashboard)/`, and on Windows git could not remove the old
   directories while a watcher held them open. It asks
@@ -592,6 +601,53 @@ been in every `SELECT`. Until the migration runs, orders keep working with a
 single mood. The first element of `moods` is always what `mood` holds, and
 `mood` stays required: the engine wants one value, the human writing the card
 wants all of them.
+
+---
+
+## A card written by hand, attached to an order
+
+Until 21 August the product could do exactly one thing: compose a card from a
+template. The way these cards are actually made — sitting down and writing one
+in HTML, CSS and JavaScript, which is how all seven works in Our work were made
+— **was not supported at all**. There was no field, no upload, no route: an
+operator holding a finished folder had no way to make `/c/<code>` show it, and
+therefore no way to make the printed QR lead to it. That was a hole in the
+design, not a missing nicety.
+
+**How it works now.** The order page has a *Своя открытка* panel. Pick the
+folder, choose which file it opens with, done — `/c/<code>` shows that instead
+of the composition, and everything else (tag, QR, statuses, publishing) is
+untouched, because only *what the code resolves to* changed.
+
+- Folder, not archive. `webkitdirectory` hands over the whole folder with
+  relative paths intact, so `./assets/song.mp3` keeps working without editing
+  anyone’s markup, and no unzip dependency is needed.
+- Files live in Postgres (`card_files`), because serverless has no writable
+  disk. The precedent already existed: order photographs are stored right
+  there as data URLs.
+- Served from `/u/<code>/…`, deliberately a different path from the card page,
+  so the frame gets a genuinely foreign origin.
+
+**The limit, and it is the platform’s.** Vercel caps a request body at 4.5 MB,
+so one file bigger than that cannot be uploaded — not by this form, not by any
+form. Measured against the existing works: four of seven upload whole; `ilove`,
+`poydem` and `tebe` each have video or audio that will not pass. When that
+starts to hurt, the fix is not here — it is uploading straight to object
+storage, bypassing the function.
+
+**Isolation, which is the whole reason this was refused before.** `/c/<code>`
+shares an origin with the admin, so serving somebody’s script there would let
+it read an operator’s session cookie — the exact objection recorded earlier in
+this file. The card renders in an iframe with `sandbox="allow-scripts"` and
+**never** `allow-same-origin`; those two together cancel the sandbox. Same pair
+as the works viewer, same reason.
+
+**Migration 005 adds `card_files` and `orders.custom_entry`.** Like 004, it can
+be run whenever: the store probes once per process for the table, the order
+columns are probed the same way, and until both run everything behaves as if no
+uploaded card exists. Without that probe the gap between a push and a migration
+would have taken down the whole admin order page, which reads the file list on
+every open — not just the new feature.
 
 ---
 
