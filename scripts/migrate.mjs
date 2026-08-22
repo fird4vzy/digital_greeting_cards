@@ -15,12 +15,57 @@
  */
 
 import { readFile, readdir } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dir = path.join(root, 'lib', 'db', 'migrations');
+
+/**
+ * Reads `.env.local` and `.env`, the way `next dev` already does.
+ *
+ * This is a plain node script, so it does not inherit Next's env loading, and
+ * that difference cost a session. The connection string lives in `.env.local`
+ * for every other command in the project; this one alone demanded it be pasted
+ * into the shell by hand, and a string pasted into a terminal lasts exactly as
+ * long as that terminal — which is why the same migration looked un-runnable
+ * the second time it was needed.
+ *
+ * A real environment variable still wins, so `DATABASE_URL=... npm run
+ * db:migrate` keeps working for a one-off run against another database.
+ *
+ * Twenty lines rather than a dependency: it needs `KEY=value`, comments and
+ * quotes, and nothing else.
+ */
+function loadEnvFiles() {
+  // `.env.local` first, so `.env` cannot overwrite what it set.
+  for (const name of ['.env.local', '.env']) {
+    let text;
+    try {
+      text = readFileSync(path.join(root, name), 'utf8');
+    } catch {
+      continue;
+    }
+
+    for (const line of text.split(/\r?\n/)) {
+      const match = /^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/.exec(line);
+      if (!match) continue;
+
+      const [, key, rawValue] = match;
+      if (process.env[key] !== undefined) continue;
+
+      const value = rawValue.trim();
+      const quoted = /^(['"])([\s\S]*)\1$/.exec(value);
+      // An unquoted value ends at the first `#`; a quoted one may contain one,
+      // and a connection string routinely does, inside the password.
+      process.env[key] = quoted ? quoted[2] : value.split('#')[0].trim();
+    }
+  }
+}
+
+loadEnvFiles();
 
 /** Mirrors the rule in lib/db/postgres.ts: anything not loopback gets TLS. */
 function sslOptionsFor(connectionString) {
@@ -39,9 +84,15 @@ function sslOptionsFor(connectionString) {
 
 const url = process.env.DATABASE_URL;
 if (!url) {
-  console.error('DATABASE_URL is not set.\n');
-  console.error('  Windows PowerShell:  $env:DATABASE_URL = "postgres://..."; npm run db:migrate');
-  console.error('  bash:                DATABASE_URL="postgres://..." npm run db:migrate');
+  console.error('DATABASE_URL is not set, and no .env.local or .env supplied it.\n');
+  console.error('  Best: put one line into .env.local — it is gitignored, and it is');
+  console.error('  what every other command in this project already reads:\n');
+  console.error('    DATABASE_URL=postgres://...\n');
+  console.error('  The string is in Vercel under Settings -> Environment Variables,');
+  console.error('  or in the Neon dashboard.\n');
+  console.error('  Just this once, without a file:');
+  console.error('    PowerShell:  $env:DATABASE_URL = "postgres://..."; npm run db:migrate');
+  console.error('    bash:        DATABASE_URL="postgres://..." npm run db:migrate');
   process.exit(1);
 }
 

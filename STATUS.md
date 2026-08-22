@@ -576,6 +576,13 @@ template ranking, and the operator sees all of them rather than one.
 
 **Migration 004 adds `orders.moods`. Run `npm run db:migrate`.**
 
+The script reads `.env.local` now. It is a plain node script, so it never
+inherited Next’s env loading and used to demand the connection string be
+pasted into the shell — which lasts exactly as long as that terminal, and is
+why the same migration looked un-runnable the second time. One line in
+`.env.local` (gitignored) and every command in the project reads the same
+string; a real environment variable still overrides it for a one-off run.
+
 It can be run whenever — before the deploy, after it, or next week — because
 `lib/db/postgres.ts` asks the database once per process whether the column
 exists and shapes its statements accordingly. Without that check the gap
