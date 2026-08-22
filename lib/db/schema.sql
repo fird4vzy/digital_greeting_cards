@@ -29,6 +29,7 @@ CREATE TABLE orders (
   relationship    TEXT NOT NULL,
   occasion        TEXT NOT NULL,
   mood            TEXT NOT NULL,
+  moods           TEXT[] NOT NULL DEFAULT '{}',
   -- The language the card is written in. Not the language the shop ordered
   -- in: a Tashkent shop browsing in Uzbek routinely sends a Russian card.
   locale          TEXT NOT NULL DEFAULT 'ru',

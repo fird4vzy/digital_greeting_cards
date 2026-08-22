@@ -145,7 +145,11 @@ export const uz: Dictionary = {
           question: 'Qanday sabab?',
           hint: "Sabab bo'lmasa — bu ham juda yaxshi javob.",
         },
-        mood: { eyebrow: 'Kayfiyat', question: "U qanday bo'lishi kerak?" },
+        mood: {
+          eyebrow: 'Kayfiyat',
+          question: "U qanday bo'lishi kerak?",
+          hint: 'Bir nechtasini tanlash mumkin — otkritka kamdan-kam bir ohangda bo‘ladi.',
+        },
         story: {
           eyebrow: 'Eng muhimi',
           question: 'Hikoyani aytib bering.',
@@ -568,6 +572,15 @@ export const uz: Dictionary = {
       panelQr: 'QR',
       generate: 'Otkritkani yig‘ish',
       previewCard: 'Otkritkani ko‘rish',
+      previewDraft: 'Qoralamani ochish',
+      howTitle: 'Bu buyurtma bilan nima qilinadi',
+      howSteps: [
+        'Buyurtmachining istaklarini va yozganini o‘qing. Odam yozadigan yagona narsa shu — dvigatel hech nima to‘qimaydi.',
+        'Shablonni tanlang va «Собрать открытку» tugmasini bosing. Sayt otkritkani buyurtmachining javoblaridan yig‘adi; uni boshqa shablon bilan istagancha qayta yig‘ish mumkin.',
+        '«Qoralamani ochish» tugmasini bosing — qabul qiluvchi ko‘radigan otkritkaning o‘zi ochiladi, ustida bu qoralama degan yozuv bilan. Hech narsa yuklash kerak emas: otkritka fayl emas, saytda yashaydi.',
+        'Hammasi to‘g‘ri bo‘lsa, holatni «Опубликован» ga o‘tkazing. Faqat shundan keyin QR bo‘limidagi manzil ochila boshlaydi.',
+        '«Бирка на печать» tugmasini bosing, chop eting va guldastaga bog‘lang. QR o‘sha manzilga olib boradi.',
+      ],
       previewTemplate: 'Shablonni ko‘rish',
       printable: 'Chop etish uchun yorliq',
       copyUrl: 'Havolani nusxalash',
@@ -826,7 +839,11 @@ export const uz: Dictionary = {
         description:
           "Yapon bezagidan emas, yapon bosma kompozitsiyasidan olingan: ulkan chekkalar, ataylab markazdan siljitilgan ustun va siz o'qiyotganingizda gulbarglarini to'kadigan bitta sakura shoxi. Kutubxonadagi eng tinch shablon va eng yaxshi qariydigani.",
         animationStyle: "Tushayotgan sakura, assimetrik ustunlar, siyoh o'tishlari",
-      },
+      },
+
+
+
+
     },
 
     copy: {

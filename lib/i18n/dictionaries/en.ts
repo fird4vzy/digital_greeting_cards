@@ -141,7 +141,11 @@ export const en: Dictionary = {
           question: "What's the occasion?",
           hint: "If there isn't one, that is a perfectly good answer.",
         },
-        mood: { eyebrow: 'The feeling', question: 'How should it feel?' },
+        mood: {
+          eyebrow: 'The feeling',
+          question: 'How should it feel?',
+          hint: 'Pick more than one if you like — a card is rarely one note.',
+        },
         story: {
           eyebrow: 'The important part',
           question: 'Tell us the story.',
@@ -561,6 +565,15 @@ export const en: Dictionary = {
       panelQr: 'QR',
       generate: 'Generate card',
       previewCard: 'Preview the card',
+      previewDraft: 'Open the draft',
+      howTitle: 'What to do with this order',
+      howSteps: [
+        'Read the customer\'s brief and what they wrote. That is the only writing a person does — the engine invents nothing.',
+        'Pick a template and press "Собрать открытку". The site builds the card from the customer\'s answers; you can rebuild it with a different template as often as you like.',
+        'Press "Open the draft" — it shows the same card the recipient will see, with a banner saying it is a draft. There is nothing to upload: the card lives on the site, not as a file.',
+        'When it is right, set the status to Published. Only then does the address in the QR panel start resolving.',
+        'Press "Бирка на печать", print it and tie it to the bouquet. The QR points at that same address.',
+      ],
       previewTemplate: 'Preview the template',
       printable: 'Printable card',
       copyUrl: 'Copy URL',
@@ -819,7 +832,11 @@ export const en: Dictionary = {
         description:
           'Borrowed from Japanese print composition rather than Japanese decoration: enormous margins, a deliberately off-centre column, and a single sakura branch that sheds petals as you read. The quietest template in the library, and the one that ages best.',
         animationStyle: 'Falling sakura, asymmetric columns, ink-wash transitions',
-      },
+      },
+
+
+
+
     },
 
     copy: {

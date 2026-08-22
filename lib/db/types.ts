@@ -54,7 +54,16 @@ export type Order = {
   customer: Customer;
   recipient: { name: string; relationship: string };
   occasion: string;
+  /** Главное настроение: по нему подбирается шаблон, его читает движок. */
   mood: string;
+  /**
+   * Весь выбор заказчика, первым — то же, что в `mood`.
+   *
+   * Отдельным полем, а не заменой `mood`, потому что у этих двух значений
+   * разные читатели: движку нужно одно настроение, а человеку, который пишет
+   * открытку руками, нужно всё, что заказчик отметил.
+   */
+  moods: string[];
   /**
    * The language the card is written in. Independent of the language the
    * customer ordered in — a Tashkent shop browsing in Uzbek routinely sends

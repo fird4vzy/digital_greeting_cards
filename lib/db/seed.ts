@@ -24,13 +24,20 @@ function compose(templateId: string, input: StoryInput) {
 }
 
 function order(
-  partial: Omit<Order, 'config' | 'createdAt' | 'updatedAt'> & { daysAgo: number; story: StoryInput },
+  // `moods` выводится из `mood`, чтобы у каждого примера не пришлось
+  // дублировать одно и то же значение двумя полями.
+  partial: Omit<Order, 'config' | 'createdAt' | 'updatedAt' | 'moods'> & {
+    moods?: string[];
+    daysAgo: number;
+    story: StoryInput;
+  },
 ): Order {
   const created = new Date(Date.now() - partial.daysAgo * 86_400_000).toISOString();
   const { daysAgo: _daysAgo, story, ...rest } = partial;
 
   return {
     ...rest,
+    moods: rest.moods ?? [rest.mood],
     config: rest.status === 'NEW' ? null : compose(rest.templateId, story),
     createdAt: created,
     updatedAt: created,

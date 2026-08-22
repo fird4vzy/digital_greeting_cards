@@ -50,7 +50,10 @@ export default async function OrderDetail({ params }: Props) {
             {order.recipient.name}
           </h1>
           <p className="mt-3 text-caption text-ink-muted">
-            {occasionLabel(order.occasion, dict)} · {moodLabel(order.mood, dict)} · {t.from}{' '}
+            {occasionLabel(order.occasion, dict)} ·{' '}
+            {/* Все выбранные настроения, а не одно главное: открытку пишет
+                человек, и «смешно и тепло» — другой заказ, чем «смешно». */}
+            {order.moods.map((mood) => moodLabel(mood, dict)).join(', ')} · {t.from}{' '}
             {order.customer.name}
           </p>
         </div>
@@ -226,11 +229,46 @@ export default async function OrderDetail({ params }: Props) {
                 <ActionButton type="submit">{t.generate}</ActionButton>
               </form>
 
-              <ActionLink href={`/c/${order.code}`} disabled={order.status !== 'PUBLISHED'}>
-                {t.previewCard}
+              {/* Before publishing, this points at the preview route rather
+                  than at nothing.
+
+                  It used to be disabled until `PUBLISHED`, which left an
+                  operator unable to look at the card they had just composed —
+                  the only way to see it was to publish it, which is exactly
+                  the wrong order for a check. `/c/[code]/preview` was built
+                  for this and composes on the fly, so it works even before
+                  "Собрать открытку" has ever been pressed. The public URL
+                  keeps its single meaning: published cards only. */}
+              <ActionLink
+                href={
+                  order.status === 'PUBLISHED'
+                    ? `/c/${order.code}`
+                    : `/c/${order.code}/preview`
+                }
+              >
+                {order.status === 'PUBLISHED' ? t.previewCard : t.previewDraft}
               </ActionLink>
               <ActionLink href={`/templates/${order.templateId}`}>{t.previewTemplate}</ActionLink>
             </div>
+          </Panel>
+
+          {/* The order of operations, on the page where it is needed.
+              Nothing here is new behaviour — it is the flow the buttons above
+              already implement, written down. It was missing, and an operator
+              looking at a composed card with a dead preview button had no way
+              to find out that the card is not a file, is never uploaded, and
+              only starts resolving when the status changes. */}
+          <Panel title={t.howTitle}>
+            <ol className="space-y-3 text-caption leading-relaxed text-ink-soft">
+              {t.howSteps.map((line, index) => (
+                <li key={line} className="flex gap-3">
+                  <span className="eyebrow shrink-0 pt-[0.15rem] text-ink-faint tabular-nums">
+                    {index + 1}
+                  </span>
+                  <span>{line}</span>
+                </li>
+              ))}
+            </ol>
           </Panel>
 
           <Panel title={t.panelQr}>

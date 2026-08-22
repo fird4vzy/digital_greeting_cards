@@ -5,10 +5,9 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 19 August 2026 — the ported templates were removed, the Our
-work gallery now plays the originals instead of photographing them, and the two
-ways this repository can quietly mislead you across machines are written down
-under Things that will bite.
+**Last updated:** 20 August 2026 — an order now explains on its own page what
+to do with it, the customer can see the template they are choosing and pick
+more than one mood, and migration 004 is waiting.
 
 ---
 
@@ -175,14 +174,22 @@ long version.
   `git rev-parse HEAD` with `git ls-remote --heads origin <branch>`** — they
   either match or they do not, which is a fact, unlike the absence of an error
   message from a fetch that quietly did nothing.
-- **Staging can rewrite a whole file's line endings.** `core.autocrlf` is `true`
-  from the global config, and some blobs here were committed with CRLF, so
-  staging normalises them to LF and every line reads as changed. The three
-  dictionaries did exactly this on 19 August: about 5,600 lines of diff around
-  6 real insertions and 90 real deletions. `git diff --cached --ignore-cr-at-eol`
-  shows what actually changed. Setting `core.autocrlf false` locally does **not**
-  fix it — it makes every *other* file diff whole instead; that was tried on the
-  same day and reverted, and the git configuration is unchanged.
+- **The three dictionaries diff as whole files, every time.** Editing 20 lines
+  of `lib/i18n/dictionaries/*.ts` produces a ~1,900-line diff per file. It
+  happened on 19 and again on 20 August. **`git diff --cached --ignore-cr-at-eol`
+  shows the real change** — use it before believing a stat line, and say what it
+  reports rather than what `--stat` does.
+
+  What is verified: the stored blobs are CRLF both before and after
+  (`git cat-file blob $(git rev-parse <rev>:<path>) | grep -c $''`), the
+  working copies are entirely CRLF, and `--ignore-cr-at-eol` collapses the diff
+  to the real edit. **The cause is not established.** A first guess — that
+  `core.autocrlf=true` was normalising these files to LF on staging — was
+  written here on 19 August and is **wrong**: the blobs never became LF. Setting
+  `core.autocrlf false` locally makes it worse, diffing every *other* file
+  whole; that was tried and reverted, and the git configuration is unchanged.
+  Nothing is broken by this — the committed content is correct — so it is
+  recorded as noise to see through, not as a fix to apply.
 - **Stop the dev server before pulling.** The admin pages moved into the route
   group `app/admin/(dashboard)/`, and on Windows git could not remove the old
   directories while a watcher held them open. It asks
@@ -521,6 +528,63 @@ degrade to English rather than to a blank card.
 **Pre-existing, not fixed:** the Uzbek dictionary mixes typographic `‘` with
 straight `'` — `sig'maydigan`, `Ba'zi`, `bo'lmadi` sit next to `o‘n`, `qat’iy`.
 Cosmetic, visible, and a separate sweep.
+
+---
+
+## What an operator actually does with an order
+
+Asked on 20 August, in the form "how am I supposed to build the card, and how
+do I upload it so the customer gets a QR?" — which is the right question, and
+the answer had never been written down anywhere the operator could see it.
+
+**Nothing is ever uploaded, and the card is not a file.** It is rows in a
+database rendered by this site at `/c/<code>`. That is the whole reason the
+QR can be printed before the card is finished: the code is decided when the
+order is created, and only what it resolves to changes.
+
+The order of operations, now printed on the order page itself in all three
+languages:
+
+1. Read the brief and the customer's own words. That is the only writing a
+   person does — the engine invents nothing.
+2. Pick a template, press **Собрать открытку**. The card is composed from the
+   answers; recomposing with a different template is free and repeatable.
+3. Press **Посмотреть черновик**. Same card the recipient will see, with a
+   banner saying it is a draft.
+4. Set the status to **Опубликован**. Only now does `/c/<code>` resolve.
+5. Press **Бирка на печать**, print, tie to the bouquet.
+
+**Step 3 did not exist.** `/c/[code]/preview` was built for exactly this and
+composes on the fly, but the admin button pointed at the public URL and was
+disabled until `PUBLISHED` — so the only way to see a card was to publish it,
+which is the wrong order for a check. The button now points at the preview
+before publishing and at the real card after.
+
+### The customer chooses a template blind no longer
+
+The live miniature was already being built two steps earlier than it was
+shown: the customer picked from a name, a line and four colour dots, then saw
+the consequence on the preview step. The same stage now sits beside the
+template list, playing their own words in whichever template they are pointing
+at, and changes as they point elsewhere.
+
+### Moods are a list
+
+Choosing a second mood used to silently cancel the first. "Смешно и тепло" is
+an ordinary order, so the step is multi-select, every match counts in the
+template ranking, and the operator sees all of them rather than one.
+
+**Migration 004 adds `orders.moods`. Run `npm run db:migrate`.**
+
+It can be run whenever — before the deploy, after it, or next week — because
+`lib/db/postgres.ts` asks the database once per process whether the column
+exists and shapes its statements accordingly. Without that check the gap
+between a push to Vercel and a migration run by hand would have broken not
+only new orders but *reading every existing one*, since `moods` would have
+been in every `SELECT`. Until the migration runs, orders keep working with a
+single mood. The first element of `moods` is always what `mood` holds, and
+`mood` stays required: the engine wants one value, the human writing the card
+wants all of them.
 
 ---
 

@@ -26,6 +26,11 @@ const draftSchema = z.object({
   recipient: z.object({ name: z.string().min(1), relationship: z.string().min(1) }),
   occasion: z.string().min(1),
   mood: z.string().min(1),
+  /**
+   * Необязателен: заказ, приславший одно настроение старым способом, остаётся
+   * валидным, а список тогда собирается из него в хранилище.
+   */
+  moods: z.array(z.string().min(1)).min(1).optional(),
   /** Language the card is written in — see lib/i18n/config.ts. */
   locale: z.string().default('ru'),
   message: z.string().default(''),
@@ -74,7 +79,14 @@ export async function POST(request: Request) {
   // than an empty record and the customer can see something immediately.
   // `publish` decides only whether it is live: on the customer flow it is
   // false, and a person reviews the draft before a code goes onto a tag.
-  const created = await createOrder({ ...draft, status: 'NEW', config: null });
+  // `moods` необязателен в контракте, а в заказе обязателен: клиент,
+  // приславший одно настроение старым способом, получает список из него.
+  const created = await createOrder({
+    ...draft,
+    moods: draft.moods ?? [draft.mood],
+    status: 'NEW',
+    config: null,
+  });
   const config = await composeConfigForOrderAnywhere(created);
 
   const { updateOrder } = await import('@/lib/db');

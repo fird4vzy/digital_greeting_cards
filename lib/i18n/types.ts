@@ -159,7 +159,7 @@ export type Dictionary = {
       steps: {
         recipient: { eyebrow: string; question: string; theirName: string; yourName: string };
         occasion: { eyebrow: string; question: string; hint: string };
-        mood: { eyebrow: string; question: string };
+        mood: { eyebrow: string; question: string; hint: string };
         story: {
           eyebrow: string;
           question: string;
@@ -509,6 +509,18 @@ export type Dictionary = {
       panelQr: string;
       generate: string;
       previewCard: string;
+      /** Same button before publishing — it opens the draft, not the live card. */
+      previewDraft: string;
+      /**
+       * The order of operations, spelled out on the page.
+       *
+       * Here rather than in a README because the question it answers — "what
+       * do I actually do with this order?" — is asked while looking at the
+       * order, and an operator who has to leave the page to find out has
+       * already been failed by it.
+       */
+      howTitle: string;
+      howSteps: string[];
       previewTemplate: string;
       printable: string;
       copyUrl: string;

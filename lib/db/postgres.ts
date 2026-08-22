@@ -35,6 +35,7 @@ type OrderRow = {
   relationship: string;
   occasion: string;
   mood: string;
+  moods: string[] | null;
   locale: string;
   message: string;
   photos: Order['photos'];
@@ -99,6 +100,10 @@ function toOrder(row: OrderRow): Order {
     recipient: { name: row.recipient_name, relationship: row.relationship },
     occasion: row.occasion,
     mood: row.mood,
+    // Заказы, созданные до миграции 004, приходят с пустым массивом: их
+    // единственный выбор восстанавливается из `mood`, чтобы читающий код
+    // никогда не встречал заказ вообще без настроений.
+    moods: row.moods?.length ? row.moods : row.mood ? [row.mood] : [],
     locale: row.locale ?? 'ru',
     message: row.message,
     photos: row.photos ?? [],
@@ -116,10 +121,42 @@ function toOrder(row: OrderRow): Order {
   };
 }
 
-const COLUMNS = `id, code, customer_name, customer_email, customer_phone, shop,
+const BASE_COLUMNS = `id, code, customer_name, customer_email, customer_phone, shop,
   recipient_name, relationship, occasion, mood, locale, message, photos, moments,
   memories, wishes, template_id, status, config, notes, brief, created_at, updated_at,
   published_at`;
+
+/**
+ * Применена ли миграция 004, добавляющая `moods`.
+ *
+ * Спрашивается у базы один раз за процесс, а не предполагается. Причина
+ * практическая: код уезжает на Vercel пушем, а миграция запускается руками, и
+ * между этими двумя событиями всегда есть окно. Без этой проверки в окне
+ * ломались бы не только новые заказы, но и чтение всех старых — `moods` попал
+ * бы в каждый SELECT. С ней миграцию можно применить когда угодно: до
+ * выкладки, после или через неделю.
+ *
+ * Ошибка при самой проверке трактуется как «колонки нет»: это всегда рабочее
+ * поведение, просто без множественных настроений.
+ */
+let moodsColumn: Promise<boolean> | null = null;
+
+function hasMoods(pool: Pool): Promise<boolean> {
+  moodsColumn ??= pool
+    .query<{ present: boolean }>(
+      `SELECT EXISTS (
+         SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'orders' AND column_name = 'moods'
+       ) AS present`,
+    )
+    .then((result) => Boolean((result.rows[0] as { present?: boolean } | undefined)?.present))
+    .catch(() => false);
+
+  return moodsColumn;
+}
+
+/** Список колонок для SELECT и RETURNING, с `moods` только если он есть. */
+const columnsFor = (moods: boolean) => (moods ? `${BASE_COLUMNS}, moods` : BASE_COLUMNS);
 
 /**
  * Both stores, on one pool.
@@ -175,20 +212,23 @@ export async function createPostgresStore(
       const limit = filter.limit ? `LIMIT ${Number(filter.limit)}` : '';
 
       const result = await pool.query<OrderRow>(
-        `SELECT ${COLUMNS} FROM orders ${where} ORDER BY created_at DESC ${limit}`,
+        `SELECT ${columnsFor(await hasMoods(pool))} FROM orders ${where} ORDER BY created_at DESC ${limit}`,
         values,
       );
       return result.rows.map(toOrder);
     },
 
     async get(id: string) {
-      const result = await pool.query<OrderRow>(`SELECT ${COLUMNS} FROM orders WHERE id = $1`, [id]);
+      const result = await pool.query<OrderRow>(
+        `SELECT ${columnsFor(await hasMoods(pool))} FROM orders WHERE id = $1`,
+        [id],
+      );
       return result.rows[0] ? toOrder(result.rows[0]) : null;
     },
 
     async getByCode(code: string) {
       const result = await pool.query<OrderRow>(
-        `SELECT ${COLUMNS} FROM orders WHERE upper(code) = upper($1)`,
+        `SELECT ${columnsFor(await hasMoods(pool))} FROM orders WHERE upper(code) = upper($1)`,
         [code.trim()],
       );
       return result.rows[0] ? toOrder(result.rows[0]) : null;
@@ -196,6 +236,18 @@ export async function createPostgresStore(
 
     async create(draft: OrderDraft) {
       const status = draft.status ?? 'NEW';
+      const moods = await hasMoods(pool);
+
+      // `moods` вставляется только когда колонка есть, поэтому номера
+      // плейсхолдеров после неё сдвигаются. Считаются, а не пишутся руками
+      // дважды: два списка $1..$22 разошлись бы при первой же правке.
+      const moodsColumnSql = moods ? 'mood, moods,' : 'mood,';
+      const statusIndex = moods ? 19 : 18;
+      const total = moods ? 22 : 21;
+      const placeholders = Array.from({ length: total }, (_, index) => {
+        const n = index + 1;
+        return n === statusIndex ? `$${n}::order_status` : `$${n}`;
+      }).join(',');
 
       // Retry on the unique-code constraint rather than pre-checking: the read
       // would be a race anyway, and a collision is a one-in-millions event.
@@ -204,19 +256,19 @@ export async function createPostgresStore(
           const result = await pool.query<OrderRow>(
             `INSERT INTO orders (
                id, code, customer_name, customer_email, customer_phone, shop,
-               recipient_name, relationship, occasion, mood, locale, message, photos,
+               recipient_name, relationship, occasion, ${moodsColumnSql} locale, message, photos,
                moments, memories, wishes, template_id, status, config, notes,
                brief, published_at
              ) VALUES (
-               $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,
-               $18::order_status,$19,$20,$21,
-               -- Both casts are load-bearing. $18 appears twice, and without
-               -- them Postgres deduces order_status from the column and text
-               -- from the comparison, then rejects the statement outright
-               -- (42P08). Naming the type at both sites keeps them agreeing.
-               CASE WHEN $18::order_status = 'PUBLISHED' THEN now() ELSE NULL END
+               ${placeholders},
+               -- Both casts are load-bearing. The status placeholder appears
+               -- twice, and without them Postgres deduces order_status from
+               -- the column and text from the comparison, then rejects the
+               -- statement outright (42P08). Naming the type at both sites
+               -- keeps them agreeing.
+               CASE WHEN $${statusIndex}::order_status = 'PUBLISHED' THEN now() ELSE NULL END
              )
-             RETURNING ${COLUMNS}`,
+             RETURNING ${columnsFor(moods)}`,
             [
               generateId('ord'),
               generateCode(),
@@ -228,6 +280,7 @@ export async function createPostgresStore(
               draft.recipient.relationship,
               draft.occasion,
               draft.mood,
+              ...(moods ? [draft.moods?.length ? draft.moods : [draft.mood]] : []),
               draft.locale,
               draft.message,
               JSON.stringify(draft.photos ?? []),
@@ -270,6 +323,9 @@ export async function createPostgresStore(
       if (patch.recipient?.relationship !== undefined) push('relationship', patch.recipient.relationship);
       if (patch.occasion !== undefined) push('occasion', patch.occasion);
       if (patch.mood !== undefined) push('mood', patch.mood);
+      // Обновляется только при наличии колонки — до миграции правка просто
+      // не записывается, а не роняет весь заказ.
+      if (patch.moods !== undefined && (await hasMoods(pool))) push('moods', patch.moods);
       if (patch.locale !== undefined) push('locale', patch.locale);
       if (patch.message !== undefined) push('message', patch.message);
       if (patch.photos !== undefined) push('photos', JSON.stringify(patch.photos));
@@ -292,7 +348,9 @@ export async function createPostgresStore(
 
       values.push(id);
       const result = await pool.query<OrderRow>(
-        `UPDATE orders SET ${sets.join(', ')} WHERE id = $${values.length} RETURNING ${COLUMNS}`,
+        `UPDATE orders SET ${sets.join(', ')} WHERE id = $${values.length} RETURNING ${columnsFor(
+          await hasMoods(pool),
+        )}`,
         values,
       );
       return result.rows[0] ? toOrder(result.rows[0]) : null;

@@ -57,7 +57,15 @@ type Draft = {
   recipientName: string;
   senderName: string;
   occasion: string;
-  mood: string;
+  /**
+   * Настроений можно выбрать несколько.
+   *
+   * Список, а не одно значение, потому что открытка редко бывает одного тона:
+   * «смешно и тепло» — обычный заказ, и раньше выбор второго молча отменял
+   * первый. Первый элемент — главный: он уходит в `mood` и по нему движок
+   * собирает открытку.
+   */
+  moods: string[];
   story: string;
   photos: Photo[];
   templateId: string;
@@ -83,7 +91,7 @@ const EMPTY: Draft = {
   recipientName: '',
   senderName: '',
   occasion: '',
-  mood: '',
+  moods: [],
   story: '',
   photos: [],
   templateId: '',
@@ -155,7 +163,9 @@ export function CreateFlow({
       .map((template) => {
         let score = 0;
         if (template.occasions.includes(draft.occasion as never)) score += 5;
-        if (template.moods.includes(draft.mood as never)) score += 3;
+        // Каждое совпадение считается отдельно: шаблон, попавший в два
+        // выбранных настроения, должен обойти попавший в одно.
+        score += draft.moods.filter((mood) => template.moods.includes(mood as never)).length * 3;
         if (draft.photos.length >= 5 && template.id === 'memories') score += 3;
         if (draft.photos.length === 0 && template.scene !== 'none') score += 1;
         return { template, score };
@@ -163,7 +173,7 @@ export function CreateFlow({
       .sort((a, b) => b.score - a.score);
 
     return scored[0]?.template ?? templates[0];
-  }, [templates, draft.occasion, draft.mood, draft.photos.length]);
+  }, [templates, draft.occasion, draft.moods, draft.photos.length]);
 
   const activeTemplate =
     templates.find((template) => template.id === draft.templateId) ?? suggested;
@@ -184,7 +194,8 @@ export function CreateFlow({
           },
           recipient: { name: draft.recipientName || 'You', relationship: draft.recipientId || 'someone-special' },
           occasion: draft.occasion || 'just-because',
-          mood: draft.mood || 'warm',
+          mood: draft.moods[0] ?? 'warm',
+          moods: draft.moods.length > 0 ? draft.moods : ['warm'],
           locale: draft.locale || locale,
           message: draft.story,
           photos: draft.photos,
@@ -332,9 +343,10 @@ export function CreateFlow({
             strings={{ back: copy.back, continue: copy.continue, progress: copy.progress }}
             eyebrow={copy.steps.mood.eyebrow}
             question={copy.steps.mood.question}
+            hint={copy.steps.mood.hint}
             onBack={back}
             onNext={next}
-            canContinue={Boolean(draft.mood)}
+            canContinue={draft.moods.length > 0}
           >
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {moods.map((mood) => (
@@ -342,8 +354,14 @@ export function CreateFlow({
                   key={mood.id}
                   title={mood.label}
                   line={mood.line}
-                  selected={draft.mood === mood.id}
-                  onSelect={() => patch({ mood: mood.id })}
+                  selected={draft.moods.includes(mood.id)}
+                  onSelect={() =>
+                    patch({
+                      moods: draft.moods.includes(mood.id)
+                        ? draft.moods.filter((id) => id !== mood.id)
+                        : [...draft.moods, mood.id],
+                    })
+                  }
                 />
               ))}
             </div>
@@ -418,7 +436,16 @@ export function CreateFlow({
             onNext={next}
             canContinue
           >
-            <div className="grid gap-3 sm:grid-cols-2">
+            {/* The miniature moved here from the step after next.
+
+                It was already being built for the preview step, so the
+                customer chose a template from a name, a line and four dots and
+                only saw the consequence two steps later. The same stage plays
+                their own words in the template they are pointing at, and
+                changes the moment they point at another one — which is the
+                only question this step asks. */}
+            <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-start">
+              <div className="grid gap-3 sm:grid-cols-2">
               {templates.map((template) => {
                 const palette = getPalette(template.paletteId);
                 const selected = activeTemplate?.id === template.id;
@@ -469,6 +496,9 @@ export function CreateFlow({
                   </button>
                 );
               })}
+              </div>
+
+              {stage ? <div className="hidden lg:block">{stage}</div> : null}
             </div>
           </StepShell>
         )}
