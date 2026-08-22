@@ -695,12 +695,24 @@ canvas was also lit for a dark stage — exposure 0.82, tinted sheen — so it
 really belongs to the dark landing edit its author explicitly deferred. When
 that arrives, `range` splits the timeline back into two.
 
-**Verified:** `tsc` clean, `next build` clean, the canvas mounts in a real
-browser (two `<canvas>` on the page, zero server errors), and the page is
-unharmed where WebGL is absent. **Not verified: the scene's own pixels.**
-Software rasterisation could not finish a frame of 266 instanced petals inside
-any workable timeout — the same wall the author hit. Run `npm run dev` and
-scroll through «Выберите чувство».
+**Taken off the page the same day.** It was wired to «Выберите чувство»,
+deployed, and looked wrong: stems standing between the occasion cards, a
+wrapped bouquet lying across «Добавьте воспоминания». Nothing malfunctioned —
+that is what a full-screen `-z-10` layer does behind a page whose sections and
+cards are opaque. It reads as one design collaged onto another because it is.
+
+The lesson is the one this file keeps relearning: the risk was named in
+advance — opaque sections, a canvas lit for a dark stage — and it was shipped
+anyway because the pixels could not be checked. Software rasterisation could
+not finish a frame of 266 instanced petals inside any workable timeout, the
+same wall the author hit. **A 3D scene that cannot be seen before deploying
+must not be deployed onto the landing page.** Put it behind a preview URL, or
+wait for eyes.
+
+The four files stay in the tree, unused and building. What is missing is not
+code but a place to put it: a section built as a stage — tall, sticky, nothing
+opaque in front — or the dark landing edit this was designed against. Wiring
+it back is one line in `app/page.tsx`.
 
 ---
 
