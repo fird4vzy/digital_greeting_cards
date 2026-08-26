@@ -6,8 +6,10 @@ explains how the product works; this says what state it is in right now and
 what is waiting.
 
 **Last updated:** 22 August 2026 — both migrations applied, headings finally
-have Cyrillic, and the landing redesign the bouquet was built for is now in
-the repository as a reference: `design/preview/bir-dunyo-v10.html`.
+have Cyrillic, the landing redesign the bouquet was built for is in the
+repository as a reference (`design/preview/bir-dunyo-v10.html`), and the
+bouquet itself has finally been *seen*: `/design/bouquet` is a stand built to
+the shape its author asked for, and it works.
 
 ---
 
@@ -184,7 +186,8 @@ long version.
   reports rather than what `--stat` does.
 
   What is verified: the stored blobs are CRLF both before and after
-  (`git cat-file blob $(git rev-parse <rev>:<path>) | grep -c $''`), the
+  (`git cat-file blob $(git rev-parse <rev>:<path>) | grep -c $'
+'`), the
   working copies are entirely CRLF, and `--ignore-cr-at-eol` collapses the diff
   to the real edit. **The cause is not established.** A first guess — that
   `core.autocrlf=true` was normalising these files to LF on staging — was
@@ -713,6 +716,58 @@ The four files stay in the tree, unused and building. What is missing is not
 code but a place to put it: a section built as a stage — tall, sticky, nothing
 opaque in front — or the dark landing edit this was designed against. Wiring
 it back is one line in `app/page.tsx`.
+
+### Seen at last: `/design/bouquet`
+
+Added 22 August, after "I still don't see the update" — which was exactly
+right. The three files were in the tree and building, and on no page at all.
+
+The stand is what the scene had been missing: **a section taller than the
+viewport, a sticky block inside it, and nothing opaque in front.** Copy comes
+from the real landing dictionary — «Выберите чувство» and «Прикрепите к
+букету» — so it is judged against text of the length it will actually meet,
+and no new user-visible string was invented. `robots: noindex`; it is not part
+of the product and it does not touch `app/page.tsx`.
+
+**It renders, and the whole arc is intact:** petals in flight → seven heads on
+stems → the wrap closing around them → the gold ribbon → the tag. Verified in
+a real browser at seven scroll positions, zero console errors.
+
+Two things this proved that had been guesses:
+
+- **Software rasterisation is fine.** The earlier note said a frame of 266
+  instanced petals could not be finished inside any workable timeout, and that
+  is what stopped anyone looking before the deploy. It is not true with the
+  right flags: headless Chromium with `--use-angle=swiftshader
+  --enable-unsafe-swiftshader` reports WebGL 2.0 through SwiftShader/Vulkan
+  and draws the full scene in a few seconds per frame. **A 3D scene on this
+  project can be checked before it ships.** That removes the excuse behind the
+  failed landing deploy, so the rule stands with its reason strengthened, not
+  weakened.
+- **The dark ground was the whole problem.** On `#17130F` the scene reads as
+  intended. It was never lit for the light landing.
+
+**And the stand reproduced the original bug once, on the way.** The first
+version put `background: #17130F` on `<main>`. The canvas is `fixed inset-0
+-z-10`, so an opaque background on any element above it in the stack simply
+covers it — the canvas mounted, drew, and showed nothing. That is precisely
+what the opaque landing sections did. The ground now lives on its own
+`fixed inset-0 -z-20` layer *behind* the canvas. **The rule is not "the page
+must be dark", it is "nothing opaque may sit between the viewer and `-z-10`."**
+Anyone wiring this into the landing needs that sentence more than the colour.
+
+### The delivery folder breaks `next build`
+
+`update UIUX/` at the repository root is the drop the three bouquet files
+arrived in. Its contents are already in the tree, byte for byte — only the line
+endings differ — so it carries nothing that is not committed.
+
+It is not harmless. `tsc` compiles it where it sits, the relative imports
+inside it (`../geometry`, `./BrandTag`) resolve to nothing there, and
+**`next build` fails on four TS2307 errors** before producing a `BUILD_ID`.
+It is untracked, so Vercel never sees it and deploys are unaffected; the
+breakage is local, and it looks like a fault in the project rather than in a
+folder somebody forgot to delete. Deleting it is safe.
 
 ---
 
