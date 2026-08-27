@@ -28,24 +28,24 @@ export function Footer({ strings }: { strings: Dictionary['ui']['footer'] }) {
   ];
 
   return (
-    <footer className="relative border-t border-line bg-paper px-[var(--spacing-gutter)] py-16">
+    <footer className="relative border-t border-edge bg-surface px-[var(--spacing-gutter)] py-16">
       <div className="mx-auto grid w-full max-w-[86rem] gap-12 sm:grid-cols-[1.4fr_1fr_1fr]">
         <div>
           <Wordmark />
-          <p className="mt-6 max-w-[26ch] text-caption leading-relaxed text-ink-muted">
+          <p className="mt-6 max-w-[26ch] text-caption leading-relaxed text-on-surface-muted">
             {strings.promise}
           </p>
         </div>
 
         {columns.map((column) => (
           <div key={column.title}>
-            <h3 className="eyebrow mb-5 text-ink-muted">{column.title}</h3>
+            <h3 className="eyebrow mb-5 text-on-surface-muted">{column.title}</h3>
             <ul className="space-y-3">
               {column.links.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-caption text-ink-soft transition-colors duration-300 hover:text-accent"
+                    className="text-caption text-on-surface-soft transition-colors duration-300 hover:text-brand"
                   >
                     {link.label}
                   </Link>
@@ -56,9 +56,9 @@ export function Footer({ strings }: { strings: Dictionary['ui']['footer'] }) {
         ))}
       </div>
 
-      <div className="mx-auto mt-14 flex w-full max-w-[86rem] flex-col gap-3 border-t border-line pt-7 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-caption text-ink-faint">© {new Date().getFullYear()} {SITE.name}</p>
-        <p className="font-display text-caption italic text-ink-muted">{strings.tagline}</p>
+      <div className="mx-auto mt-14 flex w-full max-w-[86rem] flex-col gap-3 border-t border-edge pt-7 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-caption text-on-surface-faint">© {new Date().getFullYear()} {SITE.name}</p>
+        <p className="font-display text-caption italic text-on-surface-muted">{strings.tagline}</p>
       </div>
     </footer>
   );

@@ -43,7 +43,7 @@ export function SectionHeading({
         text={title}
         className={cn(
           'mt-6 font-display text-display-sm leading-[1.02] tracking-[-0.025em]',
-          tone === 'paper' ? 'text-paper' : 'text-ink',
+          tone === 'paper' ? 'text-paper' : 'text-on-surface',
         )}
       />
 
@@ -53,7 +53,7 @@ export function SectionHeading({
             className={cn(
               'mt-6 max-w-[46ch] text-body-lg text-pretty',
               align === 'center' && 'mx-auto',
-              tone === 'paper' ? 'text-paper/65' : 'text-ink-soft',
+              tone === 'paper' ? 'text-paper/65' : 'text-on-surface-soft',
             )}
           >
             {lead}

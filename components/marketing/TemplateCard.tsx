@@ -39,8 +39,8 @@ export function TemplateCard({
 
       <div className="mt-8 flex flex-1 flex-col">
         <div className="flex items-baseline justify-between gap-4">
-          <h2 className="font-display text-title leading-none text-ink">
-            <Link href={`/templates/${template.id}`} className="transition-colors hover:text-accent">
+          <h2 className="font-display text-title leading-none text-on-surface">
+            <Link href={`/templates/${template.id}`} className="transition-colors hover:text-brand">
               {template.name}
             </Link>
           </h2>
@@ -56,12 +56,12 @@ export function TemplateCard({
           </span>
         </div>
 
-        <p className="mt-3 text-caption text-ink-soft">{template.tagline}</p>
-        <p className="mt-4 flex-1 text-caption leading-relaxed text-ink-muted">
+        <p className="mt-3 text-caption text-on-surface-soft">{template.tagline}</p>
+        <p className="mt-4 flex-1 text-caption leading-relaxed text-on-surface-muted">
           {template.description}
         </p>
 
-        <dl className="mt-6 space-y-3 border-t border-line pt-5 text-caption">
+        <dl className="mt-6 space-y-3 border-t border-edge pt-5 text-caption">
           <Row label={strings.mood}>
             {template.moods.map((mood) => moodLabel(mood, dict)).join(' · ')}
           </Row>
@@ -80,7 +80,7 @@ export function TemplateCard({
 
         <Link
           href={`/templates/${template.id}`}
-          className="group/link mt-6 inline-flex items-center gap-2 text-caption text-ink transition-colors hover:text-accent"
+          className="group/link mt-6 inline-flex items-center gap-2 text-caption text-on-surface transition-colors hover:text-brand"
         >
           {strings.openPreview}
           <ArrowGlyph className="group-hover/link:translate-x-1" />
@@ -93,8 +93,8 @@ export function TemplateCard({
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="grid grid-cols-[5rem_1fr] gap-3">
-      <dt className="eyebrow pt-[0.15rem] text-ink-faint">{label}</dt>
-      <dd className="text-ink-soft">{children}</dd>
+      <dt className="eyebrow pt-[0.15rem] text-on-surface-faint">{label}</dt>
+      <dd className="text-on-surface-soft">{children}</dd>
     </div>
   );
 }

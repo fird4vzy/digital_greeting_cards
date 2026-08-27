@@ -36,7 +36,7 @@ export function StorySection({
   if (!active) return null;
 
   return (
-    <section className="relative overflow-hidden bg-paper-warm px-[var(--spacing-gutter)] py-[var(--spacing-section)]">
+    <section className="relative overflow-hidden bg-surface-2 px-[var(--spacing-gutter)] py-[var(--spacing-section)]">
       <div className="mx-auto w-full max-w-[86rem]">
         <SectionHeading
           eyebrow={strings.eyebrow}
@@ -47,7 +47,7 @@ export function StorySection({
         <div className="mt-16 grid gap-12 lg:grid-cols-[1fr_20rem] lg:items-start lg:gap-20">
           {/* The library */}
           <div className="order-2 lg:order-1">
-            <ul className="divide-y divide-line">
+            <ul className="divide-y divide-edge">
               {templates.map((template) => {
                 const palette = getPalette(template.paletteId);
                 const isActive = template.id === active.id;
@@ -65,7 +65,7 @@ export function StorySection({
                       {isActive ? (
                         <motion.span
                           layoutId="story-marker"
-                          className="absolute -left-4 top-1/2 hidden h-9 w-[2px] -translate-y-1/2 bg-accent sm:block"
+                          className="absolute -left-4 top-1/2 hidden h-9 w-[2px] -translate-y-1/2 bg-brand sm:block"
                           transition={{ duration: 0.45, ease: easing.out }}
                         />
                       ) : null}
@@ -74,12 +74,12 @@ export function StorySection({
                         <h3
                           className={cn(
                             'font-display text-title leading-none transition-colors duration-500',
-                            isActive ? 'text-ink' : 'text-ink-muted group-hover:text-ink',
+                            isActive ? 'text-on-surface' : 'text-on-surface-muted group-hover:text-on-surface',
                           )}
                         >
                           {template.name}
                         </h3>
-                        <span className="eyebrow text-ink-faint">
+                        <span className="eyebrow text-on-surface-faint">
                           {template.occasions[0]?.replace('-', ' ')}
                         </span>
 
@@ -87,7 +87,7 @@ export function StorySection({
                           {palette.swatches.map((swatch) => (
                             <span
                               key={swatch}
-                              className="block h-3 w-3 rounded-full ring-1 ring-inset ring-black/10"
+                              className="block h-3 w-3 rounded-full ring-1 ring-inset ring-on-surface/10"
                               style={{ background: swatch }}
                             />
                           ))}
@@ -97,7 +97,7 @@ export function StorySection({
                       <p
                         className={cn(
                           'mt-2.5 max-w-[46ch] text-caption transition-colors duration-500',
-                          isActive ? 'text-ink-soft' : 'text-ink-muted',
+                          isActive ? 'text-on-surface-soft' : 'text-on-surface-muted',
                         )}
                       >
                         {template.tagline}
@@ -105,7 +105,7 @@ export function StorySection({
 
                       <p
                         className={cn(
-                          'mt-2 text-caption text-ink-faint transition-opacity duration-500',
+                          'mt-2 text-caption text-on-surface-faint transition-opacity duration-500',
                           isActive ? 'opacity-100' : 'opacity-0',
                         )}
                       >
@@ -137,7 +137,7 @@ export function StorySection({
                 <TemplateStage template={active} locale={locale} />
               </PhoneFrame>
             </Reveal>
-            <p className="mt-5 text-center text-caption text-ink-muted">
+            <p className="mt-5 text-center text-caption text-on-surface-muted">
               {strings.livePreview}
             </p>
           </div>

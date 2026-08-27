@@ -23,7 +23,7 @@ export function GalleryTabs({
   ];
 
   return (
-    <div className="mt-12 inline-flex rounded-full border border-line-strong p-1">
+    <div className="mt-12 inline-flex rounded-full border border-edge-strong p-1">
       {tabs.map((tab) => (
         <Link
           key={tab.key}
@@ -33,7 +33,7 @@ export function GalleryTabs({
             'inline-flex h-9 items-center rounded-full px-5 text-caption transition-colors duration-400',
             active === tab.key
               ? 'bg-ink text-paper'
-              : 'text-ink-soft hover:text-ink',
+              : 'text-on-surface-soft hover:text-on-surface',
           )}
         >
           {tab.label}

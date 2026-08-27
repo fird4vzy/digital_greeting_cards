@@ -46,15 +46,15 @@ export function MemoriesSection({ dict }: { dict: Dictionary }) {
           {ingredients(dict).map((item) => (
             <Reveal key={item.label} preset="fade" className={item.span}>
               <div
-                className="h-full rounded-[1.25rem] border border-line bg-white/70 p-6 shadow-[var(--shadow-lift)] transition-transform duration-700 ease-[var(--ease-out-expo)] hover:rotate-0 sm:p-7"
+                className="h-full rounded-[1.25rem] border border-edge bg-surface-2/70 p-6 shadow-[var(--shadow-lift)] transition-transform duration-700 ease-[var(--ease-out-expo)] hover:rotate-0 sm:p-7"
                 style={{ rotate: item.tilt }}
               >
-                <span className="eyebrow text-accent">{item.label}</span>
+                <span className="eyebrow text-brand">{item.label}</span>
                 <p
                   className={
                     'display' in item && item.display
-                      ? 'mt-4 font-display text-display-sm leading-none text-ink'
-                      : 'mt-3.5 text-body leading-relaxed text-pretty text-ink-soft'
+                      ? 'mt-4 font-display text-display-sm leading-none text-on-surface'
+                      : 'mt-3.5 text-body leading-relaxed text-pretty text-on-surface-soft'
                   }
                 >
                   {item.body}
@@ -65,10 +65,10 @@ export function MemoriesSection({ dict }: { dict: Dictionary }) {
 
           <Reveal preset="fade" className="sm:col-span-5">
             <div
-              className="h-full rounded-[1.25rem] border border-line bg-white/70 p-6 shadow-[var(--shadow-lift)] sm:p-7"
+              className="h-full rounded-[1.25rem] border border-edge bg-surface-2/70 p-6 shadow-[var(--shadow-lift)] sm:p-7"
               style={{ rotate: '1.4deg' }}
             >
-              <span className="eyebrow text-accent">{dict.ui.memories.labels.photos}</span>
+              <span className="eyebrow text-brand">{dict.ui.memories.labels.photos}</span>
               <div className="mt-4 grid grid-cols-4 gap-2">
                 {PHOTOS.map((url, index) => (
                   <span

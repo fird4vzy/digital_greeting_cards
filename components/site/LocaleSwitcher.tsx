@@ -43,7 +43,7 @@ export function LocaleSwitcher({
           'inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-caption transition-colors duration-300',
           tone === 'paper'
             ? 'text-paper/70 hover:text-paper'
-            : 'text-ink-soft hover:text-ink',
+            : 'text-on-surface-soft hover:text-on-surface',
           pending && 'opacity-50',
         )}
       >
@@ -71,7 +71,7 @@ export function LocaleSwitcher({
           />
           <ul
             role="listbox"
-            className="absolute right-0 top-11 z-50 min-w-[9rem] overflow-hidden rounded-[0.75rem] border border-line bg-paper py-1 shadow-[var(--shadow-float)]"
+            className="absolute right-0 top-11 z-50 min-w-[9rem] overflow-hidden rounded-[0.75rem] border border-edge bg-surface py-1 shadow-[var(--shadow-float)]"
           >
             {LOCALES.map((candidate) => (
               <li key={candidate}>
@@ -83,8 +83,8 @@ export function LocaleSwitcher({
                   className={cn(
                     'block w-full px-4 py-2 text-left text-caption transition-colors',
                     candidate === locale
-                      ? 'bg-ink/[0.06] text-ink'
-                      : 'text-ink-soft hover:bg-ink/[0.04] hover:text-ink',
+                      ? 'bg-on-surface/[0.06] text-on-surface'
+                      : 'text-on-surface-soft hover:bg-on-surface/[0.04] hover:text-on-surface',
                   )}
                 >
                   {LOCALE_META[candidate].native}

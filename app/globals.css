@@ -30,6 +30,42 @@
   --color-line-strong: rgba(25, 21, 18, 0.18);
   --color-line-inverse: rgba(246, 242, 236, 0.16);
 
+  /* --- Roles: what a colour is FOR, not what it is ---------------------
+     The literals above stay exactly as they were and keep their meaning:
+     `paper` is that cream, `ink` is that brown-black. The names below say
+     what a thing is doing instead — a page surface, the text on it, a
+     hairline — and that is the only kind of name a theme can swap.
+
+     The distinction is not pedantry. `PhoneFrame` uses `bg-ink` for the
+     black plastic of a handset and `MemoriesSection` uses `bg-white/70`
+     for a card: neither is "the text colour" or "the page", and a theme
+     that flipped `--color-ink` would turn a phone's body cream. Only the
+     things that mean a role move; the things that mean a colour stay put.
+     Which components are deliberately frozen is recorded in
+     `design/dark-landing-plan.md`, step 5. */
+  --color-surface: var(--color-paper);
+  --color-surface-2: var(--color-paper-warm);
+  --color-surface-3: var(--color-paper-deep);
+
+  --color-on-surface: var(--color-ink);
+  --color-on-surface-soft: var(--color-ink-soft);
+  --color-on-surface-muted: var(--color-ink-muted);
+  --color-on-surface-faint: var(--color-ink-faint);
+
+  --color-edge: var(--color-line);
+  --color-edge-strong: var(--color-line-strong);
+
+  --color-brand: var(--color-accent);
+  --color-brand-soft: var(--color-accent-soft);
+  --color-brand-deep: var(--color-accent-deep);
+
+  /* Главная кнопка — единственное место, где цвет текста служит заливкой, а
+     цвет фона — текстом. Без собственной пары ролей она переводится наполовину: заливка
+     становится светлой, а цвет нажатия остаётся тёмно-вишнёвым — то есть под курсором
+     кнопка теряет читаемость. Поэтому у неё своя поверхность и свой текст. */
+  --color-cta: var(--color-ink);
+  --color-on-cta: var(--color-paper);
+
   /* --- Typography ------------------------------------------------------ */
   --font-display: var(--font-instrument-serif), 'Iowan Old Style', Georgia, serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
@@ -79,6 +115,72 @@
 }
 
 /* ==========================================================================
+   THE DARK SCOPE
+   ==========================================================================
+
+   Everything inside `[data-theme='noir']` reads the same role names and gets
+   different values. Nothing outside it changes, which is the whole point: the
+   landing is going dark and `/works`, `/templates`, `/admin`, `/shops` and a
+   published card at `/c/<code>` are staying exactly as they are.
+
+   **It sits after `@theme` on purpose.** Tailwind emits theme variables onto
+   `:root`, and `:root` and `[data-theme='noir']` have identical specificity
+   (0,1,0) — so the later rule wins, and only the later one. Move this block
+   above `@theme` and the dark values are silently ignored.
+
+   Values come from `design/preview/bir-dunyo-v10.html`. The text tints are
+   `color-mix` off one ink rather than four hand-picked hexes, because on a
+   dark ground the three steps are the *same* colour at different strengths;
+   picking them separately is how a palette drifts.
+
+   `--color-brand` is warmer here than the light `#a33b48`, and that is not
+   taste: `#a33b48` on `#17130f` is close to unreadable, and it carries focus
+   rings and selection. Contrast, not preference.
+   ========================================================================== */
+
+[data-theme='noir'] {
+  --color-surface: #17130f;
+  --color-surface-2: #1c1917;
+  --color-surface-3: #0e0b09;
+
+  --color-on-surface: #f0e7da;
+  --color-on-surface-soft: color-mix(in srgb, #f0e7da 72%, transparent);
+  --color-on-surface-muted: color-mix(in srgb, #f0e7da 58%, transparent);
+  --color-on-surface-faint: color-mix(in srgb, #f0e7da 26%, transparent);
+
+  --color-edge: color-mix(in srgb, #f0e7da 15%, transparent);
+  --color-edge-strong: color-mix(in srgb, #f0e7da 24%, transparent);
+
+  --color-brand: #c2404e;
+  --color-brand-soft: #e7c9c6;
+  --color-brand-deep: #8f2f3a;
+
+  /* На тёмном главная кнопка переворачивается: светлая плашка, тёмные
+     буквы. Иначе чернильная заливка #191512 легла бы на фон #17130f — главный
+     призыв к действию стал бы почти невидим рядом со второстепенной. */
+  --color-cta: #f0e7da;
+  --color-on-cta: #17130f;
+
+  /* Ink-coloured drop shadows do not exist on ink. What lifts a surface off a
+     dark ground is a light hairline along its top edge, so the three
+     elevations become three strengths of that instead of three blurs. Eighteen
+     places read these through `shadow-[var(--shadow-*)]`; they keep working. */
+  --shadow-lift: inset 0 1px 0 rgba(240, 231, 218, 0.06);
+  --shadow-float: inset 0 1px 0 rgba(240, 231, 218, 0.09), 0 24px 60px -24px rgba(0, 0, 0, 0.6);
+  --shadow-deep: inset 0 1px 0 rgba(240, 231, 218, 0.12), 0 40px 120px -40px rgba(0, 0, 0, 0.75);
+
+  /* Scrollbars, form controls and the overscroll gutter follow the page. */
+  color-scheme: dark;
+}
+
+/* The rubber-band area above and below the document is painted from `body`,
+   not from the scope, so without this an iOS overscroll flashes a cream band
+   under a dark page. `:has()` keeps it conditional — no other route moves. */
+body:has([data-theme='noir']) {
+  background-color: #17130f;
+}
+
+/* ==========================================================================
    BASE
    ========================================================================== */
 
@@ -125,13 +227,21 @@
     overflow-x: clip;
   }
 
+  /* Both read the role, so the dark scope moves them with it. On `#17130f`
+     the light accent `#a33b48` is nearly invisible, and a focus ring nobody
+     can see is an accessibility fault rather than a styling one. */
   ::selection {
-    background: var(--color-accent-soft);
+    background: var(--color-brand-soft);
     color: var(--color-accent-deep);
   }
 
+  [data-theme='noir'] ::selection {
+    background: var(--color-brand);
+    color: #17130f;
+  }
+
   :focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 2px solid var(--color-brand);
     outline-offset: 3px;
     border-radius: 2px;
   }

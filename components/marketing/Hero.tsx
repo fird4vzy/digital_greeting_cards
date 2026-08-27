@@ -55,7 +55,7 @@ export function Hero({ strings }: { strings: Dictionary['ui']['hero'] }) {
       {/* Paper wash so type stays readable over the scene. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-paper/70 via-paper/80 to-paper lg:bg-gradient-to-r lg:from-paper lg:via-paper/70 lg:to-transparent"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-surface/70 via-surface/80 to-surface lg:bg-gradient-to-r lg:from-surface lg:via-surface/70 lg:to-transparent"
       />
 
       <motion.div
@@ -64,20 +64,20 @@ export function Hero({ strings }: { strings: Dictionary['ui']['hero'] }) {
       >
         <div className="max-w-[36rem]">
           <Reveal preset="fade" immediate>
-            <span className="eyebrow inline-flex items-center gap-2.5 text-ink-muted">
-              <span aria-hidden="true" className="h-px w-7 bg-accent/60" />
+            <span className="eyebrow inline-flex items-center gap-2.5 text-on-surface-muted">
+              <span aria-hidden="true" className="h-px w-7 bg-brand/60" />
               {strings.eyebrow}
             </span>
           </Reveal>
 
-          <h1 className="mt-8 font-display text-display leading-[0.96] tracking-[-0.03em] text-ink">
+          <h1 className="mt-8 font-display text-display leading-[0.96] tracking-[-0.03em] text-on-surface">
             <HeroLine text={strings.line1} delay={0.15} />
             <HeroLine text={strings.line2} delay={0.28} />
             <HeroLine text={strings.line3} delay={0.41} italic />
           </h1>
 
           <Reveal preset="fade" immediate delay={0.75}>
-            <p className="mt-8 max-w-[34ch] text-body-lg text-pretty text-ink-soft">
+            <p className="mt-8 max-w-[34ch] text-body-lg text-pretty text-on-surface-soft">
               {strings.sub}
             </p>
           </Reveal>
@@ -106,11 +106,11 @@ export function Hero({ strings }: { strings: Dictionary['ui']['hero'] }) {
         transition={{ delay: reduced ? 0 : 1.6, duration: 1 }}
         style={{ opacity: fade }}
       >
-        <span className="eyebrow flex items-center gap-3 text-ink-faint">
-          <span aria-hidden="true" className="relative block h-8 w-px overflow-hidden bg-line-strong">
+        <span className="eyebrow flex items-center gap-3 text-on-surface-faint">
+          <span aria-hidden="true" className="relative block h-8 w-px overflow-hidden bg-edge-strong">
             {!reduced ? (
               <motion.span
-                className="absolute inset-x-0 top-0 block h-3 bg-accent"
+                className="absolute inset-x-0 top-0 block h-3 bg-brand"
                 animate={{ y: ['-100%', '300%'] }}
                 transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut', repeatDelay: 0.5 }}
               />

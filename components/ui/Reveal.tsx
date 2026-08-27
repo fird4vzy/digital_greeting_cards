@@ -143,8 +143,8 @@ export function Eyebrow({
     <span
       className={cn(
         'eyebrow inline-flex items-center gap-2.5',
-        tone === 'muted' && 'text-ink-muted',
-        tone === 'accent' && 'text-accent',
+        tone === 'muted' && 'text-on-surface-muted',
+        tone === 'accent' && 'text-brand',
         tone === 'inverse' && 'text-paper/55',
         className,
       )}

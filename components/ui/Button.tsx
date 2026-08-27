@@ -11,9 +11,9 @@ const base =
   'active:scale-[0.985] disabled:pointer-events-none disabled:opacity-40 select-none';
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-ink text-paper hover:bg-accent-deep shadow-[var(--shadow-lift)] hover:shadow-[var(--shadow-float)]',
-  secondary: 'border border-line-strong text-ink hover:border-ink hover:bg-ink/[0.03]',
-  ghost: 'text-ink-soft hover:text-ink',
+  primary: 'bg-cta text-on-cta hover:bg-brand-deep hover:text-paper shadow-[var(--shadow-lift)] hover:shadow-[var(--shadow-float)]',
+  secondary: 'border border-edge-strong text-on-surface hover:border-on-surface hover:bg-on-surface/[0.03]',
+  ghost: 'text-on-surface-soft hover:text-on-surface',
   inverse: 'bg-paper text-ink hover:bg-white shadow-[var(--shadow-float)]',
 };
 

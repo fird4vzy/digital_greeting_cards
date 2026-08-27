@@ -48,7 +48,7 @@ export function Header({
       className={cn(
         'fixed inset-x-0 top-0 z-50 transition-[background-color,backdrop-filter,border-color] duration-500 ease-[var(--ease-out-expo)]',
         settled
-          ? 'border-b border-line bg-paper/85 backdrop-blur-xl'
+          ? 'border-b border-edge bg-surface/85 backdrop-blur-xl'
           : 'border-b border-transparent bg-transparent',
       )}
       initial={{ y: -24, opacity: 0 }}
@@ -64,7 +64,7 @@ export function Header({
               <Link
                 key={link.href}
                 href={link.href}
-                className="relative text-caption text-ink-soft transition-colors duration-300 hover:text-ink"
+                className="relative text-caption text-on-surface-soft transition-colors duration-300 hover:text-on-surface"
               >
                 {link.label}
               </Link>
