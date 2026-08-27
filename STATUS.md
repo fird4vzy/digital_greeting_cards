@@ -5,12 +5,19 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 27 August 2026 — **выбор шаблона перестал быть
-обязательным по-настоящему**: заказчик может описать свою идею словами или
-показать на работу из «Наших работ», и то и другое доезжает до оператора
-отдельным полем. Приглушённый текст затемнён — он не проходил контраст ни на
-одной светлой поверхности. **Одно всё ещё наполовину: кнопка на `/shops` ведёт
-на `@birdunyobot`, а написанное туда никто не читает.**
+**Last updated:** 27 August 2026, вечер — **выбор шаблона перестал быть
+обязательным**: заказчик описывает свою идею словами или показывает на работу
+из «Наших работ», и то и другое доезжает до оператора отдельным полем.
+Миграция 006 применена. Подписи в форме перестали быть серифом, приглушённый
+текст затемнён. Раздел про работу оператора переписан: путей два, и «Собрать
+открытку» относится только к одному из них.
+
+**Одно всё ещё наполовину: кнопка на `/shops` ведёт на `@birdunyobot`, а
+написанное туда никто не читает.**
+
+Файл в этот день заметно почищен — из него убраны замещённый список задач и
+полторы сотни строк выполненного плана, четверть которого к тому же откачена.
+Осталось то, чем пользуются.
 
 **Если вы открыли этот файл, чтобы понять, что делать** — следующий раздел, он
 первый и по-русски. Всё остальное ниже объясняет «почему».
@@ -46,15 +53,13 @@ what is waiting.
 
 Это не код, это доступы и живая база. Ни одну из них я сделать не могу.
 
-1. **Применить миграцию 006** — она добавляет колонку `wish`, куда пишется
-   «своя идея» и «как ваша работа». `npm run db:migrate`.
-   Если ответит `DATABASE_URL is not set` — это не поломка, а отсутствующий
-   `.env.local`: он в `.gitignore` и с `git pull` не приходит. Один раз на
-   машину: `npx vercel link`, затем `npx vercel env pull .env.local` — и файл
-   появится со всеми переменными сразу. Подробности в Things that will bite.
-   Саму миграцию запускать можно когда угодно, до выкладки или после:
-   `postgres.ts` спрашивает базу один раз за процесс, есть ли колонка, и пока
-   её нет — форма работает, желание просто не сохраняется.
+1. ~~**Применить миграцию 006.**~~ **Сделано 27 августа:** `applied
+   006-order-wish.sql`. Колонка `wish` на месте, «своя идея» и «как ваша
+   работа» сохраняются в заказ.
+   Если на новой машине `db:migrate` ответит `DATABASE_URL is not set` — это не
+   поломка, а отсутствующий `.env.local`: он в `.gitignore` и с `git pull` не
+   приходит. Один раз на машину: `npx vercel link`, затем
+   `npx vercel env pull .env.local`. Подробности в Things that will bite.
 2. **Починить уведомления. Причина уже найдена, осталось три действия.**
    Тестовый заказ 27 августа в группу не пришёл; диагноз целиком — в пункте 1
    раздела Open items, коротко:
@@ -222,9 +227,10 @@ Environment variables in Vercel:
 | `TELEGRAM_BOT_TOKEN` | set — but the token still wants revoking, see item 1 |
 | `TELEGRAM_CHAT_ID` | set. A new order writes to the group |
 
-Both migrations in `lib/db/migrations/` are applied to the live database.
-Verified by placing a real order against production: it was accepted, arrived
-as `NEW`, and stored its brief.
+**Все шесть миграций** в `lib/db/migrations/` применены к боевой базе,
+последняя — `006-order-wish.sql`, 27 августа. Строка «Both migrations» стояла
+здесь до шестой и успела устареть дважды, поэтому теперь считается не число, а
+называется последняя применённая.
 
 ---
 
@@ -556,35 +562,25 @@ common), **Konvert** (envelope — understood but generic), **Anor**
   stay an impulse yes, and the majority should stay with the shop — the pitch
   is earnings, not commission. The fastest way to the number is asking a
   florist what *they* would charge.
-### Next, in this order
+### Что из этого осталось верным
 
-**Superseded — the current, actionable list is «Что делать дальше — по шагам»
-at the top of this file.** Kept below because the reasoning still holds and the
-struck-through entries record what was decided and why.
+Список задач, стоявший здесь, замещён разделом «Что делать дальше — по шагам» в
+начале файла: он весь выполнен или отменён, и два списка задач в одном
+документе — это ровно тот способ запутаться, ради борьбы с которым файл и
+пишется.
 
-1. **Close the STATUS items above.** A shop page in front of a product whose
-   notifications do not work is worthless — the brief never reaches anyone.
-2. ~~**Build `/shops`.**~~ Done. Six blocks: the offer, an earnings calculator
-   driven by the florist's own bouquet price and volume, the product playing
-   itself in a phone, the three-step workflow with real timings, the five
-   questions shops actually ask, and a Telegram conversation instead of a
-   signup form. Linked from the footer. A price *table* turned into a
-   *calculator* deliberately — a florist wants to know what it adds to their
-   counter, not what a card costs in the abstract.
-   **Before showing it to anyone:** set `telegram` in `lib/shops/offer.ts`. It
-   reads `@birdunyo`, which is a placeholder that merely looks real — nobody
-   has checked whether the handle exists or registered it.
-3. **Templates.** The plan is its own section further down — a video beat, then
-   one hand port, then a builder, then an importer. That is the next real work.
-4. **Do not rebuild the homepage yet.** The current landing is what a shop
-   sends its customer; it is written for exactly that. Rewriting it for an
-   audience nobody has spoken to yet is optimising blind. Talk to five
-   florists first.
+Три вывода из него не устарели и переезжают сюда целиком:
 
-Bear in mind the website is not the main tool while there are zero shops. The
-first ten close by walking in with a phone, showing a real card, and leaving a
-printed tag. The page is what they open after you leave, to check you are not
-a student project.
+- **`/shops` собран как калькулятор, а не как прайс.** Флористу важно, сколько
+  это добавит к его счёту, а не сколько стоит открытка сама по себе. Все цифры
+  в `lib/shops/offer.ts`, помечены предварительными; меняете файл — страница
+  следует за ним.
+- **Лендинг под магазины не переписывать,** пока не поговорили ни с одним
+  флористом. Пока их ноль, это оптимизация вслепую.
+- **Сайт — не главный инструмент, пока магазинов ноль.** Первые десять
+  закрываются приходом с телефоном, показом настоящей открытки и оставленной
+  печатной биркой. Страница — то, что откроют после ухода, чтобы убедиться,
+  что это не студенческий проект.
 
 ---
 
@@ -807,34 +803,67 @@ Cosmetic, visible, and a separate sweep.
 
 ---
 
-## What an operator actually does with an order
+## Что оператор делает с заказом: два пути
 
-Asked on 20 August, in the form "how am I supposed to build the card, and how
-do I upload it so the customer gets a QR?" — which is the right question, and
-the answer had never been written down anywhere the operator could see it.
+Спрошено 20 августа — «как мне собрать открытку и как её загрузить, чтобы у
+заказчика заработал QR» — и с тех пор переписывалось трижды, потому что ответ
+менялся. Ниже он целиком и в одном месте.
 
-**Nothing is ever uploaded, and the card is not a file.** It is rows in a
-database rendered by this site at `/c/<code>`. That is the whole reason the
-QR can be printed before the card is finished: the code is decided when the
-order is created, and only what it resolves to changes.
+**Открытка — не файл.** Это строки в базе, которые сайт рисует по адресу
+`/c/<код>`. Поэтому QR печатают заранее: код закрепляется за заказом в момент
+его создания, а меняется только то, во что он разворачивается.
 
-The order of operations, now printed on the order page itself in all three
-languages:
+Путей два, и они не смешиваются.
 
-1. Read the brief and the customer's own words. That is the only writing a
-   person does — the engine invents nothing.
-2. Pick a template, press **Собрать открытку**. The card is composed from the
-   answers; recomposing with a different template is free and repeatable.
-3. Press **Посмотреть черновик**. Same card the recipient will see, with a
-   banner saying it is a draft.
-4. Set the status to **Опубликован**. Only now does `/c/<code>` resolve.
-5. Press **Бирка на печать**, print, tie to the bouquet.
+### Путь A. Открытку собирает движок
 
-**Step 3 did not exist.** `/c/[code]/preview` was built for exactly this and
-composes on the fly, but the admin button pointed at the public URL and was
-disabled until `PUBLISHED` — so the only way to see a card was to publish it,
-which is the wrong order for a check. The button now points at the preview
-before publishing and at the real card after.
+1. Прочитать пожелания и слова заказчика. Это единственное, что пишет человек;
+   движок ничего не выдумывает.
+2. Выбрать шаблон, нажать **«Собрать открытку»**. Пересобрать другим шаблоном
+   можно сколько угодно раз.
+3. Нажать **«Посмотреть черновик»** — та же открытка, что увидит адресат, с
+   плашкой «черновик».
+4. Поставить статус **«Опубликован»**. Только теперь `/c/<код>` отвечает.
+5. **«Бирка на печать»**, напечатать, привязать к букету.
+
+### Путь B. Открытку пишут руками
+
+Так сделаны все семь работ в разделе «Наши работы», и до 21 августа этот путь
+не поддерживался вообще.
+
+1. Прочитать заказ. Если заказчик описал свою идею или показал на нашу работу —
+   это написано в карточке **выше** пожеланий: он шаблона не хотел.
+2. Сделать папку руками.
+3. **Загрузить папку** в блоке «Своя открытка». С этой минуты по коду идёт она.
+   Содержимое готово.
+4. Поставить статус **«Опубликован»**. Вот это включает адрес.
+5. **«Бирка на печать»**.
+
+**«Собрать открытку» на этом пути не нажимают.** Кнопка принадлежит пути A, и
+это была главная путаница: она стояла в панели первой и читалась как следующий
+шаг. Загруженная папка и есть готовая открытка — собирать после неё нечего.
+Деплоить тоже нечего: файлы лежат в базе и отдаются с `/u/<код>/…`.
+
+С 27 августа панель говорит это первой строкой: «Ваша открытка загружена — по
+коду открывается она. Собирать больше нечего. Остался один шаг: статус
+"Опубликован"». Когда статус уже стоит — подтверждает.
+
+### Два экрана, которые выглядят поломкой и ею не являются
+
+- **«Собрать открытку» будто ничего не делает.** Она пересобирает и пишет в
+  базу — но если загружена своя открытка, результат негде увидеть, по коду
+  идёт папка. Чтобы увидеть сборку, папку надо убрать кнопкой в том же блоке.
+  Открывает при этом не она, а соседняя — «Посмотреть черновик».
+- **«Этой карточки здесь нет» по коду.** Значит, заказ не опубликован.
+  `/c/<код>` строго для опубликованных, потому что код печатают на бирке. До
+  публикации смотреть надо «Посмотреть черновик» — `/c/<код>/preview`,
+  который собирает на лету.
+
+**Шага 3 в пути A когда-то не было.** `/c/[code]/preview` существовал, но
+кнопка в админке вела на публичный адрес и была заблокирована до `PUBLISHED` —
+то есть единственным способом посмотреть открытку было её опубликовать, что
+для проверки ровно наоборот. Теперь до публикации кнопка ведёт на черновик,
+после — на настоящую открытку.
 
 ### The customer chooses a template blind no longer
 
@@ -1214,56 +1243,53 @@ GSAP тоже не переносился: 120 КБ ради интерполя�
 
 ---
 
-## «Собрать открытку» — кнопка другого пути
-
-Возвращается четвёртый раз, и на четвёртый стало ясно, что вопрос был не про
-кнопку, а про весь порядок работы. Владелец описал его так: «взял заказ,
-прочитал, сделал сайт по заказу, загружаю код, нажимаю "Собрать" — и сайт
-готов, задеплоен, QR работает».
-
-**Один шаг тут лишний, и это как раз «Собрать».** Загруженная папка и есть
-готовая открытка: по коду с этой минуты идёт она. Собирать после неё нечего —
-«Собрать открытку» принадлежит другому пути, тому, где открытку делает движок
-из шаблона. Два пути, одна панель, и кнопка стояла первой, поэтому читалась
-как следующий шаг.
-
-Порядок для открытки, написанной руками, целиком:
-
-1. Прочитать заказ. Если заказчик описал свою идею или показал на нашу работу
-   — это написано в карточке выше пожеланий.
-2. Сделать папку руками.
-3. **Загрузить папку** в блоке «Своя открытка». Всё, содержимое готово.
-4. **Поставить статус «Опубликован».** Вот это и включает адрес: до него
-   `/c/<код>` не отвечает никому, включая QR на бирке.
-5. Напечатать бирку.
-
-Деплоить ничего не надо: файлы лежат в базе и отдаются с `/u/<код>/…`. Пункта
-«и всё задеплоено» в списке нет, потому что деплоя не происходит — происходит
-загрузка.
-
-**Что исправлено 27 августа.** Панель начиналась с кнопки «Собрать открытку», а
-объяснение, почему она ничего видимого не делает, шло после неё. Теперь первой
-строкой стоит состояние и следующий шаг: «Ваша открытка загружена — по коду
-открывается она. Собирать больше нечего. Остался один шаг: статус
-"Опубликован"». Когда статус уже стоит — панель это подтверждает.
-
-**Кнопка при этом исправна.** Она пересобирает открытку из ответов и пишет
-результат в базу. Она **не открывает** ничего и не должна: открывает соседняя —
-«Посмотреть черновик».
-
-Два случая, когда кажется, что «ничего не происходит»:
-
-1. **У заказа загружена своя открытка.** Тогда по коду открывается она, а не
-   сборка — в этом весь смысл загрузки. Пересборка при этом происходит честно,
-   просто её негде увидеть. Панель говорит это прямо и предлагает выход:
-   убрать свою открытку кнопкой в блоке «Своя открытка».
-2. **Заказ не опубликован.** `/c/<код>` строго для опубликованных, и это
-   правильно: код печатают на бирке. До публикации смотреть надо
-   «Посмотреть черновик» — `/c/<код>/preview`, который собирает на лету.
-   Экран «Этой карточки здесь нет» на неопубликованном заказе — не поломка, а
-   единственное верное поведение.
-
 ---
+
+## Что было сделано 27 августа
+
+Один вечер, четыре замечания владельца, и все четыре оказались верными.
+Записано подряд, потому что три из них — про одно и то же: продукт навязывал
+шаблон там, где не должен был.
+
+**1. Шаблон перестал быть обязательным.** Отдельный раздел ниже. Коротко: три
+пути на шаге выбора — готовый шаблон, своя идея словами, «как вот эта ваша
+работа»; последнее выросло из наблюдения, что человек смотрит «Наши работы» и
+хочет такое же, а сказать об этом было негде. Хранится в `orders.wish`,
+миграция 006, применена в тот же день.
+
+**2. Превью перестало показывать чужой шаблон.** Заказчику, выбравшему свою
+идею или нашу работу, восьмой шаг всё равно показывал миниатюру шаблона — того
+самого, который он только что отклонил, — под заголовком «Вот она». Теперь
+вместо неё пересказывается его собственная просьба, а строка «Шаблон» из сводки
+уходит.
+
+**3. Шрифт в форме.** Затемнения цвета не хватило, и это была моя ошибка в
+диагнозе: жаловались на шрифт, а починили контраст. Подписи карточек были
+набраны Cormorant Garamond — дисплейным шрифтом с намеренно тонкими штрихами,
+сделанным для заголовка в сорок восемь пунктов. Подписи переехали на основной
+шрифт, 17 пикселей, начертание 500; описания под ними — с 13 на 14. Заголовок
+шага серифом остался.
+
+**4. «Собрать открытку».** Разобрано в разделе про два пути. Вопрос был не про
+кнопку, а про порядок работы, и в нём был лишний шаг.
+
+Отдельно: сообщение об ошибке `db:migrate` теперь само говорит, откуда взять
+`.env.local` (`npx vercel env pull`), потому что этот тупик встречают на каждой
+новой машине и читают как возврат старой поломки.
+
+### Как искали, и почему это стоит повторять
+
+Две находки этого дня получены измерением, а не рассуждением, и обе оказались
+не тем, чем выглядели.
+
+- **Контраст.** «Кажется бледным» превратилось в число: `getComputedStyle` на
+  проде, перевод цвета через canvas (он один разбирает `oklch`), формула WCAG.
+  Вышло 3.99 при норме 4.5 — и не в одном месте, а на всех четырёх светлых
+  поверхностях сразу.
+- **Пропажа текста.** Прогон формы в браузере показал то, чего не видно в
+  коде: заказчик пишет свою идею, заглядывает на вкладку с работами,
+  возвращается — текста нет. Хранение пути и ответа одним полем перезаписывало
+  написанное. Ни один тип и ни одна сборка этого не поймали бы.
 
 ## Tools wired up
 
@@ -1451,167 +1477,30 @@ Not one writes its own composition. The difference between any two is a palette
 (6), a scene (6), which beats play (11), and one word per beat (30 variants).
 That fits in a database row and a form — no file, no deploy.
 
-### The plan, in order
+### Как это делалось, и что от этого осталось
 
-1. ~~**A video beat.**~~ **Done, 14 August.** `video` is the twelfth section
-   kind, declared by all six templates, and it composes straight after the
-   letter — a recording is the closest thing to the sender being in the room,
-   and it lands hardest once the words have set it up. Verified through the real
-   path: with a clip the arc runs cover → envelope → intro → letter → **video**
-   → gallery → quote → final → closing, and the beat's title arrives in the
-   *card's* locale rather than the reader's.
+Весь план 13–17 августа выполнен, а на четверть — откачен, поэтому здесь он
+пересказан коротко: подробный список из пяти вычеркнутых пунктов занимал
+полторы сотни строк и описывал в том числе четыре шаблона, которых больше нет.
+Кому нужны детали — они в `git log` за те дни.
 
-   It is the one beat that can cost megabytes, so it spends nothing until it is
-   asked to: the `<video>` is not mounted until the beat is near the viewport,
-   `preload` is `none`, and a poster stands in until then. Autoplay is muted,
-   in-view only, and off entirely under reduced motion.
+| Что сделали | Что от этого осталось |
+|---|---|
+| Такт `video` (14 авг.) | остался: он в схеме и им пользуются |
+| Порт `iLove` руками → шаблон «Вслух» (14 авг.) | шаблон удалён 19 авг., такт `video` и вариант вида остались |
+| Конструктор шаблонов в `/admin/templates` (14 авг.) | остался и работает: шаблон — строка в базе, не файл |
+| Импортёр: ссылка на репозиторий → черновик рецепта (14 авг.) | остался, но выключен — нужен платный ключ, покупать рано |
+| Порты `invite`, `1`, `BirthdayParty` руками (17 авг.) | шаблоны удалены 19 авг.; такты `question` и `cake`, музыка и `reorder` остались |
 
-   **It takes a URL, not a data URL**, and that is the important consequence.
-   Photographs are inlined into the order record today; a nine-megabyte clip
-   would be a twelve-megabyte database row. This field is where object storage
-   stops being optional — the README already lists inlined photos as a known
-   gap, and this makes it due.
-2. ~~**Port `iLove` by hand.**~~ **Done, 14 August.** It is `templates/aloud/`,
-   called *Вслух / Aloud / Ovoz bilan* — the one where the sender speaks. Live
-   at `/templates/aloud`.
+Оригиналы всех четырёх портов живы и лежат в «Наших работах» — байт в байт,
+и это их настоящее место.
 
-   **The port needed no markup, and cost one palette and one reordering.** The
-   original was a single 40 KB HTML file with its styles and script inline; its
-   four screens mapped onto `cover → envelope → video → letter` exactly, its
-   letter was already blank-line separated paragraphs, and its flying hearts
-   became the `petals` scene over a new `blush` palette taken from its own hex
-   values. The only custom code is a `compose` that moves the video ahead of
-   the letter, the same technique `anniversary` uses for its timeline: you
-   watch someone say it, and the words that follow read as what would not fit
-   in the camera.
-
-   **The choreography was then ported too**, after the first pass turned out to
-   be the right skeleton in the engine's default clothes. Four variants carry
-   it, added the way `templates/README.md` prescribes so the next template gets
-   them free:
-
-   - `cover: gradient` — colour travelling along the name, three stops and back
-     over seven seconds.
-   - `envelope: heart` — not an envelope. The gate is a heart built from one
-     rotated square and two circles, and tapping it sends the note up out of it
-     rather than lifting a flap. The original's units are kept (a 125px square
-     at −45°, circles offset by half its width) because those numbers are what
-     make the lobes meet the point.
-   - `video: screen` — the clip in a near-black box even in a light palette. A
-     video is a window and a window is darker than its wall; without that it
-     reads as an illustration pasted onto paper.
-   - `letter: lines` — one line at a time, each resolving out of blur. The
-     original does this with thirty-six hand-written `nth-child` rules, which
-     works once, for a letter of exactly that length; here the stagger is an
-     index. The blur went to `lib/design/motion.ts` as a `focus` preset.
-
-   Hearts are thrown on the tap — fourteen, outward but never straight down,
-   because hearts that sink read as falling rather than escaping.
-
-   **What still does not survive a port is timing that was tuned by hand**, and
-   that is worth expecting rather than treating as a fault when the importer
-   makes the same trade automatically.
-
-   Verified through the real path: given a clip, `aloud` composes
-   cover → envelope → intro → **video → letter** → gallery → quote → final →
-   closing, while `romantic` on the same input keeps letter → video.
-3. ~~**A builder in `/admin/templates`.**~~ **Done, 14 August.** Pick a palette,
-   a scene, the beats and a look for each, plus one optional reordering, and
-   save. It appears in the gallery, at `/templates/<id>` and in the creation
-   flow with no deploy.
-
-   **A template is a row now, not a file.** `lib/card/recipe.ts` is the shape
-   and `recipeToDefinition` rebuilds a working `TemplateDefinition` from it,
-   `compose` included, so nothing downstream can tell a stored template from a
-   compiled one. Stored in `card_templates` as JSONB — migration
-   `003-templates.sql`, and **`npm run db:migrate` has to run against
-   production before the next deploy.**
-
-   Every control is an enum drawn from the vocabulary the renderer implements,
-   so a form post cannot ask for a look nobody built — the same guarantee the
-   AI layer has, for the same reason. An id belonging to a compiled template is
-   refused outright rather than shadowing it.
-
-   Two things it deliberately does not do. **The AI planner will not see a new
-   template until the next restart**, because `lib/ai/schema.ts` builds its
-   enum at module load; the cost is a slightly worse suggestion, never a broken
-   card. And **there is no live preview in the form** — save it and open
-   `/templates/<id>`, which plays the real thing rather than an approximation
-   of it.
-
-   Verified end to end against a production build: a recipe written straight
-   into the store appears in the gallery beside the seven compiled ones and its
-   page renders.
-
-   Still to come: "save this order as a template", which is now cheap because a
-   finished order already carries most of these fields.
-4. ~~**An importer.**~~ **Done, 14 August.** A field at the top of the builder:
-   paste a public GitHub URL, and it reads the repository's HTML, CSS and JS
-   and fills the form below.
-
-   It is the card planner with a different input. `lib/ai/import-schema.ts`
-   holds the contract, and every field in it is an enum built from what the
-   renderer implements — so the model cannot emit markup any more than the
-   planner can, because there is no field for markup. **That is also what
-   removes the security problem the other three routes had:** serving a
-   stranger's HTML puts their script in the same cookie jar as the admin, and
-   reading it produces data, which does not run.
-
-   **It never saves.** The mapping is a judgement and some of those judgements
-   will be wrong, so the result lands in the form for an operator to correct.
-
-   `unmapped` is the field worth watching. The model is told to list screens no
-   beat covers rather than stretch a beat to fit — that list is the engine's
-   missing vocabulary, named by the thing that needed it. The video beat exists
-   because a hand port turned one up the same way.
-
-   Private repositories are refused rather than asked for a token. A feature
-   that reads source should not start collecting credentials that can read
-   source.
-
-   **It is not switched on, deliberately.** `ANTHROPIC_API_KEY` is unset and
-   buying one was weighed and declined on 17 August: the importer saves work on
-   templates that are now all ported, and the four that existed were done by
-   hand for nothing. Turn it on when somebody other than the two of us needs to
-   add a template, or when there are thirty rather than ten.
-
-   Setting the key no longer switches the card planner — that needs
-   `AI_PLANNER=on` as well. They were one switch, which quietly coupled an
-   operator tool run a handful of times to every customer's letter being
-   rewritten by a model. At this volume a person writes better, which is why the
-   product is concierge; the planner stays off until writing by hand gets
-   expensive.
-
-   The importer also takes a **folder**, not only a URL. Most hand-written cards
-   are a folder on a desktop, and the browser posts only the text — images,
-   audio and video are filtered out, because they belong to a card rather than a
-   template.
-
-5. ~~**`invite` and `1` through the builder.**~~ **Ported by hand instead, 17
-   August, along with `BirthdayParty`.** The importer needs a paid key that is
-   not worth buying yet — see the note below — and four templates by hand is an
-   afternoon, so they were done properly rather than approximately.
-
-   | Original | Template | What the engine was missing |
-   |---|---|---|
-   | `iLove` | **Вслух / Aloud** | the `video` beat |
-   | `1` | **За окном / The Window** | `cover: film` — video *behind* the type |
-   | `invite` | **Пойдём? / Shall We** | the `question` beat |
-   | `BirthdayParty` | **При свечах / Candlelight** | the `cake` beat, card-level music |
-
-   **All four originals are now also in «Наши работы»**, so the section shows
-   both the card that was made for a person and the template it became. The
-   table above doubles as the mapping `Work.portedTo` renders.
-
-   Ten templates now, four of them ported. **Every port turned up vocabulary
-   the engine did not have**, which is the same thing the importer's
-   `unmapped` field is for — doing them by hand simply found it sooner.
-
-Order mattered, and it paid: building the builder first would have meant
-guessing its fields, and the `reorder` field — the one that separates *Aloud*
-from *Nocturne* — only became obvious after porting a template by hand.
-
----
+**Вывод, ради которого стоит это помнить:** каждый порт вскрывал слово,
+которого в движке не было, — `video`, `question`, `cake`, `reorder`. Ровно для
+этого у импортёра есть поле `unmapped`. Ручные порты просто нашли их раньше.
+И порядок оказался важен: строй мы конструктор первым, поля пришлось бы
+угадывать, а `reorder` — то, чем «Вслух» отличался от «Ноктюрна», — стал
+очевиден только после того, как один шаблон собрали руками.
 
 ## Ideas discussed, not built
 
