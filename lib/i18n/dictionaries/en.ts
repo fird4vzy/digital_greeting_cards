@@ -25,6 +25,7 @@ export const en: Dictionary = {
       sub: 'Create a little digital world for someone special.',
       ctaPrimary: 'Create something beautiful',
       ctaSecondary: 'Explore templates',
+      ctaWorks: 'See the work',
       scroll: 'Scroll',
     },
 
@@ -70,6 +71,7 @@ export const en: Dictionary = {
       eyebrow: 'The bridge',
       title: 'Attach it to a bouquet.',
       lead: 'The flowers arrive the way they always have. The card is the part they keep.',
+      doorLine: 'A QR code is just a door. Nobody remembers the door.',
       steps: [
         { title: 'The bouquet', body: 'Chosen at the shop, the way it has always been done.' },
         { title: 'The card', body: 'A small printed card tied to the stems. One line, one code.' },

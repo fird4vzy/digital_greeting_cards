@@ -32,11 +32,12 @@ const PHOTOS = [0, 1, 2, 3].map((index) =>
   }),
 );
 
-export function MemoriesSection({ dict }: { dict: Dictionary }) {
+export function MemoriesSection({ dict, counter }: { dict: Dictionary; counter?: string }) {
   return (
     <section className="relative px-[var(--spacing-gutter)] py-[var(--spacing-section)]">
       <div className="mx-auto w-full max-w-[86rem]">
         <SectionHeading
+          counter={counter}
           eyebrow={dict.ui.memories.eyebrow}
           title={dict.ui.memories.title}
           lead={dict.ui.memories.lead}

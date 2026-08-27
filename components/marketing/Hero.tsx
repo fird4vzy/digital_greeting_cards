@@ -20,7 +20,18 @@ const BRAND_PARTICLES = ['#e7c9c6', '#c1836a', '#efe7db'];
  * centred landing page. The only scroll-linked motion is a slow parallax
  * drift on the scene — enough to feel alive, not enough to notice.
  */
-export function Hero({ strings }: { strings: Dictionary['ui']['hero'] }) {
+export function Hero({
+  strings,
+  secondaryCta,
+}: {
+  strings: Dictionary['ui']['hero'];
+  /**
+   * Куда ведёт вторая кнопка. По умолчанию — шаблоны, как было всегда.
+   * Стенд тёмной редакции направляет её на работы — так в образце,
+   * и это продуктовое решение ещё не принято для главной.
+   */
+  secondaryCta?: { href: string; label: string };
+}) {
   const ref = useRef<HTMLElement | null>(null);
   // Deliberately not framer's `useReducedMotion`: it reads the media query
   // synchronously, so the server renders the animated tree and the client
@@ -88,8 +99,8 @@ export function Hero({ strings }: { strings: Dictionary['ui']['hero'] }) {
                 {strings.ctaPrimary}
                 <ArrowGlyph />
               </ButtonLink>
-              <ButtonLink href="/templates" variant="secondary" size="lg">
-                {strings.ctaSecondary}
+              <ButtonLink href={secondaryCta?.href ?? '/templates'} variant="secondary" size="lg">
+                {secondaryCta?.label ?? strings.ctaSecondary}
               </ButtonLink>
             </div>
           </Reveal>

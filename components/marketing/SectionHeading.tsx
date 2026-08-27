@@ -3,6 +3,7 @@ import { Eyebrow, Reveal, WordReveal } from '@/components/ui/Reveal';
 import { cn } from '@/lib/utils/cn';
 
 export function SectionHeading({
+  counter,
   eyebrow,
   title,
   lead,
@@ -11,6 +12,12 @@ export function SectionHeading({
   className,
   children,
 }: {
+  /**
+   * Номер секции в актах лендинга — «01», «02». Формат «01 — Шаг первый»
+   * собирает компонент, а не словарь: тире и порядок — оформление, а не текст.
+   * Необязателен: светлые страницы его не передают и не меняются.
+   */
+  counter?: string;
   eyebrow?: string;
   title: string;
   lead?: string;
@@ -29,12 +36,24 @@ export function SectionHeading({
     >
       {eyebrow ? (
         <Reveal preset="fade">
-          <Eyebrow
-            tone={tone === 'paper' ? 'inverse' : 'muted'}
-            className={cn(align === 'center' && 'justify-center')}
-          >
-            {eyebrow}
-          </Eyebrow>
+          {counter ? (
+            <span
+              className={cn(
+                'flex items-baseline gap-3',
+                align === 'center' && 'justify-center',
+              )}
+            >
+              <span className="counter-mark">{counter}</span>
+              <Eyebrow tone={tone === 'paper' ? 'inverse' : 'muted'}>{eyebrow}</Eyebrow>
+            </span>
+          ) : (
+            <Eyebrow
+              tone={tone === 'paper' ? 'inverse' : 'muted'}
+              className={cn(align === 'center' && 'justify-center')}
+            >
+              {eyebrow}
+            </Eyebrow>
+          )}
         </Reveal>
       ) : null}
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, type ReactNode } from 'react';
+import { useInView } from '@/lib/hooks/useInView';
 import { BouquetStage } from './BouquetStage';
 
 /**
@@ -31,11 +32,21 @@ export function BouquetScrollStage({
   className?: string;
 }) {
   const section = useRef<HTMLDivElement>(null);
+  // Гейт по секции, а не по слою: слой у BouquetStage растянут на весь
+  // вьюпорт и «виден» всегда, из-за чего канвас жил бы на всей странице —
+  // и позади героя, у которого собственная сцена, рисовались бы две разом.
+  const { ref: gate, inView } = useInView<HTMLDivElement>({ once: false, rootMargin: '300px' });
 
   return (
     <>
-      <BouquetStage sectionRef={section} range={range} />
-      <div ref={section} className={className}>
+      {inView ? <BouquetStage sectionRef={section} range={range} /> : null}
+      <div
+        ref={(node) => {
+          section.current = node;
+          gate.current = node;
+        }}
+        className={className}
+      >
         {children}
       </div>
     </>

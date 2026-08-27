@@ -29,6 +29,7 @@ export const uz: Dictionary = {
       sub: 'Yaqin insoningiz uchun kichkina dunyo yarating.',
       ctaPrimary: 'Chiroyli narsa yaratish',
       ctaSecondary: "Shablonlarni ko'rish",
+      ctaWorks: "Ishlarni ko‘rish",
       scroll: 'Pastga',
     },
 
@@ -74,6 +75,7 @@ export const uz: Dictionary = {
       eyebrow: "Ko'prik",
       title: 'Guldastaga biriktiring.',
       lead: "Gullar har doimgidek keladi. Kartochka esa — qoladigan qismi.",
+      doorLine: "QR — bu shunchaki eshik. Eshikni hech kim eslab qolmaydi.",
       steps: [
         { title: 'Guldasta', body: "Do'kondan tanlanadi — har doimgidek." },
         { title: 'Kartochka', body: "Poyaga bog'langan kichkina bosma yorliq. Bitta satr va kod." },

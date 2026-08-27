@@ -56,6 +56,12 @@
   --color-edge-strong: var(--color-line-strong);
 
   --color-brand: var(--color-accent);
+  /* Поверхность тёмных сцен — секций, которые тёмны на любой теме.
+     На светлой странице это тот же noir, что и был, — ничего не меняется. На
+     тёмной фон страницы сам #17130f, и без собственной поверхности эти
+     секции сливаются с ним в сплошную массу — ровно это было видно на
+     первых снимках стенда. */
+  --color-stage: var(--color-noir);
   --color-brand-soft: var(--color-accent-soft);
   --color-brand-deep: var(--color-accent-deep);
 
@@ -160,6 +166,10 @@
      призыв к действию стал бы почти невидим рядом со второстепенной. */
   --color-cta: #f0e7da;
   --color-on-cta: #17130f;
+
+  /* Глубже фона, а не светлее: тёмная сцена на тёмной странице читается
+     как провал в ещё большую темноту — смена регистра сохраняется. */
+  --color-stage: #0e0b09;
 
   /* Ink-coloured drop shadows do not exist on ink. What lifts a surface off a
      dark ground is a light hairline along its top edge, so the three
@@ -284,6 +294,17 @@ body:has([data-theme='noir']) {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   line-height: 1.4;
+}
+
+/* Счётчик секции — «01» перед надзаголовком. Третий голос мелкого
+   текста, намеренно не совпадающий с eyebrow: антиква вместо гротеска,
+   фирменный цвет вместо приглушённого, разрядка .2em и без капса.
+   Расхождение трекингов с eyebrow — намеренное, из образца. */
+@utility counter-mark {
+  font-family: var(--font-display);
+  font-size: 0.8125rem;
+  letter-spacing: 0.2em;
+  color: var(--color-brand);
 }
 
 /* Editorial reveal: text rises from behind a mask. Used for headlines. */

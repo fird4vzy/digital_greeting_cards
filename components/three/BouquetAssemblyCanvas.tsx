@@ -31,6 +31,10 @@ export default function BouquetAssemblyCanvas({
   active = true,
 }: BouquetAssemblyCanvasProps) {
   const visible = usePageVisible();
+  // Клиентский компонент за dynamic({ ssr: false }): window есть всегда.
+  // Замер один раз при монтировании; поворот телефона пересоздаст страницу
+  // задолго до того, как эта разница станет заметна.
+  const [narrowScreen] = useState(() => window.innerWidth < 680);
   const running = active && visible;
 
   return (
@@ -41,7 +45,9 @@ export default function BouquetAssemblyCanvas({
         powerPreference: 'high-performance',
         stencil: false,
       }}
-      dpr={[1, 1.75]}
+      // На узких экранах потолок ниже: телефонный GPU не должен растить
+      // 266 лепестков в ретина-разрешении ради кадра вполголоса.
+      dpr={[1, narrowScreen ? 1.5 : 1.75]}
       camera={{ position: [0, 1.2, 6.2], fov: 38, near: 0.1, far: 100 }}
       frameloop={running ? 'always' : 'never'}
       onCreated={({ gl }) => {

@@ -76,6 +76,8 @@ export type Dictionary = {
       sub: string;
       ctaPrimary: string;
       ctaSecondary: string;
+      /** Вторая кнопка героя, когда она ведёт на работы, а не на шаблоны. */
+      ctaWorks: string;
       scroll: string;
     };
     feeling: { eyebrow: string; title: string; lead: string; explore: string };
@@ -112,6 +114,11 @@ export type Dictionary = {
       title: string;
       lead: string;
       steps: { title: string; body: string }[];
+      /**
+       * Строка моста: почему открытка — не QR. Живёт в словаре, потому что
+       * это главная фраза продукта, а не оформление секции.
+       */
+      doorLine: string;
       note: string;
     };
     closing: { title: string; promise: string; ctaPrimary: string; ctaSecondary: string };

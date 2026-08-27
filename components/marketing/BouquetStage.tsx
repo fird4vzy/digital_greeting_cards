@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { Component, useEffect, useRef, useState, type ReactNode } from 'react';
+import { BouquetFallback } from '@/components/three/BouquetFallback';
 import { useInView } from '@/lib/hooks/useInView';
 import { useMotionPrefs } from '@/lib/hooks/useMotionPrefs';
 import { cn } from '@/lib/utils/cn';
@@ -34,7 +35,7 @@ type Props = {
  * one thing on the page that cannot afford that.
  */
 export function BouquetStage({ sectionRef, className, range = [0, 1], colors }: Props) {
-  const { rich } = useMotionPrefs();
+  const { rich, ready } = useMotionPrefs();
   const { ref, inView } = useInView<HTMLDivElement>({ once: false, rootMargin: '300px' });
   const [failed, setFailed] = useState(false);
   const progress = useRef(0);
@@ -65,7 +66,10 @@ export function BouquetStage({ sectionRef, className, range = [0, 1], colors }: 
     <div
       ref={ref}
       aria-hidden="true"
-      className={cn('pointer-events-none fixed inset-0 -z-10', className)}
+      className={cn(
+        'pointer-events-none fixed inset-0 -z-10 opacity-60 md:opacity-100',
+        className,
+      )}
     >
       {enabled ? (
         <WebGLBoundary onError={() => setFailed(true)}>
@@ -75,6 +79,12 @@ export function BouquetStage({ sectionRef, className, range = [0, 1], colors }: 
             active={inView}
           />
         </WebGLBoundary>
+      ) : ready ? (
+        // Сцены не будет — reduced motion, слабое устройство или упавший
+        // WebGL. Раньше все трое получали пустой тёмный экран; теперь тот же
+        // букет одной линией, из образца. `ready` отсекает первый кадр
+        // гидратации, когда prefs ещё не прочитаны и rich временно false.
+        <BouquetFallback />
       ) : null}
     </div>
   );

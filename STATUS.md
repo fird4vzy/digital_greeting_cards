@@ -5,10 +5,10 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 26 August 2026 — the dark landing has started. Colour now has
-role names a theme can swap, `/design/landing` is the whole landing in the dark
-scope, and `scripts/shoot.mjs` means any page can be photographed at any scroll
-position before it ships. The plan it follows is `design/dark-landing-plan.md`.
+**Last updated:** 27 August 2026 — `/design/landing` is now the sample's
+landing, not a recolour: the bouquet assembles behind «Выберите чувство», the
+works ride a scroll-driven rail, the bridge says the door line, and the phone
+frame is held by camera maths instead of a gate. Open it on a phone.
 
 **Если вы открыли этот файл, чтобы понять, что делать** — следующий раздел, он
 первый и по-русски. Всё остальное ниже объясняет «почему».
@@ -95,10 +95,20 @@ position before it ships. The plan it follows is `design/dark-landing-plan.md`.
 сделала бы корпус кремовым. Стенд `/design/landing` — вся главная в тёмной
 области; `app/page.tsx` не тронут.
 
-**Следующее по плану** — шаг 7, ритм. Секции, которые были `bg-noir`
-`#12100e`, слились с фоном страницы `#17130f`, и границы между ними больше
-нет — страница читается сплошной массой. Потом секции-сцены, строки в
-три словаря, кадр букета под узкий экран — **и только потом сама сцена.**
+**Сделано 27 августа — шаги 7–12 в первом приближении.** Стенд собран по
+образцу, а не по нынешней главной: герой, сцена «Выберите чувство» с
+букетом позади, лента работ на прокрутке, воспоминания, мост с фразой
+про дверь, шаги, финал. Тёмным секциям — роль `--color-stage` глубже
+фона, границы вернулись; на светлой странице роль равна прежнему noir.
+Камера держит кадр по ширине формулой образца, на узких сцена
+вполголоса, а где канвас не поднялся — SVG-букет одной линией вместо
+пустоты. Проверено снимками на 1280 и 390; светлая главная не сдвинулась.
+
+Осталось: зерно и тонкая типографика, второй акт сцены на мосту (сейчас
+букет собирается целиком в первом), шнурок бирки, и две почти
+одинаковые фразы про дверь рядом — `doorLine` моста и `note` шагов,
+какая остаётся — решение глазами. Затем шаг 13 — подмена главной,
+только после вашего просмотра стенда.
 
 **Почему букет последним.** Его уже выкатывали на светлый лендинг и сняли в тот
 же день: канвас рисуется на `-z-10`, а секции лендинга непрозрачные и просто
@@ -194,7 +204,15 @@ as `NEW`, and stored its brief.
 
 ## Open items
 
-1. **A bot token was pasted into a chat and must be revoked.** `/revoke` at
+1. **Старый бот: новый создан, но старый токен ЭТИМ НЕ ОТОЗВАН.** 27
+   августа заведён новый бот `@birdunyobot`, токен обновлён в Vercel, бот
+   добавлен в ту же группу — это правильные шаги, но они не гасят
+   скомпрометированный токен СТАРОГО бота: он продолжает действовать, и
+   если старый бот всё ещё в группе, владелец токена читает её сообщения.
+   Два действия: удалить старого бота из группы и `/revoke` (или
+   `/deletebot`) ему у @BotFather. После смены переменной в Vercel нужен
+   Redeploy и проверка кнопкой в `/admin`.
+   Исходная запись: **A bot token was pasted into a chat and must be revoked.** `/revoke` at
    @BotFather, then put the new one into Vercel. An earlier token was also
    committed to the public `fird4vzy/telegram-bot-docker` repository and
    revoked; that file is still in that repository's git history.

@@ -38,7 +38,7 @@ export async function BouquetSection({
   return (
     <section
       id="bouquet"
-      className="grain grain-invert relative overflow-hidden bg-noir px-[var(--spacing-gutter)] py-[var(--spacing-section-lg)]"
+      className="grain grain-invert relative overflow-hidden bg-stage px-[var(--spacing-gutter)] py-[var(--spacing-section-lg)]"
     >
       <div
         aria-hidden="true"

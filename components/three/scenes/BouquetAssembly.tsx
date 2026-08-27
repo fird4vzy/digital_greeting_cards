@@ -47,6 +47,8 @@ const RINGS = [
 ] as const;
 
 const FLOWERS = 7;
+/** Где камера стоит на широком экране — та же точка, что в конфиге канваса. */
+const CAM_BASE = new THREE.Vector3(0, 1.2, 6.2);
 const HEAD = 0.72;
 const BASE = new THREE.Vector3(0, -0.35, 0);
 const UP = new THREE.Vector3(0, 1, 0);
@@ -212,7 +214,7 @@ export function BouquetAssembly({ colors, progress }: Props) {
     [],
   );
 
-  useFrame(() => {
+  useFrame(({ camera }) => {
     const p = clamp01(progress.current ?? 0);
     const s = scratch;
 
@@ -325,6 +327,15 @@ export function BouquetAssembly({ colors, progress }: Props) {
       tag.rotation.set((1 - t) * 1.6, -0.45 + (1 - t) * 3.4, (1 - t) * -0.7 + 0.1);
       tag.scale.setScalar(0.42 * Math.max(0.001, t));
     }
+
+    // Кадр по ширине, формула из образца: fov в three.js вертикальный,
+    // поэтому узкий экран режет букет по бокам, не трогая высоту. Камера
+    // отъезжает вдоль своего луча ровно настолько, чтобы вернуть ширину;
+    // при aspect >= 1.5 множитель равен единице и десктоп не меняется.
+    // Позиция каждый кадр строится от базы, а не умножается накопительно.
+    const persp = camera as THREE.PerspectiveCamera;
+    const fit = Math.max(1, 1.5 / Math.max(persp.aspect, 0.35));
+    persp.position.set(CAM_BASE.x * fit, CAM_BASE.y * fit, CAM_BASE.z * fit);
   });
 
   return (

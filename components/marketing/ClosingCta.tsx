@@ -13,7 +13,7 @@ const NIGHT_PARTICLES = ['#e7c9c6', '#a33b48', '#c1836a'];
  */
 export function ClosingCta({ strings }: { strings: Dictionary['ui']['closing'] }) {
   return (
-    <section className="grain grain-invert relative flex min-h-[88svh] items-center justify-center overflow-hidden bg-noir px-[var(--spacing-gutter)] py-[var(--spacing-section)] text-center">
+    <section className="grain grain-invert relative flex min-h-[88svh] items-center justify-center overflow-hidden bg-stage px-[var(--spacing-gutter)] py-[var(--spacing-section)] text-center">
       <Atmosphere scene="petals" colors={NIGHT_PARTICLES} className="absolute inset-0" />
 
       <div
