@@ -5,11 +5,10 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 22 August 2026 — both migrations applied, headings finally
-have Cyrillic, the landing redesign the bouquet was built for is in the
-repository as a reference (`design/preview/bir-dunyo-v10.html`), and the
-bouquet itself has finally been *seen*: `/design/bouquet` is a stand built to
-the shape its author asked for, and it works.
+**Last updated:** 26 August 2026 — the dark landing has started. Colour now has
+role names a theme can swap, `/design/landing` is the whole landing in the dark
+scope, and `scripts/shoot.mjs` means any page can be photographed at any scroll
+position before it ships. The plan it follows is `design/dark-landing-plan.md`.
 
 **Если вы открыли этот файл, чтобы понять, что делать** — следующий раздел, он
 первый и по-русски. Всё остальное ниже объясняет «почему».
@@ -28,7 +27,8 @@ the shape its author asked for, and it works.
 
 | Что посмотреть | Адрес |
 |---|---|
-| **Букет, собирающийся по прокрутке** — новое, ради этого всё | `/design/bouquet` |
+| **Тёмная редакция лендинга** — самое свежее | `/design/landing` |
+| **Букет, собирающийся по прокрутке** | `/design/bouquet` |
 | Наши работы: семь открыток, каждая крутится живьём | `/works` |
 | Шаблоны: шесть, каждый играет сам себя | `/templates` |
 | Предложение цветочным магазинам | `/shops` |
@@ -81,21 +81,24 @@ the shape its author asked for, and it works.
 уведёт в никуда. Там же лежат все цифры предложения, помеченные как
 предварительные; меняете файл — страница следует за ним.
 
-### Шаг 4. Следующая большая работа — тёмная редакция лендинга
+### Шаг 4. Тёмная редакция лендинга — начата 26 августа
 
-Это то, ради чего делался букет, и то, что разблокирует его выход на сайт.
-Образец лежит целиком: `design/preview/bir-dunyo-v10.html` — самодостаточная
-страница, three.js внутри, сервер не нужен, открывается двойным щелчком.
+Образец лежит целиком — `design/preview/bir-dunyo-v10.html`, открывается
+двойным щелчком. **Подробный порядок работ — в `design/dark-landing-plan.md`:**
+13 шагов с настоящими путями и номерами строк, плюс двенадцать решений,
+которые принимаются глазами. Сырьё разбора — рядом, в `design/analysis.json`.
 
-Порядок именно такой, и последний шаг — последний не случайно:
+**Сделано (шаги 1–5 плана).** Цвет получил имена ролей — `surface`,
+`on-surface`, `edge`, `brand`, `cta`, — и только такие имена может подменять
+тема. Литеральная палитра осталась на месте: `bg-ink` у `PhoneFrame` — это
+чёрный пластик корпуса, а не цвет текста, и тема, перевернувшая его,
+сделала бы корпус кремовым. Стенд `/design/landing` — вся главная в тёмной
+области; `app/page.tsx` не тронут.
 
-1. **Тёмная тема токенами** в `globals.css`: `--bg #17130F`, `--fg #F0E7DA`,
-   `--paper #EDE3D3`, `--bloom #C2404E`, `--gold #AC8B57`, `--dusk #3A2A28`.
-2. **Три секции-сцены** — `step1`, `works`, `bridge`. Высокие, с залипающим
-   блоком внутри. Именно их сейчас нет, и именно поэтому букету некуда встать.
-3. **Все строки в три словаря** `ru`/`en`/`uz`. Правило проекта: ни одной
-   видимой строки в компоненте.
-4. **И только теперь подключить букет** — одна строка в `app/page.tsx`.
+**Следующее по плану** — шаг 7, ритм. Секции, которые были `bg-noir`
+`#12100e`, слились с фоном страницы `#17130f`, и границы между ними больше
+нет — страница читается сплошной массой. Потом секции-сцены, строки в
+три словаря, кадр букета под узкий экран — **и только потом сама сцена.**
 
 **Почему букет последним.** Его уже выкатывали на светлый лендинг и сняли в тот
 же день: канвас рисуется на `-z-10`, а секции лендинга непрозрачные и просто
@@ -122,10 +125,29 @@ the shape its author asked for, and it works.
 читается поверх обёртки. Это не поломка и не ошибка в консоли, поэтому само
 оно не всплывёт — всплывёт у первого посетителя с телефона.
 
-Решать это придётся при вёрстке тёмной редакции, и вариантов ровно три:
-подстроить камеру и высоту по ширине, увести текст из-под букета на узких
-экранах, либо честно закрыть 3D медиазапросом — то есть добавить тот самый
-гейт, который все считали существующим.
+**Переснято 26 августа, и бед там две, а не одна.** С 0.3 до 0.8 букет
+вырастает во весь экран, и текст ложится поверх крафта — это то, что было
+записано. А после 0.9 сцена **исчезает совсем**: остаётся заголовок на
+пустом чёрном. Второе выглядит хуже первого: не «некрасиво», а
+«сломалось».
+
+Решать это придётся при вёрстке тёмной редакции, и **гейт из трёх
+вариантов вычёркнут**. Разбор 26 августа показал, что записка автора
+прочитана неверно всеми: `NARROW` в образце управляет прозрачностью
+SVG-заглушки, а не сценой — автор никогда не выключал 3D по ширине. И
+гейт делать нельзя: `rich` из `useMotionPrefs` читают трое, и `Atmosphere` — это
+гейт WebGL **опубликованных открыток**, которые открывают как раз с телефона
+по QR с бирки. Плюс у `BouquetStage` нет запаски, в отличие от `Atmosphere`, так
+что гейт дал бы пустой чёрный экран. Остаются два: кадр по ширине
+(`Math.max(1, 1.5/aspect)` из самого образца — на десктопе равен единице и
+ничего не трогает) и SVG-заглушка, которая закроет и слабые устройства, и
+запрещённый WebGL, и reduced-motion сразу.
+
+**И бирка висит в воздухе.** На высоте бирки (`y = -0.34`) поверхность
+обёртки лежит на радиусе 0.81, а сама бирка — на 1.71 от оси
+(`tagTo` в `BouquetAssembly.tsx:210`). Зазор 0.9 — почти во всю ширину обёртки,
+и шнурка между ними нет. Та же болезнь, что чинили на `/shops`, где место
+крепления пришлось измерить, а не угадать.
 
 ### Чего делать не надо
 
@@ -339,6 +361,22 @@ long version.
   database for that run or delete what you make, and check
   `SELECT code, customer_name FROM orders` before assuming nothing was left
   behind.
+- **A page can be photographed at any scroll position — use it.**
+  `scripts/shoot.mjs` drives headless Chrome over the DevTools protocol:
+  navigate, scroll to a fraction of the height, capture, repeat. It exists
+  because `chrome --screenshot` only ever sees the first screen, and everything
+  interesting here is spread over several — which is how a 3D scene reached
+  production unseen and came off the same day.
+
+  ```
+  node scripts/shoot.mjs http://localhost:4011/design/landing out 0,.35,.7,1 1280 900
+  node scripts/shoot.mjs http://localhost:4011/ out 0,.5 390 844
+  ```
+
+  The flags that matter are inside it: `--use-angle=swiftshader
+  --enable-unsafe-swiftshader`. Without them WebGL never initialises and the
+  scene is simply absent from the frame — which is exactly what "the pixels
+  cannot be checked" turned out to mean. It also takes production URLs.
 - **Stop the dev server before pulling.** The admin pages moved into the route
   group `app/admin/(dashboard)/`, and on Windows git could not remove the old
   directories while a watcher held them open. It asks
