@@ -7,6 +7,7 @@ import { ClosingCta } from '@/components/marketing/ClosingCta';
 import { Hero } from '@/components/marketing/Hero';
 import { MemoriesSection } from '@/components/marketing/MemoriesSection';
 import { Step1Stage } from './Step1Stage';
+import { ThemeScrub } from './ThemeScrub';
 import { WorksStage } from './WorksStage';
 import type { Locale } from '@/lib/i18n/config';
 import type { Dictionary } from '@/lib/i18n/types';
@@ -37,7 +38,10 @@ import type { Dictionary } from '@/lib/i18n/types';
  */
 export function DarkLanding({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   return (
-    <div data-theme="noir" className="text-on-surface">
+    <div id="noir-scope" data-theme="noir" className="text-on-surface">
+      {/* Страница светлеет к мосту и темнеет за ним — как в образце. */}
+      <ThemeScrub scopeId="noir-scope" sectionId="bridge" />
+
       {/* Земля и свечение: бордовое пятно в верхней правой трети, золотое,
           вдвое тише, в нижнем левом углу. Без них тёмный фон читается как
           провал, а не как комната. */}
@@ -47,7 +51,8 @@ export function DarkLanding({ locale, dict }: { locale: Locale; dict: Dictionary
           style={{
             left: '68%',
             top: '32%',
-            background: 'radial-gradient(closest-side, rgba(194, 64, 78, 0.17), transparent 70%)',
+            background:
+              'radial-gradient(closest-side, rgb(194 64 78 / var(--noir-glow, 0.17)), transparent 70%)',
           }}
         />
         <div
@@ -55,7 +60,8 @@ export function DarkLanding({ locale, dict }: { locale: Locale; dict: Dictionary
           style={{
             left: '12%',
             top: '82%',
-            background: 'radial-gradient(closest-side, rgba(172, 139, 87, 0.085), transparent 70%)',
+            background:
+              'radial-gradient(closest-side, rgb(172 139 87 / calc(var(--noir-glow, 0.17) * 0.5)), transparent 70%)',
           }}
         />
         <div className="grain-veil" />
@@ -81,7 +87,7 @@ export function DarkLanding({ locale, dict }: { locale: Locale; dict: Dictionary
         <MemoriesSection dict={dict} counter="03" />
 
         {/* Акт второй: обёртка, лента, бирка на шнурке. */}
-        <BouquetScrollStage range={[0.55, 1]}>
+        <BouquetScrollStage range={[0.55, 1]} id="bridge">
           <BridgeStage dict={dict} />
         </BouquetScrollStage>
 

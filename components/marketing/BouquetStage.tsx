@@ -37,6 +37,7 @@ type Props = {
 export function BouquetStage({ sectionRef, className, range = [0, 1], colors }: Props) {
   const { rich, ready } = useMotionPrefs();
   const { ref, inView } = useInView<HTMLDivElement>({ once: false, rootMargin: '300px' });
+  const layer = useRef<HTMLDivElement>(null);
   const [failed, setFailed] = useState(false);
   const progress = useRef(0);
 
@@ -44,15 +45,35 @@ export function BouquetStage({ sectionRef, className, range = [0, 1], colors }: 
     if (!rich) return undefined;
 
     let frame = 0;
+    let lastFade = -1;
+
     const measure = () => {
       const node = sectionRef.current;
       if (node) {
         const rect = node.getBoundingClientRect();
-        const travel = rect.height - window.innerHeight;
+        const height = window.innerHeight;
+        const travel = rect.height - height;
         const raw = travel > 0 ? -rect.top / travel : 0;
         const clamped = Math.min(1, Math.max(0, raw));
         progress.current = range[0] + clamped * (range[1] - range[0]);
+
+        // Сцена гаснет ДО того, как снизу подойдёт непрозрачная секция.
+        //
+        // Слой лежит позади страницы, поэтому следующая секция с заливкой
+        // наезжает на букет и срезает его по своей верхней кромке — на
+        // экране это выглядит швом поперёк цветов, а не глубиной. Образец
+        // решает это тем же способом: канвас уводится в ноль на подходе.
+        // Симметрично — проявление на входе, чтобы сцена не возникала резко.
+        const enter = Math.min(1, Math.max(0, (height - rect.top) / (height * 0.35)));
+        const exit = Math.min(1, Math.max(0, (rect.bottom - height * 0.25) / (height * 0.45)));
+        const fade = Math.round(Math.min(enter, exit) * 100);
+
+        if (fade !== lastFade && layer.current) {
+          lastFade = fade;
+          layer.current.style.opacity = String(fade / 100);
+        }
       }
+
       frame = window.requestAnimationFrame(measure);
     };
 
@@ -66,11 +87,11 @@ export function BouquetStage({ sectionRef, className, range = [0, 1], colors }: 
     <div
       ref={ref}
       aria-hidden="true"
-      className={cn(
-        'pointer-events-none fixed inset-0 -z-10 opacity-60 md:opacity-100',
-        className,
-      )}
+      className={cn('pointer-events-none fixed inset-0 -z-10', className)}
     >
+      {/* Внутренний слой несёт прозрачность из rAF-цикла; внешний остаётся
+          чистым, чтобы `max-md` приглушение не спорило с ней за один стиль. */}
+      <div ref={layer} className="h-full w-full max-md:opacity-60">
       {enabled ? (
         <WebGLBoundary onError={() => setFailed(true)}>
           <BouquetAssemblyCanvas
@@ -86,6 +107,7 @@ export function BouquetStage({ sectionRef, className, range = [0, 1], colors }: 
         // гидратации, когда prefs ещё не прочитаны и rich временно false.
         <BouquetFallback />
       ) : null}
+      </div>
     </div>
   );
 }

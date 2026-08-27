@@ -25,8 +25,11 @@ export function BouquetScrollStage({
   children,
   range,
   className,
+  id,
 }: {
   children: ReactNode;
+  /** Ставится на обёртку, чтобы другие эффекты могли найти эту секцию. */
+  id?: string;
   /** Какую часть таймлайна проигрывает прокрутка через эту секцию. */
   range?: [number, number];
   className?: string;
@@ -41,6 +44,7 @@ export function BouquetScrollStage({
     <>
       {inView ? <BouquetStage sectionRef={section} range={range} /> : null}
       <div
+        id={id}
         ref={(node) => {
           section.current = node;
           gate.current = node;

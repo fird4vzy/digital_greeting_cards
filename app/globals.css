@@ -145,17 +145,31 @@
    ========================================================================== */
 
 [data-theme='noir'] {
-  --color-surface: #17130f;
-  --color-surface-2: #1c1917;
-  --color-surface-3: #0e0b09;
+  /* ДВА ИСТОЧНИКА, ОСТАЛЬНОЕ ВЫВОДИТСЯ.
+   *
+   * Всё, что ниже, считается из `--noir-bg` и `--noir-fg`, и только из них.
+   * Это не аккуратность ради аккуратности: страница умеет ехать по прокрутке
+   * из ночи в бумагу (`ThemeScrub`), и подменять при этом приходится ровно
+   * две величины — остальные девять пересчитываются браузером сами. Пропиши
+   * я их литералами, как было, скролл-тема потребовала бы одиннадцати
+   * синхронных записей в кадр и всё равно разъехалась бы.
+   *
+   * Значения по умолчанию — ночь. Светлый конец задаёт JS.
+   */
+  --noir-bg: #17130f;
+  --noir-fg: #f0e7da;
 
-  --color-on-surface: #f0e7da;
-  --color-on-surface-soft: color-mix(in srgb, #f0e7da 72%, transparent);
-  --color-on-surface-muted: color-mix(in srgb, #f0e7da 58%, transparent);
-  --color-on-surface-faint: color-mix(in srgb, #f0e7da 26%, transparent);
+  --color-surface: var(--noir-bg);
+  --color-surface-2: color-mix(in srgb, var(--noir-fg) 5%, var(--noir-bg));
+  --color-surface-3: color-mix(in srgb, #000 24%, var(--noir-bg));
 
-  --color-edge: color-mix(in srgb, #f0e7da 15%, transparent);
-  --color-edge-strong: color-mix(in srgb, #f0e7da 24%, transparent);
+  --color-on-surface: var(--noir-fg);
+  --color-on-surface-soft: color-mix(in srgb, var(--noir-fg) 72%, transparent);
+  --color-on-surface-muted: color-mix(in srgb, var(--noir-fg) 58%, transparent);
+  --color-on-surface-faint: color-mix(in srgb, var(--noir-fg) 26%, transparent);
+
+  --color-edge: color-mix(in srgb, var(--noir-fg) 15%, transparent);
+  --color-edge-strong: color-mix(in srgb, var(--noir-fg) 24%, transparent);
 
   --color-brand: #c2404e;
   --color-brand-soft: #e7c9c6;
@@ -164,12 +178,12 @@
   /* На тёмном главная кнопка переворачивается: светлая плашка, тёмные
      буквы. Иначе чернильная заливка #191512 легла бы на фон #17130f — главный
      призыв к действию стал бы почти невидим рядом со второстепенной. */
-  --color-cta: #f0e7da;
-  --color-on-cta: #17130f;
+  --color-cta: var(--noir-fg);
+  --color-on-cta: var(--noir-bg);
 
   /* Глубже фона, а не светлее: тёмная сцена на тёмной странице читается
      как провал в ещё большую темноту — смена регистра сохраняется. */
-  --color-stage: #0e0b09;
+  --color-stage: color-mix(in srgb, #000 24%, var(--noir-bg));
 
   /* Ink-coloured drop shadows do not exist on ink. What lifts a surface off a
      dark ground is a light hairline along its top edge, so the three
