@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
 import { Footer } from '@/components/site/Footer';
 import { Header } from '@/components/site/Header';
@@ -11,6 +11,12 @@ import { listAllTemplateSummaries } from '@/lib/card/registry';
 import { listWorks, workEntryUrl } from '@/lib/works';
 import { PhoneFrame, PHONE_SCREEN_RATIO } from '@/components/marketing/PhoneFrame';
 import { WorkPreview } from '@/components/works/WorkPreview';
+
+/**
+ * Тёмная страница — своя строка состояния, как у главной: общий layout
+ * объявляет кремовую и светлую схему.
+ */
+export const viewport: Viewport = { themeColor: '#17130F', colorScheme: 'dark' };
 
 export async function generateMetadata(): Promise<Metadata> {
   const { dict } = await getI18n();
@@ -49,7 +55,7 @@ export default async function WorksPage() {
     : new Map<string, string>();
 
   return (
-    <>
+    <div data-theme="noir" className="bg-surface text-on-surface">
       <Header locale={locale} strings={{ ...dict.ui.nav, language: dict.ui.localeSwitcher.label }} />
       <main className="pt-[4.5rem]">
         <section className="px-[var(--spacing-gutter)] pb-16 pt-[var(--spacing-section)]">
@@ -92,29 +98,29 @@ export default async function WorksPage() {
 
                     <div className="mt-6 flex flex-1 flex-col">
                       <div className="flex items-baseline justify-between gap-4">
-                        <h2 className="font-display text-title leading-none text-ink">
+                        <h2 className="font-display text-title leading-none text-on-surface">
                           <Link
                             href={`/works/${work.id}`}
-                            className="transition-colors hover:text-accent"
+                            className="transition-colors hover:text-brand"
                           >
                             {work.title}
                           </Link>
                         </h2>
-                        <span className="eyebrow shrink-0 text-ink-faint tabular-nums">
+                        <span className="eyebrow shrink-0 text-on-surface-faint tabular-nums">
                           {work.year}
                         </span>
                       </div>
 
-                      <p className="mt-3 text-caption text-ink-soft">
+                      <p className="mt-3 text-caption text-on-surface-soft">
                         {occasionLabel(work.occasion, dict)}
                       </p>
 
                       {work.portedTo ? (
-                        <p className="mt-4 text-caption text-ink-muted">
+                        <p className="mt-4 text-caption text-on-surface-muted">
                           {dict.ui.works.basedTemplate}:{' '}
                           <Link
                             href={`/templates/${work.portedTo}`}
-                            className="text-ink underline decoration-line-strong underline-offset-4 transition-colors hover:text-accent"
+                            className="text-on-surface underline decoration-line-strong underline-offset-4 transition-colors hover:text-brand"
                           >
                             {templateNames.get(work.portedTo) ?? work.portedTo}
                           </Link>
@@ -123,7 +129,7 @@ export default async function WorksPage() {
 
                       <Link
                         href={`/works/${work.id}`}
-                        className="mt-5 inline-flex items-center gap-2 text-caption text-ink transition-colors hover:text-accent"
+                        className="mt-5 inline-flex items-center gap-2 text-caption text-on-surface transition-colors hover:text-brand"
                       >
                         {dict.ui.works.open}
                       </Link>
@@ -136,6 +142,6 @@ export default async function WorksPage() {
         </section>
       </main>
       <Footer strings={dict.ui.footer} />
-    </>
+    </div>
   );
 }

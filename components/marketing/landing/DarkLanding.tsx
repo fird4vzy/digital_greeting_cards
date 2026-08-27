@@ -60,6 +60,8 @@ export function DarkLanding({ locale, dict }: { locale: Locale; dict: Dictionary
         />
       </div>
 
+      <div aria-hidden="true" className="grain-veil" />
+
       <Header
         overlay
         locale={locale}

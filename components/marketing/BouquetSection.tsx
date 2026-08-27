@@ -81,11 +81,9 @@ export async function BouquetSection({
           ))}
         </RevealGroup>
 
-        <Reveal preset="fade">
-          <p className="mx-auto mt-20 max-w-[36ch] text-center font-display text-title italic leading-snug text-paper/70">
-            {dict.ui.bouquet.note}
-          </p>
-        </Reveal>
+        {/* Фраза про дверь живёт на мосту (`BridgeStage`), как в образце.
+          Здесь она стояла, пока моста не было; две почти одинаковые строки в
+          соседних секциях читались как оговорка, а не как рефрен. */}
       </div>
     </section>
   );

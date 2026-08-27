@@ -5,11 +5,12 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 27 August 2026 — **the dark edition is live on `/`.** The
-homepage and `/design/landing` render one shared `DarkLanding` component, so
-the stand can never drift from production. The scene plays in two acts —
-petals on «Выберите чувство», wrap-ribbon-tag on the bridge — and the tag
-finally sits on the wrap, on a cord, instead of floating mid-air.
+**Last updated:** 27 August 2026 — **the dark edition is live on `/`,
+`/templates` and `/works`.** One shared `DarkLanding` for the homepage and the
+stand; the galleries carry the same scope page-locally. Film grain from the
+sample lies over the dark pages, the door line lives only on the bridge now,
+and the old bot token is revoked — the notification chain was tested
+end-to-end with a throwaway order (`S75QJH`, deleted the same minute).
 
 **Если вы открыли этот файл, чтобы понять, что делать** — следующий раздел, он
 первый и по-русски. Всё остальное ниже объясняет «почему».
@@ -209,21 +210,16 @@ as `NEW`, and stored its brief.
 
 ## Open items
 
-1. **Старый бот: новый создан, но старый токен ЭТИМ НЕ ОТОЗВАН.** 27
-   августа заведён новый бот `@birdunyobot`, токен обновлён в Vercel, бот
-   добавлен в ту же группу — это правильные шаги, но они не гасят
-   скомпрометированный токен СТАРОГО бота: он продолжает действовать, и
-   если старый бот всё ещё в группе, владелец токена читает её сообщения.
-   Два действия: удалить старого бота из группы и `/revoke` (или
-   `/deletebot`) ему у @BotFather. После смены переменной в Vercel нужен
-   Redeploy и проверка кнопкой в `/admin`.
-   Исходная запись: **A bot token was pasted into a chat and must be revoked.** `/revoke` at
-   @BotFather, then put the new one into Vercel. An earlier token was also
-   committed to the public `fird4vzy/telegram-bot-docker` repository and
-   revoked; that file is still in that repository's git history.
-   *Audited 13 August:* **this** repository is clean — nothing token-shaped in
-   the working tree or in any commit of any branch, so there is no history to
-   rewrite here. The exposure is the chat and the other repository.
+1. ~~**Старый бот и его токен.**~~ **Закрыто 27 августа.** Старый токен
+   отозван руками владельца; новый бот `@birdunyobot` создан, его токен в
+   Vercel, бот в той же группе. Код не менялся и не должен был:
+   `notifyNewOrder` читает обе переменные при каждом вызове.
+   Сквозная проверка того же дня: тестовый заказ `S75QJH` создан через
+   боевой API и сразу удалён из базы — если сообщение о нём пришло в
+   группу, цепочка работает целиком. Если не пришло — причина видна
+   кнопкой проверки в `/admin` (она показывает отказ самого Telegram
+   словами), а типичные две: переменная задана не для Production-окружения
+   или в значение попали кавычки/пробел при вставке.
 2. ~~**`TELEGRAM_CHAT_ID` is missing.**~~ **Done** — reported working on
    13 August: the bot is connected and a new order writes to the group. This
    entry stayed marked open long after it was fixed and sent a whole session

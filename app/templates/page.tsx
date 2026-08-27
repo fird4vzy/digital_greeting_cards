@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
 import { Footer } from '@/components/site/Footer';
 import { Header } from '@/components/site/Header';
@@ -12,6 +12,12 @@ import { getI18n } from '@/lib/i18n/server';
 import { t } from '@/lib/i18n';
 import { listAllTemplateSummaries } from '@/lib/card/registry';
 import { cn } from '@/lib/utils/cn';
+
+/**
+ * Тёмная страница — своя строка состояния, как у главной: общий layout
+ * объявляет кремовую и светлую схему.
+ */
+export const viewport: Viewport = { themeColor: '#17130F', colorScheme: 'dark' };
 
 export async function generateMetadata(): Promise<Metadata> {
   const { dict } = await getI18n();
@@ -29,7 +35,7 @@ export default async function TemplatesPage({ searchParams }: Props) {
   const templates = active ? all.filter((template) => template.occasions.includes(active)) : all;
 
   return (
-    <>
+    <div data-theme="noir" className="bg-surface text-on-surface">
       <Header locale={locale} strings={{ ...dict.ui.nav, language: dict.ui.localeSwitcher.label }} />
       <main className="pt-[4.5rem]">
         <section className="px-[var(--spacing-gutter)] pb-16 pt-[var(--spacing-section)]">
@@ -68,7 +74,7 @@ export default async function TemplatesPage({ searchParams }: Props) {
             </Reveal>
 
             {active ? (
-              <p className="mt-8 text-caption text-ink-muted">
+              <p className="mt-8 text-caption text-on-surface-muted">
                 {t(dict.ui.templates.countLine, {
                   count: templates.length,
                   feeling: occasionLabel(active, dict),
@@ -95,7 +101,7 @@ export default async function TemplatesPage({ searchParams }: Props) {
         </section>
       </main>
       <Footer strings={dict.ui.footer} />
-    </>
+    </div>
   );
 }
 
@@ -115,7 +121,7 @@ function FilterChip({
         'inline-flex h-9 items-center rounded-full border px-4 text-caption transition-colors duration-400',
         active
           ? 'border-ink bg-ink text-paper'
-          : 'border-line-strong text-ink-soft hover:border-ink hover:text-ink',
+          : 'border-edge-strong text-on-surface-soft hover:border-on-surface hover:text-ink',
       )}
     >
       {children}
