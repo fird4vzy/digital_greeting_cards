@@ -189,6 +189,7 @@ export function BouquetAssembly({ colors, progress }: Props) {
   const wrapRef = useRef<THREE.Mesh>(null);
   const ribbonRef = useRef<THREE.Mesh>(null);
   const tagRef = useRef<THREE.Group>(null);
+  const cordRef = useRef<THREE.Mesh>(null);
 
   // Scratch objects, allocated once. Allocating inside useFrame is how a
   // scene that runs fine for ten seconds starts stuttering at thirty.
@@ -209,7 +210,13 @@ export function BouquetAssembly({ colors, progress }: Props) {
       euler: new THREE.Euler(),
       one: new THREE.Vector3(1, 1, 1),
       tagFrom: new THREE.Vector3(5.5, 2.6, 2.5),
-      tagTo: new THREE.Vector3(1.42, -0.34, 0.95),
+      // Радиус обёртки на высоте бирки — 0.83; бирка садится на 0.97, то есть
+      // лежит на бумаге, а не висит в метре от неё. Старая точка 1.71 от оси
+      // была измеренной ошибкой, записанной в STATUS.
+      tagTo: new THREE.Vector3(0.8, -0.3, 0.55),
+      // Край обёртки на том же азимуте — точка, к которой привязан шнурок.
+      cordAnchor: new THREE.Vector3(0.84, 0.15, 0.58),
+      hole: new THREE.Vector3(),
     }),
     [],
   );
@@ -326,6 +333,24 @@ export function BouquetAssembly({ colors, progress }: Props) {
       // square to the camera.
       tag.rotation.set((1 - t) * 1.6, -0.45 + (1 - t) * 3.4, (1 - t) * -0.7 + 0.1);
       tag.scale.setScalar(0.42 * Math.max(0.001, t));
+
+      // Шнурок: от края обёртки до отверстия бирки. Без него бирка висела
+      // в воздухе даже вплотную к бумаге: ничто не объясняло, на чём она
+      // держится. Появляется, когда бирка почти долетела и её поворот осел.
+      const cord = cordRef.current;
+      if (cord) {
+        const show = t > 0.72;
+        cord.visible = show;
+        if (show) {
+          s.hole.set(0, 0.16, 0).add(tag.position);
+          s.dir.copy(s.hole).sub(s.cordAnchor);
+          const length = Math.max(0.001, s.dir.length());
+          s.dir.normalize();
+          cord.quaternion.setFromUnitVectors(UP, s.dir);
+          cord.scale.set(1, length, 1);
+          cord.position.copy(s.cordAnchor).addScaledVector(s.dir, length / 2);
+        }
+      }
     }
 
     // Кадр по ширине, формула из образца: fov в three.js вертикальный,
@@ -390,6 +415,12 @@ export function BouquetAssembly({ colors, progress }: Props) {
       <mesh ref={ribbonRef} visible={false} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[0.4, 0.042, 8, 26]} />
         <meshStandardMaterial color="#ac8b57" roughness={0.42} metalness={0.35} />
+      </mesh>
+
+      {/* Шнурок бирки — тот же латунный тон, что у ленты. */}
+      <mesh ref={cordRef} visible={false}>
+        <cylinderGeometry args={[0.008, 0.008, 1, 6]} />
+        <meshStandardMaterial color="#ac8b57" roughness={0.5} metalness={0.25} />
       </mesh>
 
       {/* The tag is the existing component, not a new one: the brand is a set

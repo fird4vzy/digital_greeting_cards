@@ -1,46 +1,29 @@
-import { Footer } from '@/components/site/Footer';
-import { Header } from '@/components/site/Header';
-import { BouquetSection } from '@/components/marketing/BouquetSection';
-import { ClosingCta } from '@/components/marketing/ClosingCta';
-import { FeelingSection } from '@/components/marketing/FeelingSection';
-import { Hero } from '@/components/marketing/Hero';
-import { MemoriesSection } from '@/components/marketing/MemoriesSection';
-import { StorySection } from '@/components/marketing/StorySection';
-import { localiseTemplates } from '@/lib/i18n/localise';
+import type { Viewport } from 'next';
+import { DarkLanding } from '@/components/marketing/landing/DarkLanding';
 import { getI18n } from '@/lib/i18n/server';
-import { listAllTemplateSummaries } from '@/lib/card/registry';
 
 /**
- * The landing page.
+ * Главная. С 27 августа — тёмная редакция.
  *
- * Six beats, in the order someone actually makes this decision: feel
- * something → find the story that fits → realise how personal it can get →
- * understand how it reaches them → act.
+ * Вся страница живёт в `DarkLanding`, общем со стендом `/design/landing`:
+ * один компонент на два адреса, чтобы стенд всегда показывал ровно то, что
+ * стоит здесь. Порядок работ и решения — `design/dark-landing-plan.md`;
+ * прежняя светлая композиция с секциями историй и поводов осталась в
+ * компонентах (`FeelingSection`, `StorySection`) и в истории git.
  *
- * The dictionary is read once here and handed down as props. Client
- * components never import a dictionary, so a browser only downloads the
- * strings that are actually on the page — in one language, not three.
+ * Подмена случилась после просмотра стенда на проде — правило «то, что
+ * нельзя увидеть до деплоя, нельзя выкатывать на лендинг» соблюдено:
+ * увидели, потом выкатили.
  */
+
+/**
+ * Своя строка состояния: общий layout объявляет кремовую и светлую схему.
+ * Без переопределения мобильный браузер держал бы светлую полосу и светлые
+ * полосы прокрутки над тёмной страницей. Прецедент — `app/c/[code]/page.tsx`.
+ */
+export const viewport: Viewport = { themeColor: '#17130F', colorScheme: 'dark' };
+
 export default async function HomePage() {
   const { locale, dict } = await getI18n();
-  const templates = localiseTemplates(await listAllTemplateSummaries(), dict);
-
-  return (
-    <>
-      <Header
-        overlay
-        locale={locale}
-        strings={{ ...dict.ui.nav, language: dict.ui.localeSwitcher.label }}
-      />
-      <main id="main">
-        <Hero strings={dict.ui.hero} />
-        <FeelingSection dict={dict} />
-        <StorySection templates={templates} strings={dict.ui.story} locale={locale} />
-        <MemoriesSection dict={dict} />
-        <BouquetSection dict={dict} />
-        <ClosingCta strings={dict.ui.closing} />
-      </main>
-      <Footer strings={dict.ui.footer} />
-    </>
-  );
+  return <DarkLanding locale={locale} dict={dict} />;
 }
