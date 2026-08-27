@@ -1,7 +1,7 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
-import { useMemo, useRef, type RefObject } from 'react';
+import { useEffect, useMemo, useRef, type RefObject } from 'react';
 import * as THREE from 'three';
 import { curvedPetalGeometry } from '../geometry';
 import { useStudioEnvironment } from '../useStudioEnvironment';
@@ -49,19 +49,31 @@ const RINGS = [
 const FLOWERS = 7;
 
 /**
- * Габариты собранного букета — измеренные, не на глаз.
+ * ПУТЬ КАМЕРЫ — из образца, дословно.
  *
- * По высоте: низ стеблей и край обёртки на `BASE.y - 1.2`, верхние головки на
- * `BASE.y + 1.62 + 0.52 + 0.14` плюс радиус лепестков. По ширине: крайние
- * цветы на ±1.02 плюс тот же радиус. Кадр строится по этой коробке, а не по
- * фиксированному расстоянию до камеры.
+ * Камера не стоит: она облетает сборку. Ключи — `[прогресс, где камера, куда
+ * смотрит]`. Именно это и отличало нашу сборку от образца сильнее всего:
+ * статичная камера показывает, как объект меняется, движущаяся — как за ним
+ * идут. Первое читается схемой, второе сценой.
  */
-const FRAME_W = 3.6;
-const FRAME_H = 4.5;
-/** Центр коробки по высоте. */
-const FRAME_Y = 0.45;
-/** Запас по краям, чтобы букет не упирался в границу экрана. */
-const FRAME_MARGIN = 1.12;
+const CAM_KEYS: [number, THREE.Vector3, THREE.Vector3][] = [
+  [0.0, new THREE.Vector3(0, 0.9, 5.0), new THREE.Vector3(0, 1.0, 0)],
+  [0.35, new THREE.Vector3(0.5, 1.3, 6.0), new THREE.Vector3(0, 1.4, 0)],
+  [0.55, new THREE.Vector3(0, 1.6, 7.2), new THREE.Vector3(0, 1.3, 0)],
+  [0.8, new THREE.Vector3(1.9, 1.1, 6.6), new THREE.Vector3(0.5, 0.5, 0)],
+  [1.0, new THREE.Vector3(0.9, 1.4, 7.0), new THREE.Vector3(0.2, 0.8, 0)],
+];
+
+/**
+ * Сглаживание прогресса.
+ *
+ * Образец гонит сцену не к значению прокрутки, а К ЦЕЛИ: `p += (target - p) *
+ * 0.1` каждый кадр. Разница видна сразу — без этого сборка идёт один в один
+ * за колесом мыши, дёргается на каждом щелчке и останавливается мгновенно;
+ * со сглаживанием у неё есть инерция, и она доигрывает, когда прокрутка уже
+ * встала. Это и есть «собирается красивее».
+ */
+const EASING = 0.1;
 const HEAD = 0.72;
 const BASE = new THREE.Vector3(0, -0.35, 0);
 const UP = new THREE.Vector3(0, 1, 0);
@@ -99,6 +111,36 @@ type Flower = {
 
 export function BouquetAssembly({ colors, progress }: Props) {
   useStudioEnvironment(colors);
+
+  /** Сглаженное значение: гонится к `progress`, а не равно ему. */
+  const eased = useRef(0);
+  /**
+   * Первый кадр берёт цель как есть.
+   *
+   * Между актами сцена размонтируется и монтируется заново, а второй акт
+   * начинается с 0.55. Без этого сглаживание погнало бы его от нуля и
+   * переиграло всю первую половину сборки за секунду — на экране это выглядит
+   * как сбой, а не как продолжение.
+   */
+  const primed = useRef(false);
+
+  /**
+   * Лёгкий параллакс от мыши — из образца.
+   *
+   * В ref, а не в состоянии: движение мыши не должно перерисовывать дерево.
+   * На тач-устройствах события просто не приходят, и множитель остаётся нулём.
+   */
+  const pointer = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const track = (event: PointerEvent) => {
+      pointer.current.x = event.clientX / window.innerWidth - 0.5;
+      pointer.current.y = event.clientY / window.innerHeight - 0.5;
+    };
+
+    window.addEventListener('pointermove', track, { passive: true });
+    return () => window.removeEventListener('pointermove', track);
+  }, []);
 
   const geometry = useMemo(() => curvedPetalGeometry(), []);
   const stemGeometry = useMemo(() => new THREE.CylinderGeometry(0.026, 0.045, 1, 6, 1), []);
@@ -222,6 +264,7 @@ export function BouquetAssembly({ colors, progress }: Props) {
       head: new THREE.Vector3(),
       euler: new THREE.Euler(),
       one: new THREE.Vector3(1, 1, 1),
+      look: new THREE.Vector3(),
       tagFrom: new THREE.Vector3(5.5, 2.6, 2.5),
       // Радиус обёртки на высоте бирки — 0.83; бирка садится на 0.97, то есть
       // лежит на бумаге, а не висит в метре от неё. Старая точка 1.71 от оси
@@ -235,7 +278,14 @@ export function BouquetAssembly({ colors, progress }: Props) {
   );
 
   useFrame(({ camera }) => {
-    const p = clamp01(progress.current ?? 0);
+    // Сцена идёт К цели, а не В цель: инерция из образца.
+    const target = clamp01(progress.current ?? 0);
+    if (!primed.current) {
+      primed.current = true;
+      eased.current = target;
+    }
+    eased.current += (target - eased.current) * EASING;
+    const p = eased.current;
     const s = scratch;
 
     const gather = ease(seg(p, 0.42, 0.62));
@@ -366,27 +416,39 @@ export function BouquetAssembly({ colors, progress }: Props) {
       }
     }
 
-    // Кадр строится по ОБЕИМ осям.
-    //
-    // Раньше считалась только ширина, и на широком невысоком окне букет
-    // выходил за верх и низ: ограничивает там высота. Теперь берётся большее
-    // из двух расстояний — чтобы влезла высота и чтобы влезла ширина, — и
-    // букет помещается на любом окне по построению.
+    // Камера идёт по ключам образца.
+    let from = CAM_KEYS[0];
+    let to = CAM_KEYS[CAM_KEYS.length - 1];
+    for (let i = 0; i < CAM_KEYS.length - 1; i += 1) {
+      if (p >= CAM_KEYS[i][0] && p <= CAM_KEYS[i + 1][0]) {
+        from = CAM_KEYS[i];
+        to = CAM_KEYS[i + 1];
+        break;
+      }
+    }
+
     const persp = camera as THREE.PerspectiveCamera;
-    const halfFov = (persp.fov * Math.PI) / 360;
-    const forHeight = FRAME_H / 2 / Math.tan(halfFov);
-    const forWidth = FRAME_W / 2 / (Math.tan(halfFov) * Math.max(persp.aspect, 0.3));
-    const distance = Math.max(forHeight, forWidth) * FRAME_MARGIN;
+    const k = ease(seg(p, from[0], to[0]));
+    persp.position.lerpVectors(from[1], to[1], k);
+    s.look.lerpVectors(from[2], to[2], k);
 
-    // На узком экране камера целится ВЫШЕ букета, и тот уходит в нижнюю
-    // половину кадра — верх остаётся тексту. Это то же разведение, что в
-    // вёрстке секций, только со стороны сцены: без него букет и заголовок
-    // делили одну середину экрана.
-    const narrow = persp.aspect < 0.85;
-    const aimY = FRAME_Y + (narrow ? 1.15 : 0);
+    // Текст живёт слева, поэтому букет не стоит по центру кадра — на широких
+    // окнах он сдвигается вправо. Числа из образца.
+    const width = window.innerWidth;
+    const shift = width > 1100 ? -1.35 : width > 880 ? -0.7 : 0;
 
-    persp.position.set(0, aimY + 0.55, distance);
-    persp.lookAt(0, aimY, 0);
+    // Узкое окно: камера отъезжает вдоль своего луча, пока букет не влезет по
+    // ширине. Формула образца; при aspect >= 1.5 множитель равен единице.
+    const fit = Math.max(1, 1.5 / Math.max(persp.aspect, 0.35));
+    persp.position.sub(s.look).multiplyScalar(fit).add(s.look);
+
+    // На телефоне ещё и вниз: текст занимает верх экрана.
+    if (persp.aspect < 0.85) s.look.y += 1.15;
+
+    persp.position.x += pointer.current.x * 0.45 + shift;
+    persp.position.y += -pointer.current.y * 0.3;
+    s.look.x += shift;
+    persp.lookAt(s.look);
   });
 
   return (
