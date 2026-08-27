@@ -209,6 +209,11 @@ export type Dictionary = {
           suggested: string;
           /** Пропустить выбор — подберём сами. */
           skip: string;
+          /** Три пути на шаге: готовый шаблон, своя идея, как одна из работ. */
+          routes: { template: string; own: string; work: string };
+          ownHint: string;
+          ownPlaceholder: string;
+          workHint: string;
         };
         language: { label: string; hint: string };
         preview: {
@@ -506,6 +511,11 @@ export type Dictionary = {
       from: string;
       sectionOrder: string;
       sectionBrief: string;
+      /** Заголовок блока «заказчик не хотел шаблон». */
+      sectionWish: string;
+      /** `{title}` — название работы, на которую он показал. */
+      wishWork: string;
+      wishOwn: string;
       sectionMessage: string;
       sectionPhotos: string;
       sectionDetails: string;

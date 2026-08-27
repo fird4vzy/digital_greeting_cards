@@ -38,6 +38,7 @@ type OrderRow = {
   mood: string;
   moods: string[] | null;
   custom_entry: string | null;
+  wish: Order['wish'] | null;
   locale: string;
   message: string;
   photos: Order['photos'];
@@ -107,6 +108,7 @@ function toOrder(row: OrderRow): Order {
     // никогда не встречал заказ вообще без настроений.
     moods: row.moods?.length ? row.moods : row.mood ? [row.mood] : [],
     customEntry: row.custom_entry ?? null,
+    wish: row.wish ?? null,
     locale: row.locale ?? 'ru',
     message: row.message,
     photos: row.photos ?? [],
@@ -167,16 +169,22 @@ function hasColumn(pool: Pool, column: string): Promise<boolean> {
 
 /** Какие из необязательных колонок уже есть. Спрашивается раз за процесс. */
 async function optionalColumns(pool: Pool) {
-  const [moods, customEntry] = await Promise.all([
+  const [moods, customEntry, wish] = await Promise.all([
     hasColumn(pool, 'moods'),
     hasColumn(pool, 'custom_entry'),
+    hasColumn(pool, 'wish'),
   ]);
-  return { moods, customEntry };
+  return { moods, customEntry, wish };
 }
 
 /** Список колонок для SELECT и RETURNING, с `moods` только если он есть. */
-const columnsFor = (present: { moods: boolean; customEntry: boolean }) =>
-  [BASE_COLUMNS, present.moods ? 'moods' : null, present.customEntry ? 'custom_entry' : null]
+const columnsFor = (present: { moods: boolean; customEntry: boolean; wish: boolean }) =>
+  [
+    BASE_COLUMNS,
+    present.moods ? 'moods' : null,
+    present.customEntry ? 'custom_entry' : null,
+    present.wish ? 'wish' : null,
+  ]
     .filter(Boolean)
     .join(', ');
 
@@ -323,7 +331,24 @@ export async function createPostgresStore(
           );
 
           const row = result.rows[0];
-          if (row) return toOrder(row);
+          if (!row) continue;
+
+          // `wish` дописывается вторым запросом, а не встраивается в INSERT
+          // выше. Тот считает номера плейсхолдеров от того, есть ли колонка
+          // `moods`; третья необязательная колонка превратила бы этот счёт в
+          // разбор случаев, где ошибка на единицу тихо запишет данные не в то
+          // поле. Лишний UPDATE случается только когда желание есть, то есть
+          // редко, и заказ уже создан — если он не пройдёт, потеряется
+          // пожелание, а не заказ.
+          if (draft.wish && present.wish) {
+            const updated = await pool.query<OrderRow>(
+              `UPDATE orders SET wish = $1 WHERE id = $2 RETURNING ${columnsFor(present)}`,
+              [JSON.stringify(draft.wish), row.id],
+            );
+            if (updated.rows[0]) return toOrder(updated.rows[0]);
+          }
+
+          return toOrder(row);
         } catch (error) {
           const code = (error as { code?: string }).code;
           if (code !== '23505') throw error;
@@ -355,6 +380,9 @@ export async function createPostgresStore(
       if (patch.moods !== undefined && (await hasColumn(pool, 'moods'))) push('moods', patch.moods);
       if (patch.customEntry !== undefined && (await hasColumn(pool, 'custom_entry'))) {
         push('custom_entry', patch.customEntry);
+      }
+      if (patch.wish !== undefined && (await hasColumn(pool, 'wish'))) {
+        push('wish', patch.wish ? JSON.stringify(patch.wish) : null);
       }
       if (patch.locale !== undefined) push('locale', patch.locale);
       if (patch.message !== undefined) push('message', patch.message);

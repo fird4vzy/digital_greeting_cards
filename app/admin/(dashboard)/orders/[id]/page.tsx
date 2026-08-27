@@ -8,6 +8,7 @@ import { getCardFileStore, getOrder } from '@/lib/db';
 import { CustomCardUpload } from '@/components/admin/CustomCardUpload';
 import { ORDER_STATUSES, isDeletable } from '@/lib/db/types';
 import { getI18n } from '@/lib/i18n/server';
+import { getWork } from '@/lib/works';
 import {
   localiseTemplate,
   localiseTemplates,
@@ -17,6 +18,9 @@ import {
   recipientLabel,
 } from '@/lib/i18n/localise';
 import { plural } from '@/lib/i18n/plural';
+// `t` в этом файле — объект строк, поэтому подстановка берётся под своим
+// именем: переименовывать объект ради одной строки дороже, чем импорт.
+import { t as fill } from '@/lib/i18n';
 import { cardUrl } from '@/lib/qr';
 import { siteOrigin } from '@/lib/site-origin';
 import { resolveTemplateAnywhere, listAllTemplates } from '@/lib/card/registry';
@@ -97,6 +101,50 @@ export default async function OrderDetail({ params }: Props) {
               </Detail>
             </dl>
           </section>
+
+          {/*
+            ЗАКАЗЧИК ШАБЛОН НЕ ХОТЕЛ.
+
+            Выше пожеланий и выше текста открытки, потому что это меняет саму
+            задачу: собирать по шаблону тут не надо. Раньше такого следа в
+            заказе не было вовсе — форма всегда показывала что-то шаблонное, и
+            в магазин приезжал заказ, по которому нельзя было понять, что
+            человек хотел другого.
+          */}
+          {order.wish ? (
+            <section>
+              <h2 className="eyebrow mb-5 text-ink-muted">{t.sectionWish}</h2>
+              <div className="space-y-4 rounded-[1rem] border border-accent/40 bg-accent/[0.06] p-6">
+                {order.wish.kind === 'work' ? (
+                  <p className="text-body leading-[1.8] text-ink-soft">
+                    {fill(
+                      // Название работы, а не её идентификатор: `loveis` ничего
+                      // не говорит человеку, который будет её повторять.
+                      // Работа могла и исчезнуть из реестра — тогда честнее
+                      // показать id, чем пустое место.
+                      t.wishWork,
+                      { title: getWork(order.wish.workId)?.title ?? order.wish.workId },
+                    )}{' '}
+                    <Link
+                      href={`/works/${order.wish.workId}`}
+                      className="underline decoration-line-strong underline-offset-4 transition-colors hover:text-accent"
+                    >
+                      /works/{order.wish.workId}
+                    </Link>
+                  </p>
+                ) : (
+                  <>
+                    <p className="eyebrow text-ink-muted">{t.wishOwn}</p>
+                    {paragraphs(order.wish.text).map((block, index) => (
+                      <p key={index} className="text-body leading-[1.8] text-ink-soft">
+                        {block}
+                      </p>
+                    ))}
+                  </>
+                )}
+              </div>
+            </section>
+          ) : null}
 
           {/* Above the card's own text on purpose: this is the instruction,
               and an operator should read it before the thing it applies to. */}

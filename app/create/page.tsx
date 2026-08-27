@@ -4,6 +4,7 @@ import { Header } from '@/components/site/Header';
 import { localiseTemplates } from '@/lib/i18n/localise';
 import { getI18n } from '@/lib/i18n/server';
 import { listAllTemplateSummaries } from '@/lib/card/registry';
+import { listWorks } from '@/lib/works';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { dict } = await getI18n();
@@ -22,6 +23,9 @@ export default async function CreatePage({ searchParams }: Props) {
       <main className="flex min-h-[100svh] flex-col bg-paper-warm">
         <CreateFlow
           templates={localiseTemplates(await listAllTemplateSummaries(), dict)}
+          // Реестр работ помечен `server-only`, а форма — клиентская, поэтому
+          // сюда уезжает только то, что она показывает: имя, год и обложка.
+          works={listWorks().map(({ id, title, year, cover }) => ({ id, title, year, cover }))}
           initialTemplate={template}
           locale={locale}
           dict={dict}

@@ -26,7 +26,7 @@ function compose(templateId: string, input: StoryInput) {
 function order(
   // `moods` выводится из `mood`, чтобы у каждого примера не пришлось
   // дублировать одно и то же значение двумя полями.
-  partial: Omit<Order, 'config' | 'createdAt' | 'updatedAt' | 'moods' | 'customEntry'> & {
+  partial: Omit<Order, 'config' | 'createdAt' | 'updatedAt' | 'moods' | 'customEntry' | 'wish'> & {
     moods?: string[];
     daysAgo: number;
     story: StoryInput;
@@ -39,6 +39,8 @@ function order(
     ...rest,
     moods: rest.moods ?? [rest.mood],
     customEntry: null,
+    // Ни один пример не приходит со своей идеей: они показывают шаблоны.
+    wish: null,
     config: rest.status === 'NEW' ? null : compose(rest.templateId, story),
     createdAt: created,
     updatedAt: created,

@@ -7,6 +7,10 @@ import { composeConfigForOrderAnywhere } from '@/lib/card/compose-server';
 import { notifyNewOrder } from '@/lib/notify/telegram';
 import { siteOrigin } from '@/lib/site-origin';
 import { DEFAULT_TEMPLATE_ID } from '@/templates';
+import { listWorks } from '@/lib/works';
+
+/** Идентификаторы работ — чтобы «хочу как эта» нельзя было прислать наугад. */
+const WORK_IDS = new Set(listWorks().map((work) => work.id));
 
 const draftSchema = z.object({
   customer: z
@@ -41,6 +45,24 @@ const draftSchema = z.object({
   memories: z.array(z.object({ label: z.string(), text: z.string() })).default([]),
   wishes: z.array(z.string()).default([]),
   templateId: z.string().default(DEFAULT_TEMPLATE_ID),
+  /**
+   * Чего заказчик хочет вместо шаблона — своя идея словами или «как вот эта
+   * ваша работа». Отсутствует, когда шаблон его устраивает.
+   *
+   * `workId` сверяется с реестром работ, а не принимается на слово: иначе
+   * оператор увидел бы ссылку на работу, которой нет, и не понял бы, чего от
+   * него хотят. Незнакомый id — отказ, а не тихое сохранение мусора.
+   */
+  wish: z
+    .discriminatedUnion('kind', [
+      z.object({ kind: z.literal('own'), text: z.string().min(1).max(4000) }),
+      z.object({
+        kind: z.literal('work'),
+        workId: z.string().refine((id) => WORK_IDS.has(id), 'Unknown work'),
+      }),
+    ])
+    .nullable()
+    .default(null),
   notes: z.string().optional(),
   /** The customer's instructions to the shop. Never rendered into the card. */
   brief: z.string().max(4000).optional(),

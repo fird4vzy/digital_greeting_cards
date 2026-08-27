@@ -9,6 +9,7 @@ import { PhoneFrame } from '@/components/marketing/PhoneFrame';
 import { TemplateStage } from '@/components/marketing/TemplateStage';
 import { Button } from '@/components/ui/Button';
 import type { Photo } from '@/lib/card/schema';
+import type { CardWish } from '@/lib/db/types';
 import { copyFor } from '@/lib/card/copy';
 import type { Locale } from '@/lib/i18n/config';
 import { t } from '@/lib/i18n';
@@ -69,6 +70,24 @@ type Draft = {
   story: string;
   photos: Photo[];
   templateId: string;
+  /**
+   * ЧЕГО ЗАКАЗЧИК ХОЧЕТ ВМЕСТО ШАБЛОНА — тремя полями, а не одним союзом.
+   *
+   * Союз `CardWish` здесь хранить нельзя, и это выяснилось проверкой: человек
+   * пишет свою идею, из любопытства открывает вкладку с работами, возвращается
+   * — а текста нет, потому что переключение вкладки его перезаписало. Свои
+   * слова терять нельзя ровно так же, как текст открытки, ради которого
+   * черновик и пишется в localStorage.
+   *
+   * Поэтому путь и оба ответа живут порознь и переживают любое переключение,
+   * а `CardWish` собирается один раз, при отправке. Все три поля попадают в
+   * localStorage вместе, так что расходиться им негде.
+   */
+  wishRoute: WishRoute;
+  /** Своя идея словами. Хранится, даже когда открыт другой путь. */
+  wishText: string;
+  /** Выбранная работа. Хранится так же. */
+  wishWorkId: string;
   /** Instructions for the shop. Never rendered into the card. */
   brief: string;
   /** How the shop reaches them. At least one is required to submit. */
@@ -95,6 +114,9 @@ const EMPTY: Draft = {
   story: '',
   photos: [],
   templateId: '',
+  wishRoute: 'template',
+  wishText: '',
+  wishWorkId: '',
   brief: '',
   phone: '',
   email: '',
@@ -103,13 +125,22 @@ const EMPTY: Draft = {
 
 const STORAGE_KEY = 'mtab:draft:v1';
 
+/** Три пути на шаге выбора. Порядок — порядок кнопок. */
+const ROUTES = ['template', 'own', 'work'] as const;
+type WishRoute = (typeof ROUTES)[number];
+
+/** Работа в списке «как ваша работа» — только то, что показывает форма. */
+export type WorkChoice = { id: string; title: string; year: string; cover: string };
+
 export function CreateFlow({
   templates,
+  works,
   initialTemplate,
   locale,
   dict,
 }: {
   templates: LocalisedTemplate[];
+  works: WorkChoice[];
   initialTemplate?: string;
   locale: Locale;
   dict: Dictionary;
@@ -178,6 +209,22 @@ export function CreateFlow({
   const activeTemplate =
     templates.find((template) => template.id === draft.templateId) ?? suggested;
 
+  const route = draft.wishRoute;
+
+  /**
+   * Желание в том виде, в каком его ждёт заказ, — собирается из трёх полей.
+   *
+   * Пустая своя идея и невыбранная работа дают `null`: заказ, где написано
+   * «заказчик не хотел шаблон», но не сказано чего он хотел, хуже обычного —
+   * оператор прочитает его как загадку. Пустое — значит шаблон, как раньше.
+   */
+  const wish: CardWish | null =
+    route === 'own' && draft.wishText.trim()
+      ? { kind: 'own', text: draft.wishText.trim() }
+      : route === 'work' && draft.wishWorkId
+        ? { kind: 'work', workId: draft.wishWorkId }
+        : null;
+
   const publish = useCallback(async () => {
     setPublishing(true);
     setError(null);
@@ -203,6 +250,10 @@ export function CreateFlow({
           memories: [],
           wishes: [],
           templateId: activeTemplate?.id ?? 'romantic',
+          // Черновик всё равно собирается шаблоном — иначе по коду не было бы
+          // ничего, а бирку печатают заранее. Желание едет рядом как
+          // инструкция магазину, а не как отмена сборки.
+          wish,
           brief: draft.brief.trim() || undefined,
           // The shop publishes, not the customer: a code only goes onto a tag
           // once a person has read the card through.
@@ -431,86 +482,183 @@ export function CreateFlow({
             strings={{ back: copy.back, continue: copy.continue, progress: copy.progress }}
             eyebrow={copy.steps.template.eyebrow}
             question={copy.steps.template.question}
-            hint={suggested ? t(copy.steps.template.hint, { name: suggested.name }) : undefined}
+            hint={
+              route === 'template' && suggested
+                ? t(copy.steps.template.hint, { name: suggested.name })
+                : route === 'own'
+                  ? copy.steps.template.ownHint
+                  : copy.steps.template.workHint
+            }
             onBack={back}
             onNext={next}
             canContinue
-            // Выбирать необязательно. Подбор по ответам уже работает и стоит
-            // в `suggested`; кнопка просто говорит вслух, что можно на него
-            // положиться. Пропуск чистит `templateId`, поэтому дальше берётся
-            // подобранный — а не тот, на который случайно нажали и передумали.
-            skip={{
-              label: copy.steps.template.skip,
-              onSkip: () => {
-                patch({ templateId: '' });
-                next();
-              },
-            }}
+            // Пропуск остаётся только у шаблонов: у своей идеи и у работы
+            // пропускать нечего, а «пусть подберут» рядом с уже написанной
+            // своей идеей читалось бы как отмена написанного.
+            skip={
+              route === 'template'
+                ? {
+                    label: copy.steps.template.skip,
+                    onSkip: () => {
+                      patch({ templateId: '' });
+                      next();
+                    },
+                  }
+                : undefined
+            }
           >
-            {/* The miniature moved here from the step after next.
+            {/*
+              ТРИ ПУТИ, А НЕ ОДИН С ПРОПУСКОМ.
 
-                It was already being built for the preview step, so the
-                customer chose a template from a name, a line and four dots and
-                only saw the consequence two steps later. The same stage plays
-                their own words in the template they are pointing at, and
-                changes the moment they point at another one — which is the
-                only question this step asks. */}
-            <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-start">
-              <div className="grid gap-3 sm:grid-cols-2">
-              {templates.map((template) => {
-                const palette = getPalette(template.paletteId);
-                const selected = activeTemplate?.id === template.id;
+              Раньше шаблон был обязательным по сути: пропустить его формально
+              можно было, но что-то шаблонное показывалось всё равно, и в
+              магазин заказ приезжал без следа того, что заказчик шаблон не
+              хотел. Два настоящих случая не имели куда записаться — «у меня
+              своя идея» и «хочу как вот эта ваша работа», — а второй ещё и
+              самый ценный: человек посмотрел «Наши работы» и захотел такое же.
 
-                return (
-                  <button
-                    key={template.id}
-                    type="button"
-                    onClick={() => patch({ templateId: template.id })}
-                    aria-pressed={selected}
-                    className={cn(
-                      'rounded-[1rem] border p-5 text-left transition-all duration-500 ease-[var(--ease-out-expo)]',
-                      selected
-                        ? 'border-ink bg-ink text-paper shadow-[var(--shadow-float)]'
-                        : 'border-line-strong bg-white/50 hover:border-ink hover:bg-white',
-                    )}
-                  >
-                    <div className="flex items-baseline justify-between gap-3">
-                      <span className="font-display text-[1.3rem] leading-none">{template.name}</span>
-                      <span className="flex gap-1">
-                        {palette.swatches.map((swatch) => (
-                          <span
-                            key={swatch}
-                            className="block h-2.5 w-2.5 rounded-full ring-1 ring-inset ring-black/10"
-                            style={{ background: swatch }}
-                          />
-                        ))}
-                      </span>
-                    </div>
-                    <span
-                      className={cn(
-                        'mt-2.5 block text-caption leading-snug',
-                        selected ? 'text-paper/60' : 'text-ink-muted',
-                      )}
-                    >
-                      {template.tagline}
-                    </span>
-                    {suggested?.id === template.id ? (
-                      <span
+              Путь виден по самому желанию, отдельного состояния нет: иначе
+              восстановленный из localStorage черновик показывал бы шаблоны, а
+              отправлял свою идею.
+            */}
+            <div className="flex flex-wrap gap-2">
+              {ROUTES.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  // Переключение пути не трогает ответы: написанное на одной
+                  // вкладке ждёт возвращения, а не исчезает.
+                  onClick={() => patch({ wishRoute: option })}
+                  aria-pressed={route === option}
+                  className={cn(
+                    'inline-flex h-9 items-center rounded-full border px-4 text-caption transition-colors duration-400',
+                    route === option
+                      ? 'border-ink bg-ink text-paper'
+                      : 'border-line-strong text-ink-soft hover:border-ink hover:text-ink',
+                  )}
+                >
+                  {copy.steps.template.routes[option]}
+                </button>
+              ))}
+            </div>
+
+            {route === 'template' ? (
+              /* The miniature moved here from the step after next.
+
+                 It was already being built for the preview step, so the
+                 customer chose a template from a name, a line and four dots and
+                 only saw the consequence two steps later. The same stage plays
+                 their own words in the template they are pointing at, and
+                 changes the moment they point at another one — which is the
+                 only question this step asks. */
+              <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-start">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {templates.map((template) => {
+                    const palette = getPalette(template.paletteId);
+                    const selected = activeTemplate?.id === template.id;
+
+                    return (
+                      <button
+                        key={template.id}
+                        type="button"
+                        onClick={() => patch({ templateId: template.id })}
+                        aria-pressed={selected}
                         className={cn(
-                          'eyebrow mt-3 block',
-                          selected ? 'text-paper/50' : 'text-accent',
+                          'rounded-[1rem] border p-5 text-left transition-all duration-500 ease-[var(--ease-out-expo)]',
+                          selected
+                            ? 'border-ink bg-ink text-paper shadow-[var(--shadow-float)]'
+                            : 'border-line-strong bg-white/50 hover:border-ink hover:bg-white',
                         )}
                       >
-                        {copy.steps.template.suggested}
-                      </span>
-                    ) : null}
-                  </button>
-                );
-              })}
-              </div>
+                        <div className="flex items-baseline justify-between gap-3">
+                          <span className="font-display text-[1.3rem] leading-none">{template.name}</span>
+                          <span className="flex gap-1">
+                            {palette.swatches.map((swatch) => (
+                              <span
+                                key={swatch}
+                                className="block h-2.5 w-2.5 rounded-full ring-1 ring-inset ring-black/10"
+                                style={{ background: swatch }}
+                              />
+                            ))}
+                          </span>
+                        </div>
+                        <span
+                          className={cn(
+                            'mt-2.5 block text-caption leading-snug',
+                            selected ? 'text-paper/60' : 'text-ink-muted',
+                          )}
+                        >
+                          {template.tagline}
+                        </span>
+                        {suggested?.id === template.id ? (
+                          <span
+                            className={cn(
+                              'eyebrow mt-3 block',
+                              selected ? 'text-paper/50' : 'text-accent',
+                            )}
+                          >
+                            {copy.steps.template.suggested}
+                          </span>
+                        ) : null}
+                      </button>
+                    );
+                  })}
+                </div>
 
-              {stage ? <div className="hidden lg:block">{stage}</div> : null}
-            </div>
+                {stage ? <div className="hidden lg:block">{stage}</div> : null}
+              </div>
+            ) : null}
+
+            {route === 'own' ? (
+              <textarea
+                value={draft.wishText}
+                onChange={(event) => patch({ wishText: event.target.value })}
+                rows={7}
+                maxLength={4000}
+                placeholder={copy.steps.template.ownPlaceholder}
+                className="mt-8 w-full resize-none rounded-[1rem] border border-line-strong bg-white/60 p-5 text-body leading-relaxed text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-ink"
+              />
+            ) : null}
+
+            {route === 'work' ? (
+              <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {works.map((work) => {
+                  const selected = draft.wishWorkId === work.id;
+
+                  return (
+                    <button
+                      key={work.id}
+                      type="button"
+                      onClick={() => patch({ wishWorkId: work.id })}
+                      aria-pressed={selected}
+                      className={cn(
+                        'overflow-hidden rounded-[1rem] border text-left transition-all duration-500 ease-[var(--ease-out-expo)]',
+                        selected
+                          ? 'border-ink bg-ink text-paper shadow-[var(--shadow-float)]'
+                          : 'border-line-strong bg-white/50 hover:border-ink hover:bg-white',
+                      )}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={work.cover}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        className="block aspect-[16/9] w-full object-cover"
+                      />
+                      <span className="flex items-baseline justify-between gap-3 p-4">
+                        <span className="font-display text-[1.15rem] leading-none">{work.title}</span>
+                        <span
+                          className={cn('text-caption', selected ? 'text-paper/50' : 'text-ink-muted')}
+                        >
+                          {work.year}
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
           </StepShell>
         )}
 

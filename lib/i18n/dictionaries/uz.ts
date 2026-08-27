@@ -184,6 +184,13 @@ export const uz: Dictionary = {
           hint: "Javoblaringizga qarab biz «{name}»ni tanlagan bo'lardik. Rozi bo'lmasangiz ham bo'ladi.",
           skip: 'O‘zingiz tanlang',
           suggested: "Biz shuni tanlagan bo'lardik",
+          routes: { template: 'Tayyor shablon', own: 'O‘z g‘oyam', work: 'Ishlaringizdagidek' },
+          ownHint:
+            'O‘z so‘zlaringiz bilan tasvirlab bering. Do‘kon kartochkani shablondan emas, sizning tavsifingizdan yig‘adi.',
+          ownPlaceholder:
+            'Masalan: qorong‘i ekran, bitta surat asta paydo bo‘ladi, keyin xat qatorma-qator. Va bizning qo‘shig‘imiz yangrasin.',
+          workHint:
+            'Yoqqanini tanlang. Do‘kon shunga o‘xshashini qiladi — sizning so‘zlaringiz va suratlaringiz bilan.',
         },
         language: {
           label: 'Kartochka tili',
@@ -548,6 +555,9 @@ export const uz: Dictionary = {
       from: 'kimdan:',
       sectionOrder: 'Buyurtma',
       sectionBrief: 'Buyurtmachi istaklari',
+      sectionWish: 'Buyurtmachi shablon tanlamadi',
+      wishWork: '«{title}» ishidagidek bo‘lishini xohlaydi.',
+      wishOwn: 'O‘z g‘oyasini tasvirlab berdi:',
       sectionMessage: 'Buyurtmachi nima yozgan',
       sectionPhotos: 'Suratlar',
       sectionDetails: 'Yana nima ko‘rsatilgan',

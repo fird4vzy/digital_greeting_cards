@@ -180,6 +180,13 @@ export const en: Dictionary = {
           hint: 'Based on your answers we would pick {name}. You can overrule us.',
           skip: 'Choose one for me',
           suggested: 'Suggested for you',
+          routes: { template: 'A ready template', own: 'My own idea', work: 'Like one of your works' },
+          ownHint:
+            'Describe it in your own words. The shop builds the card from your description rather than from a template.',
+          ownPlaceholder:
+            'For example: a dark screen, one photograph fading in, then the letter a line at a time. And our song playing.',
+          workHint:
+            'Pick the one you liked. The shop will make something like it — with your words and your photographs.',
         },
         language: {
           label: 'Language of the card',
@@ -542,6 +549,9 @@ export const en: Dictionary = {
       from: 'from',
       sectionOrder: 'The order',
       sectionBrief: 'What the customer asked for',
+      sectionWish: 'The customer did not want a template',
+      wishWork: 'Wants something like “{title}”.',
+      wishOwn: 'Described their own idea:',
       sectionMessage: 'What the customer wrote',
       sectionPhotos: 'Photographs',
       sectionDetails: 'Details supplied',
