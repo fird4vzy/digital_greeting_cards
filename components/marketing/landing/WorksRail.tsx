@@ -49,28 +49,48 @@ export function WorksRail({
   useEffect(() => {
     if (!rich) return undefined;
 
-    let frame = 0;
-    const measure = () => {
-      const section = sectionRef.current;
+    // Насколько лента длиннее окна — столько ей и ехать. Меряется при
+    // изменении размеров, а НЕ каждый кадр: `scrollWidth` заставляет браузер
+    // пересчитать вёрстку синхронно, и шестьдесят таких пересчётов в секунду
+    // — это и был тот рывок при прокрутке.
+    let shift = 0;
+    const remeasure = () => {
       const viewport = viewportRef.current;
       const rail = railRef.current;
+      if (viewport && rail) shift = Math.max(0, rail.scrollWidth - viewport.clientWidth);
+    };
 
-      if (section && viewport && rail) {
+    const observer = new ResizeObserver(remeasure);
+    if (viewportRef.current) observer.observe(viewportRef.current);
+    if (railRef.current) observer.observe(railRef.current);
+    remeasure();
+
+    let frame = 0;
+    let last = -1;
+    const tick = () => {
+      const section = sectionRef.current;
+      const rail = railRef.current;
+
+      if (section && rail) {
         const rect = section.getBoundingClientRect();
         const travel = rect.height - window.innerHeight;
         const progress = travel > 0 ? Math.min(1, Math.max(0, -rect.top / travel)) : 0;
-        // Насколько лента длиннее окна — столько ей и ехать. Меряется каждый
-        // кадр, а не один раз: ширина меняется с поворотом телефона.
-        const shift = Math.max(0, rail.scrollWidth - viewport.clientWidth);
-        rail.style.transform = `translate3d(${-progress * shift}px, 0, 0)`;
+        const x = Math.round(-progress * shift);
+        // Писать в стиль только когда сдвиг реально изменился: иначе браузер
+        // получает новый transform в каждом кадре даже на стоящей странице.
+        if (x !== last) {
+          last = x;
+          rail.style.transform = `translate3d(${x}px, 0, 0)`;
+        }
       }
 
-      frame = window.requestAnimationFrame(measure);
+      frame = window.requestAnimationFrame(tick);
     };
 
-    frame = window.requestAnimationFrame(measure);
+    frame = window.requestAnimationFrame(tick);
     return () => {
       window.cancelAnimationFrame(frame);
+      observer.disconnect();
       if (railRef.current) railRef.current.style.transform = '';
     };
   }, [rich]);

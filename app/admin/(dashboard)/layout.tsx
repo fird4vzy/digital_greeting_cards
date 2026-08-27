@@ -46,7 +46,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="min-h-[100svh] bg-paper">
       <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 w-full max-w-[82rem] items-center gap-8 px-[var(--spacing-gutter)]">
+        {/* Две строки на телефоне, одна от планшета.
+            Раньше была одна строка фиксированной высоты, и на 390 px знак, четыре
+            вкладки, переключатель языка и две ссылки не помещались. Навигация
+            сжималась в полоску шириной в несколько пикселей — на экране это
+            выглядело как чёрное полукружие рядом со знаком (сплющенная активная
+            плашка), а меню казалось пропавшим. */}
+        <div className="mx-auto flex w-full max-w-[82rem] flex-wrap items-center gap-x-6 gap-y-3 px-[var(--spacing-gutter)] py-3 md:h-16 md:flex-nowrap md:gap-8 md:py-0">
           <Wordmark href="/admin" />
           <AdminNav
             labels={{
@@ -57,7 +63,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             }}
           />
 
-          <div className="ml-auto flex items-center gap-5">
+          <div className="ml-auto flex items-center gap-5 max-md:order-first">
             <LocaleSwitcher locale={locale} label={dict.ui.localeSwitcher.label} />
 
             <Link href="/" className="text-caption text-ink-muted transition-colors hover:text-ink">

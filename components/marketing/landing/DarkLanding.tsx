@@ -58,9 +58,8 @@ export function DarkLanding({ locale, dict }: { locale: Locale; dict: Dictionary
             background: 'radial-gradient(closest-side, rgba(172, 139, 87, 0.085), transparent 70%)',
           }}
         />
+        <div className="grain-veil" />
       </div>
-
-      <div aria-hidden="true" className="grain-veil" />
 
       <Header
         overlay

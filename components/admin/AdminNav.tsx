@@ -26,7 +26,9 @@ export function AdminNav({ labels }: { labels: AdminNavLabels }) {
   ];
 
   return (
-    <nav className="flex items-center gap-1 overflow-x-auto">
+    // На телефоне — своя строка во всю ширину, вкладки переносятся.
+    // `shrink-0` на самих ссылках: без него flex сжимал плашки до нечитаемого.
+    <nav className="flex w-full flex-wrap items-center gap-1 md:w-auto md:flex-nowrap">
       {links.map((link) => {
         const active = link.exact ? pathname === link.href : pathname.startsWith(link.href);
 
@@ -35,7 +37,7 @@ export function AdminNav({ labels }: { labels: AdminNavLabels }) {
             key={link.href}
             href={link.href}
             className={cn(
-              'rounded-full px-3.5 py-1.5 text-caption transition-colors duration-300',
+              'shrink-0 rounded-full px-3.5 py-1.5 text-caption transition-colors duration-300',
               active ? 'bg-ink text-paper' : 'text-ink-soft hover:bg-ink/[0.05] hover:text-ink',
             )}
           >
