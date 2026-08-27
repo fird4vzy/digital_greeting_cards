@@ -1,0 +1,745 @@
+{
+  "tokens": {
+    "colors": [
+      {
+        "name": "--ink",
+        "value": "#17130F",
+        "role": "Тёплый почти-чёрный — «ночь». ОБЪЯВЛЕНА, НО НИ РАЗУ НЕ ИСПОЛЬЗУЕТСЯ через var(). Её значение продублировано литералом в --bg и в #loader{background:#17130F}, а также в JS-массиве BG[0]."
+      },
+      {
+        "name": "--dusk",
+        "value": "#3A2A28",
+        "role": "«Сумерки» — средняя точка перехода темы по скроллу. Через var() не используется нигде: живёт литералом в JS как BG[1]. Существует, чтобы переход ночь→бумага не был скачком."
+      },
+      {
+        "name": "--paper",
+        "value": "#EDE3D3",
+        "role": "«Бумага» — конечное светлое состояние темы. Через var() не используется: JS BG[2] и цвет материала бумаги в 3D-сцене (0xEDE3D3)."
+      },
+      {
+        "name": "--bloom",
+        "value": "#C2404E",
+        "role": "Единственный активный акцент. Красит: .counter (нумерация шагов «01 — Шаг первый»), #seal (прогресс-полоска лоадера), .scroll-hint i::after (капля, анимация trickle), .work .open («Открыть работу →»), .steps .n, #fallback path (обводка SVG-букета), .foot-col a:hover, #status[data-ok=\"0\"]. Плюс литералом rgba(194,64,78) в первом радиальном пятне body::before."
+      },
+      {
+        "name": "--gold",
+        "value": "#AC8B57",
+        "role": "ОБЪЯВЛЕНА, НО ЧЕРЕЗ var() НЕ ИСПОЛЬЗУЕТСЯ. Реально работает двумя литералами: rgba(172,139,87) во втором радиальном пятне body::before (левый нижний угол, вполовину тише первого) и 0xAC8B57 в материалах 3D-сцены."
+      },
+      {
+        "name": "--bg",
+        "value": "#17130F",
+        "role": "Фон body, цвет текста на .btn (инверсия), фон ячеек .steps>div, фон .frame img-подложки нет — но фон #fonts и #diag через color-mix(--bg 86%/82%). АНИМИРУЕТСЯ ИЗ JS: #17130F → #3A2A28 → #EDE3D3."
+      },
+      {
+        "name": "--fg",
+        "value": "#F0E7DA",
+        "role": "Основной текст, заливка/бордер .btn, фон активной кнопки #fonts, цвет .tag-qr. База для --muted/--faint/--line и для всех локальных color-mix. АНИМИРУЕТСЯ ИЗ JS: #F0E7DA → #F0E2D6 → #221B16."
+      },
+      {
+        "name": "--glowA",
+        "value": ".17",
+        "role": "Прозрачность тёплого светового пятна body::before. Второе пятно берёт calc(var(--glowA)*.5). Из JS едет .17 → .05 по мере просветления темы (формула .17 - .12*t)."
+      },
+      {
+        "name": "--muted",
+        "value": "color-mix(in srgb,var(--fg) 58%,transparent)",
+        "role": "Вторичный текст: .lead, .eyebrow, .steps p, .step p, .foot-promise, .foot-col h3, .foot-tagline, #diag, кнопки #fonts в неактивном состоянии."
+      },
+      {
+        "name": "--faint",
+        "value": "color-mix(in srgb,var(--fg) 26%,transparent)",
+        "role": "Третичный текст и хайрлайны: .field dt, .work .meta em, .frame .tile span, .step .n, .tag-code, .foot-bottom p, #fonts span, полоска .scroll-hint i, черта .rule-eyebrow i."
+      },
+      {
+        "name": "--line",
+        "value": "color-mix(in srgb,var(--fg) 15%,transparent)",
+        "role": "ВСЕ границы толщиной 1px: .frame, .letter, .field (border-top), .btn--ghost, #fonts, #diag, .nav-cta, footer (border-top), .foot-bottom (border-top), #status (border-right). Плюс фон сетки .steps (gap:1px поверх --line даёт разделители)."
+      },
+      {
+        "name": "--display",
+        "value": "'Prata',Georgia,serif",
+        "role": "Заголовочная антиква. Красит h1/h2/h3, .counter, #loader .line, #count, .frame .tile b, .work .meta b, .field dd, .steps h3, .bridge-note, .steps-note, .tag-line, .foot-tagline. ПОДМЕНЯЕТСЯ ВО ВРЕМЯ ВЫПОЛНЕНИЯ переключателем #fonts (Prata / Cormorant Garamond / Playfair Display) через setProperty на documentElement."
+      },
+      {
+        "name": "--ease",
+        "value": "cubic-bezier(.16,1,.3,1)",
+        "role": "Единственная кривая на странице. Все transition (.wm-fold .7s, #scene .8s, .btn .4s, .frame .7s, .foot-col a .3s) и keyframes trickle 2.6s."
+      },
+      {
+        "name": "--wm-ink",
+        "value": "var(--fg), fallback #191512",
+        "role": "Локальная переменная на .wm. Заливка основных path в SVG-логотипе. В #loader .mid .wm жёстко переопределена на #F0E7DA, потому что лоадер не участвует в скролл-теме."
+      },
+      {
+        "name": "--wm-surface",
+        "value": "var(--bg), fallback #f6f2ec",
+        "role": "Локальная переменная на .wm. Заливка «отворота» (.wm-fold) — имитация сгиба бумаги на логотипе. В лоадере переопределена на #17130F. ВНИМАНИЕ: fallback #f6f2ec не совпадает ни с --paper, ни с --bg."
+      },
+      {
+        "name": "wordmark accent",
+        "value": "#a33b48",
+        "role": "Жёстко зашит в SVG логотипа (первый path — подложка под буквой). Близко к --bloom #C2404E, но НЕ равно ему и переменной не управляется."
+      },
+      {
+        "name": "FG midtone",
+        "value": "#F0E2D6",
+        "role": "Средняя точка анимации --fg (только в JS, переменной не соответствует). Тёплый сдвиг светлого текста на сумеречном фоне."
+      },
+      {
+        "name": "FG light",
+        "value": "#221B16",
+        "role": "Конечный цвет текста на «бумаге» (только в JS). Это НЕ --ink #17130F — на светлом фоне текст мягче чёрного."
+      },
+      {
+        "name": "status ok",
+        "value": "#8FBF7F",
+        "role": "Зелёный индикатор #status[data-ok=\"1\"] в отладочной панели 3D. Единственный зелёный на странице, переменной не имеет."
+      },
+      {
+        "name": "terracotta glow",
+        "value": "rgba(193,131,106,.20) = #C1836A",
+        "role": "Радиальное пятно #steps::before (110vmin × 60vmin, сдвинуто translate(-50%,-33%)). Это цвет лепестка из 3D-сцены, а не --bloom и не --gold."
+      },
+      {
+        "name": "petal palette (3D)",
+        "value": "#E7C9C6 / #C1836A / #B2585C / #A33B48",
+        "role": "Градация лепестков в three.js-сцене — от почти-белого розового к тёмной вишне. Задаёт «нижний регистр» акцента, к которому --bloom работает верхней нотой."
+      },
+      {
+        "name": "leaf palette (3D)",
+        "value": "0x6F7C64 / 0x5F6B57",
+        "role": "Приглушённая зелень листвы в 3D-сцене. Единственная зелень в проекте, в CSS не выведена."
+      },
+      {
+        "name": "scene lights (3D)",
+        "value": "0xffe4d4 / 0xfff2e2 / 0x2A1C20",
+        "role": "Тёплый ключевой свет, заполняющий и цвет тени в 3D-сцене."
+      },
+      {
+        "name": "noise overlay",
+        "value": "feTurbulence baseFrequency .85, opacity .26, mix-blend-mode:overlay, tile 180px",
+        "role": "body::after — плёночное зерно поверх всей страницы на z-index 60. Цвета нет, но без него палитра выглядит стерильной."
+      }
+    ],
+    "typography": [
+      {
+        "selector": "body",
+        "family": "Inter, system-ui, sans-serif",
+        "size": "16px / line-height 1.7 (на ≤640px — 15px)",
+        "notes": "Из Google подгружены только веса 400 и 500. -webkit-font-smoothing:antialiased. Межстрочник 1.7 — заметно просторнее обычного, это часть «дыхания» макета."
+      },
+      {
+        "selector": "h1, h2, h3",
+        "family": "var(--display) = Prata, Georgia, serif",
+        "size": "—",
+        "notes": "font-weight:400, letter-spacing:-.02em, line-height:1, text-wrap:balance. Отрицательный трекинг обязателен — без него антиква на крупном кегле рассыпается. text-wrap:balance делает перенос строк в заголовках осмысленным."
+      },
+      {
+        "selector": "#hero h1",
+        "family": "var(--display)",
+        "size": "clamp(42px, 8.6vw, 126px)",
+        "notes": "line-height .99 (на ≤640px поднимается до 1.02), margin-top 22px. Каждая строка обёрнута в .ln{overflow:hidden} со вложенным span{translateY(105%)} — маска для въезда строк снизу. ТРЕТЬЯ строка курсивная: «в сообщение.»"
+      },
+      {
+        "selector": "#step1 h2 / #works h2 / #memories h2 / #bridge h2 / .steps-title / #closing h2",
+        "family": "var(--display)",
+        "size": "clamp(36,6.6vw,92) / clamp(32,5.4vw,76) / clamp(34,5.6vw,80) / clamp(34,5.6vw,80) / clamp(32,5vw,68) / clamp(40,8vw,116)",
+        "notes": "Шесть разных clamp-шкал — намеренная иерархия: hero > closing > step1 > memories=bridge > works > steps. Не сводить к одной переменной. #closing h2 разбивается JS на .w-обёртки по СЛОВАМ (не по строкам, как hero)."
+      },
+      {
+        "selector": ".i",
+        "family": "наследует var(--display) внутри заголовков",
+        "size": "наследует",
+        "notes": "КЛЮЧЕВОЕ. Только одно правило: font-style:italic. Курсивом набирается ВТОРАЯ, эмоциональная половина фразы, всегда с точкой на конце: «в сообщение.», «чувство.», «работы.», «воспоминания.», «к букету.», «сделанный для одного человека.», «Дверь никто не запоминает.» Первая половина — нейтральная, прямая. Это ритмическая рифма всей страницы."
+      },
+      {
+        "selector": ".work .meta em",
+        "family": "Inter",
+        "size": "11px",
+        "notes": "font-style:NORMAL — <em> с годом («2025») намеренно ЛИШЁН курсива. Курсив в этой системе зарезервирован за чувством, а не за метаданными. При переносе не «починить» это по привычке."
+      },
+      {
+        "selector": ".steps-note",
+        "family": "var(--display)",
+        "size": "clamp(20px, 2.4vw, 28px) / line-height 1.35",
+        "notes": "font-style:italic задан прямо на элементе (не через .i), текст по центру, max-width 36ch, margin 78px auto 0, цвет color-mix(--fg 72%). Внутри ещё и вложенный .i — то есть курсив уже в курсиве, визуально просто продолжается."
+      },
+      {
+        "selector": ".foot-tagline",
+        "family": "var(--display)",
+        "size": "15px",
+        "notes": "font-style:italic, color:var(--muted) с !important (перебивает footer{color:var(--fg)}). Подпись-мантра в подвале — курсивная по той же логике."
+      },
+      {
+        "selector": ".bridge-note",
+        "family": "var(--display)",
+        "size": "clamp(18px, 2.2vw, 25px)",
+        "notes": "САМА не курсивная, max-width 26ch, margin-top 30px. Курсив только на вложенном .i («Дверь никто не запоминает.»). Тот же кегль, что .field dd — они рифмуются."
+      },
+      {
+        "selector": ".eyebrow",
+        "family": "Inter",
+        "size": "11px / weight 500",
+        "notes": "letter-spacing:.18em, text-transform:uppercase, color:var(--muted). Надзаголовок. .scroll-hint получает этот же класс — «Листайте» набрано так же."
+      },
+      {
+        "selector": ".counter",
+        "family": "var(--display)",
+        "size": "13px",
+        "notes": "letter-spacing:.2em (САМЫЙ широкий трекинг на странице), color:var(--bloom), БЕЗ uppercase. Нумерация разделов «01 — Шаг первый». Антиква вразрядку — отдельный голос, не путать с .eyebrow (гротеск, .18em, uppercase)."
+      },
+      {
+        "selector": ".lead",
+        "family": "Inter",
+        "size": "clamp(15px, 1.5vw, 18px) / line-height 1.65",
+        "notes": "max-width 38ch → 34ch на ≤640px → 40ch на ≥1600px. color:var(--muted). Единственный подзаголовочный тип. В #closing перебит инлайн-стилем на clamp(17px,2vw,21px)."
+      },
+      {
+        "selector": "«малый капс» — .field dt, .frame .tile span, .work .meta em, #loader .foot, .steps .n",
+        "family": "Inter",
+        "size": "11px",
+        "notes": "Один общий паттерн: 11px + letter-spacing .16em + uppercase + var(--faint). Держать как единый токен «label». Отличается от .eyebrow только трекингом (.16em против .18em) — разница намеренная, .eyebrow чуть шире."
+      },
+      {
+        "selector": ".step .n / .tag-code",
+        "family": "Inter",
+        "size": "11px / 8px",
+        "notes": "letter-spacing .18em, var(--faint). У .step .n дополнительно font-variant-numeric:tabular-nums — цифры 01…04 не пляшут по сетке. У .tag-code 8px — самый мелкий кегль на странице."
+      },
+      {
+        "selector": ".field dd",
+        "family": "var(--display)",
+        "size": "clamp(18px, 2.2vw, 25px) / line-height 1.35",
+        "notes": "Ответы в «письме» набраны антиквой — это визуально превращает форму в письмо, а не в анкету. dt при этом гротеск 11px uppercase."
+      },
+      {
+        "selector": ".frame .tile b / .work .meta b / .steps h3 / .step h3",
+        "family": "var(--display)",
+        "size": "25px / 20px / 19px / clamp(20px, 1.6vw, 25px)",
+        "notes": "Все с font-weight:400 (у <b> вес принудительно сброшен). .steps h3 дополнительно display:inline — заголовок и текст шага стоят в одной строке."
+      },
+      {
+        "selector": ".foot-col h3",
+        "family": "Inter, system-ui, sans-serif — ЯВНО, а не var(--display)",
+        "size": "11px / weight 500",
+        "notes": "Единственный h3, выломанный из антиквы. letter-spacing .18em, uppercase, var(--muted), margin-bottom 22px. Правило h1,h2,h3{font-family:var(--display)} здесь перебито намеренно — заголовки колонок подвала должны читаться как ярлыки, а не как текст."
+      },
+      {
+        "selector": "#loader .line / #count",
+        "family": "var(--display)",
+        "size": "clamp(16px,2.2vw,24px) / clamp(38px,8vw,84px)",
+        "notes": "У #count line-height .8 — счётчик прижат к базовой линии. Цвета в лоадере ЖЁСТКО зашиты rgba(240,231,218,.58) и .4, потому что лоадер живёт до старта скролл-темы."
+      },
+      {
+        "selector": "header / .btn / .nav-cta / #diag / .steps p / .step p",
+        "family": "Inter",
+        "size": "13px / 13px (12px на ≤640) / 12px / 12px / 14px / 14px",
+        "notes": "Мелкий функциональный текст. .step p — line-height 1.6, max-width 28ch. footer явно сбрасывает letter-spacing:normal и text-transform:none — защита от протечки uppercase-правил."
+      },
+      {
+        "selector": ".tag-line",
+        "family": "var(--display)",
+        "size": "10px / line-height 1.25",
+        "notes": "Антиква на 10px внутри бумажной бирки. Единственное место, где display-шрифт работает на микрокегле — имитирует типографскую печать на ярлыке."
+      }
+    ],
+    "spacing": [
+      "Горизонтальные поля — единственный источник: .pad{padding-left/right: clamp(20px, 5vw, 52px)}. На ≥1320px правило подменяется на calc((100vw - 84rem)/2) — контент садится в центральную колонку 84rem (≈1344px). Комментарий в файле уточняет, что на живом сайте это mx-auto max-w-[86rem] — то есть 84rem в образце и 86rem в проде РАСХОДЯТСЯ на 2rem.",
+      "Заголовок фиксирован: header{padding: 18px clamp(20px,5vw,52px)}, nav gap 24px. Из-под него всё липкое выводится через .sticky{padding-top: clamp(92px,13vh,132px); padding-bottom: clamp(28px,7vh,64px)} — не трогать, иначе кадры залезут под шапку.",
+      "Вертикальный ритм секций: #memories — clamp(80px,14vh,150px) сверху и снизу; #steps — clamp(80px,14vh,150px) сверху, clamp(80px,16vh,170px) снизу (низ намеренно тяжелее); на ≤640px общее правило section{padding: clamp(56px,9vh,90px) 0}.",
+      "Длина прокрутки задаётся ВЫСОТОЙ секции, а не pin: #step1 230vh, #works 330vh, #bridge 280vh. На ≤1024px — 190vh / — / 220vh; на ≤640px — 170vh / — / 190vh. #works 330vh не уменьшается ни на одном пороге.",
+      "Экранные высоты: #hero min-height 100svh (92svh на ≤640px), .sticky min-height 100svh, #closing min-height 84svh. Везде svh, не vh — иначе на мобильных адресная строка ломает кадр.",
+      "Максимальные ширины в rem: hero-колонка min(60rem,100%), #step1 колонка 32rem, #bridge .col 33rem, .letter 54rem, #diag 22rem, .field dt-колонка minmax(0,10rem).",
+      "Максимальные ширины в ch (мера строки): .lead 38ch → 34ch на ≤640 → 40ch на ≥1600; .step p 28ch; .bridge-note 26ch; .foot-promise 26ch; .steps-note 36ch. Именно ch, а не px — при смене display-шрифта мера пересчитывается сама.",
+      "Кнопки: .btn padding 15px 29px, radius 999px, gap 10px; на ≤640px — 13px 22px. .cta-row{gap:13px; margin-top:40px}, на ≤640px gap 10px. .nav-cta (мобильная замена меню) — 9px 17px.",
+      "Лента работ: .rail gap 20px → 16px (≤1024) → 14px (≤640). .work width min(84vw,400px) → min(72vw,340px) → 82vw. .frame radius 14px, aspect-ratio 16/9, .tile padding 20px, .work .meta margin-top 14px. #works .sticky gap 34px.",
+      "Письмо: .letter margin-top 46px (34px на ≤640), padding clamp(22px,3.6vw,46px). .field — grid minmax(0,10rem) 1fr, gap 6px 30px, padding 17px 0, border-top var(--line); .field:first-child обнуляет и border, и padding-top. На ≤700px схлопывается в одну колонку.",
+      "Ряд шагов: .steps-row margin-top 76px → 56px (≤1024) → 44px (≤640); grid repeat(4,minmax(0,1fr)) gap 32px → repeat(2) gap 44px 28px на ≤940px → 1fr на ≤560px. Внутри карточки: .art height 176px → 150px → 126px, затем .n margin-top 30px, h3 margin-top 11px, p margin-top 9px. .steps-note margin 78px auto 0 (52px на ≤640).",
+      "Соединители между шагами: .step + .step::before — абсолютная чёрточка left:-24px, top:88px, width:26px, height:1px, градиент от color-mix(--fg 30%) в прозрачность. Прячется на ≤940px, когда сетка перестаёт быть однорядной. top:88px привязан к середине .art высотой 176px — при смене высоты .art чёрточка съедет.",
+      "Список шагов в #bridge: .steps{display:grid; gap:1px; background:var(--line)} — разделители сделаны зазором сетки поверх фона, а не бордерами. Ячейки .steps>div{background:var(--bg); padding:15px 0 15px 16px; grid 32px 1fr; gap 12px; align-items:baseline}. Это ломается, если у ячеек будет прозрачный фон.",
+      "Подвал: padding-top 66px / bottom 58px (48/44 на ≤640). .foot-grid — 1.4fr 1fr 1fr, gap 48px → 1fr 1fr gap 40px на ≤860px → 1fr на ≤560px. .foot-promise margin-top 24px, .foot-col h3 margin-bottom 22px, .foot-col ul gap 14px. .foot-bottom margin-top 56px (38 на ≤640), padding-top 26px, border-top.",
+      "Радиусы: 999px — все пилюли (.btn, .nav-cta, #fonts и его кнопки); 14px — .frame; 10px — #diag; 8px — .tag. Другие значения не встречаются.",
+      "Толщина линий — везде ровно 1px (border, .scroll-hint i, .rule-eyebrow i width:34px, #seal, .step::before). Единственное исключение: #fallback path stroke-width 1.5.",
+      "Порядок слоёв (z-index): 0 — световое пятно body::before; 1 — #scene и #fallback; 2 — main и footer; 40 — #diag; 50 — header; 60 — зерно body::after; 70 — #fonts; 80 — #loader. Зерно выше шапки, но ниже переключателя шрифтов и лоадера.",
+      "Пороги адаптива, все восемь: 560 / 640 / 700 / 860 / 880 / 900 / 940 / 1024 / 1320 / 1600. Плюс медиазапросы возможностей: (hover:none) и (prefers-reduced-motion:reduce). Ломается не по устройствам, а по месту, где конкретный блок перестаёт помещаться — поэтому порогов много и они не выровнены в шкалу."
+    ],
+    "notes": "1) ЧЕТЫРЕ ПЕРЕМЕННЫЕ — МЁРТВЫЕ. --ink, --dusk, --paper и --gold объявлены в :root, но ни разу не вызваны через var(). Их значения продублированы литералами: --ink/--dusk/--paper в JS-массиве BG=['#17130F','#3A2A28','#EDE3D3'], --gold — в rgba(172,139,87) внутри body::before и в 0xAC8B57 в 3D-сцене. Если переносить «как есть» и потом менять токен --paper, ничего не изменится. При переносе их надо либо реально связать с JS/градиентами, либо честно удалить.\n\n2) ТЕМА ЕДЕТ СКРОЛЛОМ И ЖИВЁТ В JS, А НЕ В CSS. applyTheme() пишет --bg, --fg и --glowA прямо в style документа по двум ScrollTrigger: разгон t:0→1 привязан к #bridge (start 'top bottom', end 'top 25%'), обратный t:1→0 — к нему же (start 'bottom 75%', end 'bottom 15%'). То есть светлая «бумага» существует только в окне вокруг секции #bridge, дальше страница снова темнеет. Ключевое: массив FG — ['#F0E7DA','#F0E2D6','#221B16'] — содержит две величины, которых НЕТ ни в одной CSS-переменной: тёплую середину #F0E2D6 и светлый текст #221B16 (это не --ink, он мягче). Потерять их при переносе очень легко. --glowA считается формулой .17 - .12*t.\n\n3) КУРСИВ — ЭТО СМЫСЛ, И ОН ЛОМАЕТ СЛОВАРИ. Класс .i всегда падает на вторую, эмоциональную половину фразы, заканчивающуюся точкой: «Некоторые чувства не помещаются / *в сообщение.*», «Выберите / *чувство.*», «Наши *работы.*», «Добавьте *воспоминания.*», «Прикрепите *к букету.*», «QR — это всего лишь дверь. *Дверь никто не запоминает.*», «Маленький мир, *сделанный для одного человека.*» При жёстком правиле проекта (ни одной видимой строки в компоненте) это значит, что заголовок НЕЛЬЗЯ хранить одной строкой — словарь должен отдавать пару вида {plain, italic} или единый rich-text-формат. Одна строка + попытка вставить <span class=\"i\"> в шаблоне — это ровно то нарушение, которое уже трижды давало баги.\n\n4) КУРСИВ У PRATA — СИНТЕТИЧЕСКИЙ. Google-запрос грузит family=Prata без оси ital: у Prata есть только Regular 400 и настоящего курсива не существует. Значит весь .i в дефолтной теме — это наклон, дорисованный браузером. Cormorant Garamond (ital,wght@0,400;0,600;1,400) и Playfair Display (ital,wght@0,500;1,500) загружены С настоящими курсивами — переключатель #fonts, по сути, существует именно чтобы сравнить фальшивый наклон с настоящим. При переносе: либо смириться и зафиксировать Prata, либо переехать на Cormorant/Playfair — но тогда изменится и цвет полосы набора, и оптический размер. Отдельно: h1,h2,h3 просят font-weight:400, а у Playfair Display загружен только 500 — на нём вес молча подменится.\n\n5) <em> НАМЕРЕННО ЛИШЁН КУРСИВА. .work .meta em{font-style:normal} — год выпуска работы. Курсив зарезервирован за чувством; метаданные набраны прямо, 11px, вразрядку, uppercase. Не «чинить» это рефлекторно.\n\n6) .foot-col h3 ВЫЛОМАН ИЗ АНТИКВЫ. Единственный h3 на странице, которому явно прописан font-family:Inter — он должен читаться как ярлык колонки, а не как заголовок. Правило h1,h2,h3{font-family:var(--display)} тут перебивается сознательно; при переносе на Tailwind это первое, что теряется.\n\n7) БАГ/КВИРК ПОЗИЦИОНИРОВАНИЯ: .scroll-hint{position:absolute; bottom:32px} лежит внутри #hero, но у #hero НЕТ position:relative. Ближайший позиционированный предок — main{position:relative;z-index:2}, который тянется на всю страницу. То есть подсказка «Листайте» физически привязана к низу всего main, а не к низу первого экрана. Переносить надо осознанно: либо добавить #hero{position:relative}, либо оставить как есть, если так и задумано визуально.\n\n8) ЗЕРНО И СВЕЧЕНИЕ — ЧАСТЬ ПАЛИТРЫ, А НЕ УКРАШЕНИЕ. body::before — два радиальных пятна (бордовое 85%×60% в точке 68%/32% и золотое 60%×50% в 12%/82%, вполовину тише), body::after — SVG-шум feTurbulence baseFrequency .85 numOctaves 3, тайл 180px, opacity .26, mix-blend-mode:overlay. Уберёшь их — тёмный фон читается как провал, ровно та проблема, которую чинили в v3 (см. комментарий в шапке CSS). Зерно на z-index 60 лежит ПОВЕРХ фиксированной шапки, но под #fonts и #loader.\n\n9) НИ ОДНОГО PIN. Комментарий в CSS прямо предупреждает: ScrollTrigger pin + overflow-clip у body — причина наложения секций в v2. Вместо pin — длинная секция .tall{position:relative} плюс .sticky{position:sticky;top:0}. Длина прокрутки задаётся высотой секции в vh (230/330/280). Не возвращать pin.\n\n10) ЛОАДЕР ЖИВЁТ ВНЕ ТЕМЫ. #loader и его потомки используют жёсткие #17130F, #F0E7DA, rgba(240,231,218,.58/.4) и переопределяют --wm-ink/--wm-surface локально — потому что он показывается до старта скролл-темы. Не переводить на var(--bg)/var(--fg): при переносе тема ещё не проинициализирована.\n\n11) ЛОГОТИП ЗАВЯЗАН НА ДВЕ ЛОКАЛЬНЫЕ ПЕРЕМЕННЫЕ. .wm задаёт --wm-ink:var(--fg) и --wm-surface:var(--bg); SVG внутри ссылается на них с фолбэками #191512 и #f6f2ec, которые НЕ совпадают ни с --ink, ни с --paper. Плюс один path залит жёстким #a33b48 — близким к --bloom #C2404E, но не равным. Ховер .wm:hover .wm-fold{transform:scale(1.3)} с transform-box:fill-box и origin 0 0 — «отворот» бумаги; на тач-устройствах отключён.\n\n12) ТАЧ-ВЕТКА @media(hover:none) НЕ КОСМЕТИЧЕСКАЯ. Там .work .open{opacity:.75} — то, что на десктопе появляется только по ховеру, на тач показывается сразу. Без этой ветки на телефоне пропадает вся навигационная подсказка «Открыть работу →».\n\n13) PREFERS-REDUCED-MOTION ОТМЕНЯЕТ НЕ АНИМАЦИИ, А НАЧАЛЬНЫЕ СОСТОЯНИЯ. Несколько элементов свёрнуты в CSS «до анимации»: #hero h1 .ln>span и #closing h2 .w>span сдвинуты на translateY(105%), .letter обрезан clip-path:inset(0 0 100% 0), #step1 .lead имеет opacity:0. Без блока reduced-motion (и без JS) весь этот текст просто невидим. Любой перенос обязан тащить и эти сбросы, и #loader{display:none} внутри того же запроса.\n\n14) ДВА ГОЛОСА МЕЛКОГО ТЕКСТА, КОТОРЫЕ ЛЕГКО СЛИТЬ. .eyebrow — Inter 11px/500, трекинг .18em, uppercase, --muted. .counter — антиква 13px, трекинг .2em (самый широкий на странице), --bloom, БЕЗ uppercase. Плюс третий, «label»: 11px, трекинг .16em, uppercase, --faint (dt, tile span, meta em, loader foot). Три разных трекинга — .16 / .18 / .2 — расхождение намеренное.\n\n15) МЕРА СТРОКИ ЗАДАНА В ch, НЕ В px. .lead 38ch, .step p 28ch, .bridge-note и .foot-promise 26ch, .steps-note 36ch. Это важно именно потому, что --display подменяется в рантайме: при смене антиквы мера пересчитывается автоматически. Перевод в фиксированные px сломает этот механизм.\n\n16) ЦЕНТРАЛЬНАЯ КОЛОНКА В ОБРАЗЦЕ И В ПРОДЕ РАЗНАЯ. .pad на ≥1320px даёт 84rem, а собственный комментарий в CSS говорит, что на живом сайте это max-w-[86rem]. Расхождение в 2rem — при сверке образца с реальными страницами это первое место, где «поедет».\n\n17) 3D-ПАЛИТРА НЕ ВЫВЕДЕНА В CSS, НО ПРОТЕКАЕТ В НЕГО. Лепестки #E7C9C6 / #C1836A / #B2585C / #A33B48, листва 0x6F7C64 / 0x5F6B57, свет 0xffe4d4 / 0xfff2e2, тень 0x2A1C20, золото 0xAC8B57, бумага 0xEDE3D3. Именно #C1836A всплывает в CSS как rgba(193,131,106,.20) — свечение под секцией #steps. Если менять акценты, менять надо в обоих местах, иначе сцена и страница разъедутся.\n\n18) ОТЛАДОЧНЫЙ СЛОЙ НЕ ПЕРЕНОСИТЬ. #fonts (переключатель антиквы), #status и #diag — это инструменты превью, а не элементы дизайна. Единственный зелёный на странице (#8FBF7F) существует только ради #status[data-ok=\"1\"].\n\nФайлы: образец — C:\\\\Users\\\\HP\\\\Desktop\\\\проджэктыы\\\\digital_greeting_cards\\\\design\\\\preview\\\\bir-dunyo-v10.html; извлечённый CSS и очищенная разметка положены во временную папку — C:\\\\Users\\\\HP\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-HP-Desktop------------digital-greeting-cards\\\\85b4f7ce-fd48-4df2-bd0c-b733ea19dd42\\\\scratchpad\\\\styles.css и \\\\body.html. В репозитории ничего не менялось."
+  },
+  "copy": {
+    "sections": [
+      {
+        "id": "hero",
+        "eyebrow": "Цифровая карточка для настоящего букета",
+        "title": "Некоторые чувства / не помещаются / в сообщение.",
+        "lead": "Создайте маленький мир для того, кто вам дорог.",
+        "structure": "Обычная секция class=\"pad\", БЕЗ tall и БЕЗ sticky: #hero{min-height:100svh;display:flex;align-items:center} (на ≤640px — 92svh). Колонка max-width:min(60rem,100%): .eyebrow → h1 clamp(42px,8.6vw,126px) из трёх <span class=\"ln\"> с overflow:hidden, внутренний span сдвинут translateY(105%) и выезжает при загрузке (курсив на третьей строке) → p.lead (margin-top:28px) → .cta-row из двух кнопок: сплошная «Создать что-то красивое →» (href=#closing) и .btn--ghost «Посмотреть работы» (href=#works). Абсолютом в левом нижнем углу .scroll-hint: вертикальная линия 1px с бегущей каплей (@keyframes trickle) и слово «Листайте». Позади секции — фиксированный #scene (three.js-букет из семи голов BloomFlower) с SVG-запаской #fallback, который дорисовывается штрихом по скроллу. Прогресс букета S.pTarget скрабится 0→.55 от #hero до конца #step1."
+      },
+      {
+        "id": "step1",
+        "eyebrow": "01 — Шаг первый",
+        "title": "Выберите чувство.  (в разметке разбито: «Выберите<br><span class=\"i\">чувство.</span>»)",
+        "lead": "Не макет и не шрифт. Начните с того, что человек должен почувствовать, когда загорится экран.",
+        "structure": "class=\"tall\" — секция задаёт длину прокрутки: #step1{height:230vh} (≤1024px — 190vh, ≤640px — 170vh). Внутри ровно один <div class=\"sticky pad\">: position:sticky;top:0;min-height:100svh;display:flex;align-items:center, с padding-top:clamp(92px,13vh,132px), чтобы кадр уходил из-под фиксированной шапки. Это замена ScrollTrigger pin — pin здесь сознательно не используется. Внутри колонка max-width:32rem: .counter → h2 clamp(36px,6.6vw,92px) → p.lead, у которого в CSS opacity:0 и который проявляется скрабом на первых 25% секции (в prefers-reduced-motion сразу opacity:1). Своей графики у секции нет: букет — это тот же фоновый #scene."
+      },
+      {
+        "id": "works",
+        "eyebrow": "02 — Сделано",
+        "title": "Наши работы.",
+        "lead": "Семь открыток, которые уже открыли живые люди. Те же файлы, что получили адресаты.",
+        "structure": "class=\"tall\", в CSS #works{height:330vh}, но JS пересчитывает высоту под реальную длину ленты: height = (110 + dist()/innerHeight*100)vh, где dist() = rail.scrollWidth − innerWidth + 40, с пересчётом по resize. Внутри .sticky — колонка (flex-direction:column;justify-content:center;overflow:hidden;gap:34px): сверху блок .pad с заголовком (counter, h2 clamp(32-76px), lead), снизу горизонтальная лента .rail (display:flex;gap:20px;width:max-content), которую GSAP тянет по X до −dist() скрабом — снова без pin. В ленте семь <a class=\"work\"> шириной min(84vw,400px): .frame 16/9 с рамкой и radius 14 → <img data-k> обложка + оверлей .tile (сверху «2025 · День рождения», снизу крупное имя работы) → .meta (имя + год справа) → .open «Открыть работу →», видимая только на hover. Пока секция на экране, 3D-букет уводится в opacity:0."
+      },
+      {
+        "id": "memories",
+        "eyebrow": "03 — Шаг третий",
+        "title": "Добавьте воспоминания.",
+        "lead": "Имя, письмо, фотографии, даты, которые что-то значат только для вас двоих. Мы соберём из этого карточку — вам остаётся только вспомнить.",
+        "structure": "Обычная секция class=\"pad\", БЕЗ tall и БЕЗ sticky, вертикальные отступы clamp(80px,14vh,150px). Поток: .counter → h2 clamp(34-80px) с курсивом на «воспоминания.» → p.lead → <dl class=\"letter\" id=\"letter\"> — рамка 1px, фон 5% от текста, padding clamp(22px,3.6vw,46px), max-width:54rem. Внутри четыре <div class=\"field\">, каждый — грид minmax(0,10rem)/1fr с верхней линейкой: dt (Имя / Дата / То, что знаете только вы / Письмо) и dd текстом дисплейной антиквой clamp(18-25px). На ≤700px грид схлопывается в одну колонку. Само письмо появляется скрабом: clip-path:inset(0 0 100% 0) → inset(0 0 0 0) (в reduced-motion сразу раскрыто)."
+      },
+      {
+        "id": "bridge",
+        "eyebrow": "04 — Мост",
+        "title": "Прикрепите к букету.",
+        "lead": "Цветы приезжают так же, как всегда. Карточка — то, что остаётся.",
+        "structure": "class=\"tall\", #bridge{height:280vh} (≤1024px — 220vh, ≤640px — 190vh). Внутри один <div class=\"sticky pad\"> и в нём .col{max-width:33rem}: .counter → h2 clamp(34-80px) с курсивом на «к букету.» → p.lead → отдельным крупным абзацем .bridge-note дисплейной антиквой clamp(18-25px), max-width:26ch, вторая фраза курсивом. Списка из четырёх шагов здесь НЕТ — правила .steps в CSS остались, но разметка переехала в следующую секцию. Именно на этой секции происходят два главных события сцены: букет возвращается (opacity назад до 1 / .6 на узких) и палитра скрабится ночь → сумерки → бумага (applyTheme t:0→1 на входе и обратно t:1→0 на выходе), а прогресс букета S.pTarget доводится до 1."
+      },
+      {
+        "id": "steps",
+        "eyebrow": "Мост",
+        "title": "Прикрепите к букету.",
+        "lead": "Цветы приезжают так же, как всегда. Карточка — то, что остаётся.",
+        "structure": "Обычная секция class=\"pad\", БЕЗ tall и БЕЗ sticky, отступы clamp(80px,14vh,150px)/clamp(80px,16vh,170px); ::before рисует радиальное свечение 110vmin×60vmin поверх верха секции. В комментарии разметки указано: структура и линейная графика взяты из BouquetSection.tsx. Надзаголовок здесь оформлен иначе, чем в других секциях: .rule-eyebrow — линейка 34px + .eyebrow капсом, без номера. Дальше h2.steps-title clamp(32-68px), p.lead, затем .steps-row — грид repeat(4,1fr) gap:32px, между карточками тонкие соединительные линии (.step + .step::before). Каждая карточка: .art высотой 176px → .n («01»…«04») → h3 → p (max-width:28ch). Иллюстрации: 01 — линейный букет в вазе (inline SVG, лепестки эллипсами по пять на голову); 02 — HTML-бирка .tag 112×152 с поворотом −4°, в ней строка «Тебя ждёт кое-что ещё.», настоящий 29×29 QR из <rect> и код 8FJ29K; 03 — телефон со сканирующей линией (<animate> на opacity, 2.4s); 04 — телефон с градиентной заливкой, курсивным «Алина,» и тремя строками текста. Завершает секцию центрированная курсивная .steps-note (max-width:36ch). К этому моменту 3D-букет уже уведён в opacity:0."
+      },
+      {
+        "id": "closing",
+        "eyebrow": "надзаголовка нет — секция начинается сразу с h2",
+        "title": "Больше, чем букет.",
+        "lead": "Букет говорит, что вам не всё равно. Карточка объясняет почему.",
+        "structure": "Обычная секция class=\"pad\", БЕЗ tall и БЕЗ sticky: #closing{min-height:84svh;display:flex;flex-direction:column;justify-content:center}. h2#closingTitle clamp(40px,8vw,116px) — JS разбивает его по словам на <span class=\"w\"><span>, каждое слово выезжает снизу со stagger .07 при попадании в кадр (в reduced-motion transform:none). Ниже p.lead с увеличенным до clamp(17px,2vw,21px) кеглем и .cta-row: сплошная «Создать что-то красивое →» (href=#hero) и .btn--ghost «Открыть готовую карточку» (href=#works). Сразу за секцией — <footer class=\"pad\"> с .foot-grid 1.4fr/1fr/1fr: вордмарк + .foot-promise, колонка «Продукт» (4 ссылки), колонка «Цветочным магазинам» (4 ссылки), и .foot-bottom с копирайтом слева и курсивным тэглайном справа."
+      }
+    ],
+    "newStrings": [
+      {
+        "russian": "Собираем",
+        "where": "Прелоадер #loader, блок .foot слева от счётчика «00». Единственное слово прелоадера, которого нет ни в одном словаре."
+      },
+      {
+        "russian": "Посмотреть работы",
+        "where": "hero, вторая кнопка .btn--ghost (href=#works). В словаре на этом месте ui.hero.ctaSecondary = «Посмотреть шаблоны» — это ДРУГАЯ строка. Либо новый ключ (ui.hero.ctaWorks), либо смена значения ctaSecondary во всех трёх словарях."
+      },
+      {
+        "russian": "Семь открыток, которые уже открыли живые люди. Те же файлы, что получили адресаты.",
+        "where": "Лид секции #works. В словаре ui.works.lead = «Открытки, которые уже дошли до своих людей. Каждая открывается так, как её видел адресат, — не пересобранная и не приглаженная.» — совпадения нет. Плюс здесь зашито числительное «Семь»: если работ станет больше, нужен плейсхолдер {count} и формы множественного числа (в словаре уже есть такой приём — admin.overview.count)."
+      },
+      {
+        "russian": "Открыть работу →",
+        "where": "Подпись .open на карточке работы в ленте #works, проявляется по hover. Ближайшее в словаре — ui.works.open = «Открыть» и ui.works.openFull = «Открыть в новой вкладке»; точной строки нет."
+      },
+      {
+        "russian": "© 2026 Bir dunyo",
+        "where": "footer, .foot-bottom слева. Копирайта в словарях нет вообще (символа © в ru.ts нет ни разу). Год лучше подставлять, а не хранить: ключ вида ui.footer.copyright = '© {year} Bir dunyo'."
+      },
+      {
+        "russian": "Это не открытка. Это дверь.",
+        "where": "Надпись, которая рисуется на canvas-текстуре карточки внутри 3D-сцены (ctx.fillText, вместе с вордмарком «bir dunyo» и адресом «bir.dunyo/c/AL-2026»). Строка видима пользователю, но живёт в скрипте сцены. Похожая формулировка в словаре есть — content.copy.friendship.fallbackLetter начинается «Это не открытка к празднику…», — но это другой текст."
+      },
+      {
+        "russian": "bir.dunyo/c/AL-2026",
+        "where": "Вторая строка на той же canvas-текстуре карточки в 3D-сцене. Демо-адрес; либо собирать из реального кода, либо вынести как декоративную константу."
+      },
+      {
+        "russian": "8FJ29K",
+        "where": "Демо-код: на бирке .tag-code в шаге 02 и в двух ссылках футера (/c/8FJ29K, /c/8FJ29K/qr). Не фраза, но видимый текст — в проекте это должно приходить из данных, а не из шаблона."
+      },
+      {
+        "russian": "«01 — », «02 — », «03 — », «04 — »",
+        "where": "Числовые префиксы в .counter перед надзаголовками секций step1/works/memories/bridge. В словаре надзаголовки лежат без номеров (ui.feeling.eyebrow = «Шаг первый», ui.works.eyebrow = «Сделано», ui.bouquet.eyebrow = «Мост»), поэтому номер и тире — это формат, который должен собирать компонент, а не новая строка словаря. Учтите: у #steps тот же надзаголовок «Мост» уже БЕЗ номера."
+      },
+      {
+        "russian": "«Алина,» (с запятой)",
+        "where": "Курсивный <text> внутри SVG-телефона в шаге 04 секции #steps. В словаре есть ui.memories.samples.name = «Алина» без запятой — запятая должна дописываться в разметке, отдельной строки заводить не надо."
+      },
+      {
+        "russian": "«3D · старт», «Заголовки», «Prata», «Cormorant», «Playfair» + статусы из скрипта («3D · выкл · узкий экран», «3D · недоступен», «3D · вкл · N элементов», «3D · сбой кадра», «3D · ошибка · см. консоль», «Среда не собралась…», «Сцена не собралась…», «Кадр упал…»)",
+        "where": "Служебная панель #fonts и диагностический блок #diag — инструмент самого превью (переключатель дисплейного шрифта и индикатор WebGL). В продакшен-лендинг не переносится, переводить не нужно."
+      },
+      {
+        "russian": "bir dunyo — превью v10",
+        "where": "<title> страницы-образца. Артефакт превью, не копия лендинга."
+      }
+    ],
+    "existingStrings": [
+      {
+        "russian": "Маленький мир, сделанный для одного человека.",
+        "key": "ui.footer.tagline — встречается в образце ТРИ раза: строка прелоадера (разбита на «Маленький мир, » + курсив «сделанный для одного человека.»), .steps-note в конце секции #steps и .foot-tagline в футере"
+      },
+      {
+        "russian": "Наши работы",
+        "key": "ui.nav.works (шапка) — он же ui.footer.links.works (футер)"
+      },
+      {
+        "russian": "Шаблоны",
+        "key": "ui.nav.templates (шапка) — он же ui.footer.links.templates (футер)"
+      },
+      {
+        "russian": "Как это работает",
+        "key": "ui.nav.howItWorks (шапка, ведёт на #bridge)"
+      },
+      {
+        "russian": "Создать карточку",
+        "key": "ui.nav.createCard (шапка) — он же ui.footer.links.create (футер)"
+      },
+      {
+        "russian": "Цифровая карточка для настоящего букета",
+        "key": "ui.hero.eyebrow"
+      },
+      {
+        "russian": "Некоторые чувства",
+        "key": "ui.hero.line1"
+      },
+      {
+        "russian": "не помещаются",
+        "key": "ui.hero.line2"
+      },
+      {
+        "russian": "в сообщение.",
+        "key": "ui.hero.line3"
+      },
+      {
+        "russian": "Создайте маленький мир для того, кто вам дорог.",
+        "key": "ui.hero.sub"
+      },
+      {
+        "russian": "Создать что-то красивое",
+        "key": "ui.hero.ctaPrimary (кнопка hero) и ui.closing.ctaPrimary (кнопка в #closing) — в образце обе со стрелкой «→», стрелка декоративная и в словаре её нет"
+      },
+      {
+        "russian": "Листайте",
+        "key": "ui.hero.scroll (.scroll-hint)"
+      },
+      {
+        "russian": "Шаг первый",
+        "key": "ui.feeling.eyebrow (в образце с префиксом «01 — »)"
+      },
+      {
+        "russian": "Выберите чувство.",
+        "key": "ui.feeling.title (в образце разбит переносом: «Выберите<br>чувство.», вторая часть курсивом)"
+      },
+      {
+        "russian": "Не макет и не шрифт. Начните с того, что человек должен почувствовать, когда загорится экран.",
+        "key": "ui.feeling.lead"
+      },
+      {
+        "russian": "Сделано",
+        "key": "ui.works.eyebrow (в образце с префиксом «02 — »)"
+      },
+      {
+        "russian": "Наши работы.",
+        "key": "ui.works.title"
+      },
+      {
+        "russian": "День рождения",
+        "key": "content.occasions.birthday.label — плашка .tile у работ svechi и hbday"
+      },
+      {
+        "russian": "Любовь",
+        "key": "content.occasions.love.label — плашка .tile у работ ilove, loveis, tebe, poydem"
+      },
+      {
+        "russian": "Просто так",
+        "key": "content.occasions['just-because'].label — плашка .tile у работы genki"
+      },
+      {
+        "russian": "Шаг третий",
+        "key": "ui.memories.eyebrow (в образце с префиксом «03 — »)"
+      },
+      {
+        "russian": "Добавьте воспоминания.",
+        "key": "ui.memories.title"
+      },
+      {
+        "russian": "Имя, письмо, фотографии, даты, которые что-то значат только для вас двоих. Мы соберём из этого карточку — вам остаётся только вспомнить.",
+        "key": "ui.memories.lead"
+      },
+      {
+        "russian": "Имя",
+        "key": "ui.memories.labels.name — dt первого поля письма"
+      },
+      {
+        "russian": "Алина",
+        "key": "ui.memories.samples.name — dd первого поля письма"
+      },
+      {
+        "russian": "Дата",
+        "key": "ui.memories.labels.date"
+      },
+      {
+        "russian": "Март 2023 — спор про кофе",
+        "key": "ui.memories.samples.date"
+      },
+      {
+        "russian": "То, что знаете только вы",
+        "key": "ui.memories.labels.detail"
+      },
+      {
+        "russian": "Однажды прозвучало: пионы выглядят так, будто их перебили на полуслове.",
+        "key": "ui.memories.samples.detail"
+      },
+      {
+        "russian": "Письмо",
+        "key": "ui.memories.labels.message"
+      },
+      {
+        "russian": "Я начинал это одиннадцать раз. Каждая версия звучала или слишком мелко, или слишком громко. Вот простая.",
+        "key": "ui.memories.samples.message"
+      },
+      {
+        "russian": "Мост",
+        "key": "ui.bouquet.eyebrow — дважды: в #bridge с префиксом «04 — » и в #steps без номера, капсом в .rule-eyebrow"
+      },
+      {
+        "russian": "Прикрепите к букету.",
+        "key": "ui.bouquet.title — дважды: h2 в #bridge (с курсивом на «к букету.») и h2.steps-title в #steps"
+      },
+      {
+        "russian": "Цветы приезжают так же, как всегда. Карточка — то, что остаётся.",
+        "key": "ui.bouquet.lead — дважды: лид #bridge и лид #steps"
+      },
+      {
+        "russian": "QR — это всего лишь дверь. Дверь никто не запоминает.",
+        "key": "ui.bouquet.note — .bridge-note, вторая фраза курсивом"
+      },
+      {
+        "russian": "Букет",
+        "key": "ui.bouquet.steps[0].title — шаг 01 в #steps"
+      },
+      {
+        "russian": "Выбран в магазине — так, как это делали всегда.",
+        "key": "ui.bouquet.steps[0].body"
+      },
+      {
+        "russian": "Карточка",
+        "key": "ui.bouquet.steps[1].title — шаг 02"
+      },
+      {
+        "russian": "Маленькая печатная бирка на стебле. Одна строка и код.",
+        "key": "ui.bouquet.steps[1].body"
+      },
+      {
+        "russian": "Сканирование",
+        "key": "ui.bouquet.steps[2].title — шаг 03"
+      },
+      {
+        "russian": "Телефон поднимут раньше, чем найдут вазу.",
+        "key": "ui.bouquet.steps[2].body"
+      },
+      {
+        "russian": "Мир",
+        "key": "ui.bouquet.steps[3].title — шаг 04"
+      },
+      {
+        "russian": "Маленький мир, сделанный для одного человека, открывается экран за экраном.",
+        "key": "ui.bouquet.steps[3].body"
+      },
+      {
+        "russian": "Тебя ждёт кое-что ещё.",
+        "key": "content.card.tagLine — строка .tag-line на бирке внутри иллюстрации шага 02"
+      },
+      {
+        "russian": "Больше, чем букет.",
+        "key": "ui.closing.title (#closingTitle, разбивается JS по словам)"
+      },
+      {
+        "russian": "Букет говорит, что вам не всё равно. Карточка объясняет почему.",
+        "key": "ui.closing.promise — лид #closing; та же строка лежит и в ui.footer.promise, которой подписан .foot-promise в футере (в словаре это два разных ключа с одинаковым значением)"
+      },
+      {
+        "russian": "Открыть готовую карточку",
+        "key": "ui.closing.ctaSecondary — вторая кнопка #closing"
+      },
+      {
+        "russian": "Продукт",
+        "key": "ui.footer.product — заголовок первой колонки футера"
+      },
+      {
+        "russian": "Посмотреть готовую карточку",
+        "key": "ui.footer.links.seeCard"
+      },
+      {
+        "russian": "Цветочным магазинам",
+        "key": "ui.footer.forShops — заголовок второй колонки футера"
+      },
+      {
+        "russian": "Салонам: сколько это даёт",
+        "key": "ui.footer.links.shops"
+      },
+      {
+        "russian": "Панель магазина",
+        "key": "ui.footer.links.dashboard"
+      },
+      {
+        "russian": "Заказы",
+        "key": "ui.footer.links.orders"
+      },
+      {
+        "russian": "QR-карточка для печати",
+        "key": "ui.footer.links.printable"
+      },
+      {
+        "russian": "С днём рождения, Алина / Love is… / Для тебя / С днём рождения! / Тебе. / Пойдём? / 元気になってね",
+        "key": "НЕ в словаре и не должны там быть: это title семи работ из lib/works/index.ts, где в комментарии прямо написано «Собственное имя работы, на её языке. Не переводится». Годы (2024/2025/2026) оттуда же, поле year"
+      }
+    ],
+    "notes": "КАК СНЯТО. Образец не читался целиком: скриптом на python вырезаны <script> и <style> (re.S), облегчённая копия — C:\\Users\\HP\\AppData\\Local\\Temp\\claude\\c--Users-HP-Desktop------------digital-greeting-cards\\85b4f7ce-fd48-4df2-bd0c-b733ea19dd42\\scratchpad\\lite.html (34 КБ, 261 строка), стили отдельно в styles.css (16 КБ), скрипт без минифицированных строк длиннее 2000 символов — в scripts_lite.js (26 КБ). В файле ровно один тег <script> на 884 707 символов: three.js r149, GSAP 3.12.5 и ScrollTrigger вшиты в него же вместе с логикой сцены. В репозитории ничего не менялось и не создавалось.\n\nГЛАВНЫЙ ИТОГ. Словарь ru.ts покрывает образец почти целиком: 54 строки уже лежат в нём с точными ключами. Дописывать в три словаря нужно всего ШЕСТЬ настоящих фраз: «Собираем», «Посмотреть работы», лид секции works («Семь открыток…»), «Открыть работу», копирайт «© 2026 Bir dunyo» и — если 3D-карточка останется — надпись на текстуре «Это не открытка. Это дверь.». Остальное из списка новых — служебное (панель превью), демонстрационные данные (8FJ29K, bir.dunyo/c/AL-2026) или формат, который должен собирать компонент (номера «01 — », стрелка «→», запятая после «Алина»).\n\nДВА КОНФЛИКТА, А НЕ ПРОСТО ПРОПУСКИ. (1) ui.hero.ctaSecondary сейчас «Посмотреть шаблоны», а образец ведёт второй кнопкой на работы — «Посмотреть работы». (2) ui.works.lead сейчас «Открытки, которые уже дошли до своих людей…», а в образце другой лид с числительным. В обоих случаях придётся решать: менять значение существующего ключа во всех трёх языках или заводить новый ключ. Это не механическая дописка — это правка смысла.\n\nЧЕГО В ОБРАЗЦЕ НЕТ, ХОТЯ В СЛОВАРЕ ЕСТЬ. Целая секция ui.story.* («Шаг второй» / «Выберите историю.» / «Шесть способов сказать это…» / previewPrefix / allTemplates / livePreview) в образце не используется вообще: на её месте стоит секция #works. Нумерация в образце из-за этого сквозная и без пропуска: 01 первый шаг, 02 «Сделано», 03 «Шаг третий», 04 «Мост» — то есть надзаголовок ui.memories.eyebrow «Шаг третий» стоит под номером 03, но второго шага перед ним нет. Если переносить образец как есть, либо возвращается секция историй, либо надзаголовок memories перестаёт быть «третьим шагом».\n\nДУБЛЬ BOUQUET. #bridge и #steps показывают ОДИН И ТОТ ЖЕ текст: одинаковые title и lead, только надзаголовок во второй раз без номера. То есть ui.bouquet.eyebrow/title/lead рендерятся дважды на странице, а ui.bouquet.steps[0..3] и ui.bouquet.note разведены по разным секциям (note в #bridge, четыре шага в #steps). Новых строк это не требует, но компонентов нужно два, и оба берут из одного узла словаря.\n\nСТРОКА ПРЕЛОАДЕРА И ТЭГЛАЙН. ui.footer.tagline используется в трёх местах и в двух из них разбит на две части курсивом: «Маленький мир, » + <span class=\"i\">«сделанный для одного человека.»</span>. Разрезать переведённую строку по запятой в компоненте нельзя (в en/uz запятая может стоять иначе). Либо два ключа, либо разметка с двумя слотами — иначе это ровно тот класс бага, о котором предупреждает правило проекта.\n\nГДЕ ЛЕЖИТ ОСТАЛЬНОЙ ТЕКСТ, КОТОРЫЙ НЕ СЛОВАРНЫЙ. Названия и годы семи работ — lib/works/index.ts (там же прямой комментарий, что title не переводится). Ярлыки поводов на плашках обложек берутся из content.occasions.*.label, то есть плашка «2025 · День рождения» собирается из year работы и переводимого label — склеивать её строкой нельзя.\n\nПРО СТРУКТУРУ, ЧТО ВАЖНО ДЛЯ ПОРТА. Три секции из семи «высокие»: #step1 (230/190/170vh), #works (330vh в CSS, но JS переписывает высоту под длину ленты) и #bridge (280/220/190vh). Ни одна не использует ScrollTrigger pin — вместо него .sticky{position:sticky;top:0;min-height:100svh} с padding-top clamp(92px,13vh,132px), чтобы кадр не залезал под фиксированную шапку; в комментарии CSS это названо сознательной заменой pin. Остальные четыре (#hero, #memories, #steps, #closing) — обычные секции в потоке. Смена палитры ночь→бумага привязана к входу и выходу из #bridge, 3D-букет гасится на #works и окончательно на #steps. Все анимации имеют ветку prefers-reduced-motion: прелоадер удаляется, письмо раскрыто, лид step1 виден, маски заголовков отключены."
+  },
+  "css": {
+    "currentTokens": [
+      {
+        "name": "--color-paper",
+        "value": "#f6f2ec",
+        "usedBy": "~95 классов. ДВЕ РОЛИ СРАЗУ: (а) фон страницы — body{background-color}, Footer, Header (bg-paper/85 после скролла), LocaleSwitcher (выпадашка), PhoneFrame:40 (экран телефона), Button variant=inverse; (б) СВЕТЛЫЙ ТЕКСТ НА ТЁМНОМ — text-paper 27 раз в components/marketing (BouquetSection ×8, ClosingCta ×4, FeelingSection ×5), 12 раз в components/works/WorkViewer, 8 раз в admin, 6 в create, GalleryTabs:35 (активная пилюля), Button variant=primary. Плюс Hero.tsx:58 — «бумажная подложка» градиентом from-paper/70 via-paper/80 to-paper поверх 3D-сцены. Плюс Wordmark.tsx:35 --wm-ink. Плюс BouquetSection.tsx:22 захардкожен в генератор QR: qrSvg(..., { dark: '#f6f2ec' })."
+      },
+      {
+        "name": "--color-paper-warm",
+        "value": "#efe7db",
+        "usedBy": "3 использования: StorySection.tsx:39 (bg-paper-warm), app/c/[code]/page.tsx, app/create/page.tsx. Также захардкожен как строка в Hero.tsx:13 в BRAND_PARTICLES."
+      },
+      {
+        "name": "--color-paper-deep",
+        "value": "#e6dccd",
+        "usedBy": "1 использование: FeelingSection.tsx:101 (bg-paper-deep)."
+      },
+      {
+        "name": "--color-noir",
+        "value": "#12100e",
+        "usedBy": "14 использований, ВСЕГДА как тёмная поверхность, никогда как текст: BouquetSection.tsx:41, ClosingCta.tsx:16, FeelingSection.tsx:115 (градиент from/via/to-noir), PreviewBar.tsx:45, components/works/WorkViewer.tsx:59,76,124,125,134 (5 раз — плеер работ), app/c/[code]/preview/page.tsx:76, components/create/PhotoStep.tsx:116, Wordmark.tsx:35 (--wm-surface при tone='paper')."
+      },
+      {
+        "name": "--color-noir-soft",
+        "value": "#1c1917",
+        "usedBy": "НИКТО. Мёртвый токен — 0 использований во всём репозитории."
+      },
+      {
+        "name": "--color-ink",
+        "value": "#191512",
+        "usedBy": "~317 классов — самый нагруженный. ДВЕ РОЛИ: (а) основной текст — text-ink везде (admin 35, app/admin 35, create 8, marketing 9, works 3, shops 3); (б) ТЁМНАЯ ПОВЕРХНОСТЬ / ЧЁРНЫЙ ПЛАСТИК — bg-ink в PhoneFrame.tsx:34 и :50 (корпус телефона и «чёлка»), GalleryTabs.tsx:35 (активная вкладка bg-ink text-paper), Button.tsx:14 (primary: bg-ink text-paper), CreateFlow.tsx:462, StepShell.tsx:142, admin (8×bg-ink, 15×border-ink). Плюс шесть литералов #191512 в SVG Wordmark и app/c/[code]/qr/page.tsx:48 (qrSvg dark:'#191512')."
+      },
+      {
+        "name": "--color-ink-soft",
+        "value": "#4a403a",
+        "usedBy": "46 использований. Только вторичный текст на светлом: Header (ссылки навигации), Footer, SectionHeading (lead при tone='ink'), TemplateCard:59, Button ghost, StorySection:100, admin/create/shops/works. Ни разу не встречается внутри тёмных секций. Роль чистая."
+      },
+      {
+        "name": "--color-ink-muted",
+        "value": "#8b7d70",
+        "usedBy": "67 использований. Только приглушённый текст на светлом: Footer (заголовки колонок, tagline), Hero:67 (eyebrow), Reveal.tsx:146 (Eyebrow tone='muted'), TemplateCard:60, StorySection, MemoriesSection, app/admin (32), app/shops (4). Плюс lib/db/types.ts:34 как строка 'var(--color-ink-muted)' — тон статуса NEW в админке."
+      },
+      {
+        "name": "--color-ink-faint",
+        "value": "#b6a99a",
+        "usedBy": "54 использования. Самый слабый текст на светлом: Footer (копирайт), Hero:109, StorySection:82,108, components/create (10), components/admin (13), app/admin (21). Плюс lib/db/types.ts:39 — тон статуса CANCELLED."
+      },
+      {
+        "name": "--color-accent",
+        "value": "#a33b48",
+        "usedBy": "43 использования на ОБОИХ фонах: text-accent (Footer hover, TemplateCard:43,83, MemoriesSection:52,71, works, shops), bg-accent (StorySection:68, admin, create), Hero:68 (bg-accent/60), border-accent. Глобально: globals.css :focus-visible outline. Плюс TemplateBuilder.tsx:379 accent-[var(--color-accent)], lib/db/types.ts:38 (статус PUBLISHED), и ХАРДКОД fill=\"#a33b48\" в Wordmark.tsx:46 и в ClosingCta.tsx:8."
+      },
+      {
+        "name": "--color-accent-deep",
+        "value": "#7d2833",
+        "usedBy": "9 использований: Button.tsx:14 (hover primary), text-accent-deep в admin/create, globals.css ::selection { color }."
+      },
+      {
+        "name": "--color-accent-soft",
+        "value": "#e7c9c6",
+        "usedBy": "0 tailwind-классов. Живёт только в globals.css ::selection { background }. Но значение продублировано хардкодом в Hero.tsx:13, ClosingCta.tsx:8, BouquetStage.tsx:14 (частицы 3D)."
+      },
+      {
+        "name": "--color-clay",
+        "value": "#c1836a",
+        "usedBy": "0 tailwind-классов. Только lib/db/types.ts:35 как 'var(--color-clay)' — тон статуса PROCESSING в админке. Значение продублировано хардкодом в Hero.tsx:13, ClosingCta.tsx:8, BouquetStage.tsx:14."
+      },
+      {
+        "name": "--color-gold",
+        "value": "#ac8b57",
+        "usedBy": "0 tailwind-классов. Только lib/db/types.ts:36 — тон статуса REVIEW. Ровно это же значение стоит как --gold в тёмном образце design/preview/bir-dunyo-v10.html."
+      },
+      {
+        "name": "--color-sage",
+        "value": "#7f8b73",
+        "usedBy": "0 tailwind-классов. Только lib/db/types.ts:37 — тон статуса READY. Плюс как swatch в палитре linen."
+      },
+      {
+        "name": "--color-line",
+        "value": "rgba(25, 21, 18, 0.1)",
+        "usedBy": "86 использований + глобальное правило globals.css @layer base { * { border-color: var(--color-line) } } — то есть КАЖДЫЙ элемент в документе. Явно: Header (border-b), Footer (×2), TemplateCard:64, MemoriesSection:49,68, LocaleSwitcher, app/admin (17), app/shops (3), divide-line."
+      },
+      {
+        "name": "--color-line-strong",
+        "value": "rgba(25, 21, 18, 0.18)",
+        "usedBy": "42 использования: Button secondary, PhoneFrame.tsx:34, GalleryTabs.tsx:26, Hero.tsx:110, components/admin (10), components/create (8), app/admin (15)."
+      },
+      {
+        "name": "--color-line-inverse",
+        "value": "rgba(246, 242, 236, 0.16)",
+        "usedBy": "НИКТО. 0 использований. Мёртвый токен — тёмные секции вместо него пишут border-white/10 (PreviewBar:44, WorkViewer:76,124,134, app/c/[code]/preview:76) или border-paper/25 (BouquetSection:134)."
+      },
+      {
+        "name": "--shadow-lift / --shadow-float / --shadow-deep",
+        "value": "0 1px 2px rgba(25,21,18,.04), 0 8px 24px -12px rgba(25,21,18,.14) / 0 2px 4px rgba(25,21,18,.03), 0 24px 60px -24px rgba(25,21,18,.22) / 0 40px 120px -40px rgba(25,21,18,.42)",
+        "usedBy": "Всегда через произвольное значение shadow-[var(--shadow-float)] — 18 мест: Button (обе тени), PhoneFrame:34 (deep), MemoriesSection:49,68 (lift), LocaleSwitcher:74, PreviewBar:45, WorkViewer:77, CreateFlow:462, StepShell:142, components/cards/* (5 мест — карточки), app/c/[code]/preview:76, app/c/[code]/qr:71. Все три — чернильные rgba, рассчитаны на светлый фон."
+      },
+      {
+        "name": ".card-scope → --card-bg, --card-bg-deep, --card-ink, --card-ink-soft, --card-ink-muted, --card-accent, --card-accent-soft, --card-glow, --card-line, --card-particle-1..3",
+        "value": "инжектируются инлайн из lib/design/palettes.ts paletteVars(), 11 палитр (duskRose, champagne, linen, midnightBrass, archive, washi, blush, daylight, confetti, candlelight)",
+        "usedBy": "components/cards/** и templates/** — и ТОЛЬКО они. Ставятся в CardRenderer.tsx:66 и TemplateStage.tsx (обе также пишут data-scheme={palette.scheme}). КЛЮЧЕВОЙ ФАКТ: grep по components/cards и templates даёт РОВНО НОЛЬ вхождений bg-paper/text-ink/bg-noir/text-accent/border-line — открытки не читают ни одного брендового токена. Плюс components/three/Atmosphere.tsx:122 читает --card-particle-1..3 через getComputedStyle, с фолбэком FALLBACK_COLORS = ['#e79a9a','#c96b74','#f3cfc6']."
+      }
+    ],
+    "darkStrategy": "ВЕРДИКТ: обёртка-скоуп на корне лендинга через data-атрибут — но переопределять в нём НЕ существующие --color-paper/--color-ink, а НОВЫЙ слой ролевых токенов. Существующая палитра остаётся замороженной и продолжает обслуживать светлые маршруты и «буквальные» применения.\n\n=== ПОЧЕМУ НЕЛЬЗЯ ПРОСТО ПЕРЕОПРЕДЕЛИТЬ --color-paper / --color-ink ===\n\nМеханически это работает: Tailwind v4 компилирует bg-paper в background-color: var(--color-paper), а text-paper/65 в color-mix(... var(--color-paper) 65% ...), так что переопределение переменной в любом предке подхватится. Соблазн большой: ноль правок в компонентах. И именно поэтому это ловушка.\n\nТокены в @theme НЕ семантические, они ЛИТЕРАЛЬНЫЕ. paper — это «кремовый цвет», а не «поверхность». ink — «почти чёрный», а не «текст». И каждый из двух уже работает в обеих ролях одновременно:\n\n  paper = фон страницы  И  светлый текст на тёмном (text-paper, 47+ мест)\n  ink   = основной текст  И  чёрный пластик (bg-ink: корпус телефона, активная вкладка, primary-кнопка)\n\nПричина — лендинг УЖЕ содержит тёмные секции, и они построены ручной инверсией той же пары. BouquetSection и ClosingCta — это bg-noir + text-paper. Поменяй значения местами, и:\n\n  1. BouquetSection и ClosingCta останутся на bg-noir (noir не трогали), но весь их текст text-paper/text-paper/70 станет тёмно-чернильным. Две целые секции лендинга — нечитаемы.\n  2. FeelingSection.tsx:121-133 — text-paper/85 поверх видео под градиентом from-noir/80. Тот же провал.\n  3. PhoneFrame.tsx:34,50 — bg-ink это КОРПУС ТЕЛЕФОНА. Станет кремовым. Телефон перестанет быть телефоном.\n  4. GalleryTabs.tsx:35 — активная вкладка bg-ink text-paper инвертируется и станет визуально неотличима от неактивной.\n  5. Button variant='inverse' (bg-paper text-ink) существует ровно для того, чтобы стоять НА тёмной секции. Станет тёмной кнопкой на тёмном — исчезнет.\n  6. Wordmark.tsx:35 при tone='paper' ставит --wm-ink: var(--color-paper) и --wm-surface: var(--color-noir). Обе стороны станут тёмными — логотип в BouquetSection пропадёт целиком. А первый path у него вообще с хардкодом fill=\"#a33b48\".\n  7. Правило @layer base { * { border-color: var(--color-line) } } применяется к КАЖДОМУ элементу документа, включая содержимое .card-scope. Это единственный канал, по которому брендовый токен вообще дотягивается до открыток.\n\nВариант «data-атрибут на секции» — это то же самое с меньшим радиусом, плюс своя поломка: Header отрендерен в app/page.tsx рядом с <main>, а не внутри него, и он position: fixed. Атрибут на секции до него не дойдёт никогда — шапка так и осядет в bg-paper/85 поверх тёмной страницы. То же с Footer. И тегировать пришлось бы шесть секций вместо одного корня.\n\nВариант «отдельные токены только для лендинга» (bg-landing-surface и т.п.) безопасен, но форкает общие компоненты. Header, Footer, SectionHeading, GalleryTabs, PhoneFrame, TemplateStage, Button, Reveal/Eyebrow, TemplateCard, Wordmark используются И лендингом, И /works, И /templates, И /shops. Чтобы они знали, где стоят, придётся протаскивать проп tone через все десять — ровно тот форк, которого проект в комментариях явно избегает («one set of sections serve every template»). Для точечных украшений (подложка героя, альфа свечения) это правильный инструмент, как основной механизм — нет.\n\n=== ЧТО ПРАВИЛЬНО ===\n\nОдин скоуп на корне лендинга + новый ролевой слой.\n\nШАГ 1. В app/page.tsx завернуть фрагмент в <div data-theme=\"noir\"> — он охватывает Header, main и Footer сразу. position: fixed у Header наследованию кастомных свойств не мешает (это DOM-наследование, не раскладка).\n\nПочему data-атрибут, а не класс: в проекте уже есть ровно этот приём — CardRenderer.tsx:66 и TemplateStage пишут data-scheme={palette.scheme} на .card-scope. Берём существующее соглашение, а не заводим второе. Плюс атрибут читается как состояние и его не подметёт tailwind-утилита.\n\nШАГ 2. В globals.css завести ролевые токены в @theme со светлыми значениями через ссылку на литеральные:\n\n  @theme {\n    /* литеральная палитра — не двигается никогда */\n    --color-paper: #f6f2ec;  --color-ink: #191512;  ... (как есть)\n\n    /* НОВОЕ: роли */\n    --color-surface:         var(--color-paper);\n    --color-surface-2:       var(--color-paper-warm);\n    --color-surface-3:       var(--color-paper-deep);\n    --color-on-surface:      var(--color-ink);\n    --color-on-surface-soft: var(--color-ink-soft);\n    --color-on-surface-muted:var(--color-ink-muted);\n    --color-on-surface-faint:var(--color-ink-faint);\n    --color-edge:            var(--color-line);\n    --color-edge-strong:     var(--color-line-strong);\n    --color-brand:           var(--color-accent);\n  }\n\nи перекрыть их в скоупе обычным CSS-правилом ПОСЛЕ @theme, с селектором :root [data-theme='noir'], [data-theme='noir'] (не внутри @theme и не в @layer base — специфичность должна побеждать :root):\n\n  [data-theme='noir'] {\n    --color-surface: #17130f;  --color-surface-2: #1c1917;  --color-surface-3: #0e0b09;\n    --color-on-surface: #f0e7da;\n    --color-on-surface-soft:  color-mix(in srgb, #f0e7da 72%, transparent);\n    --color-on-surface-muted: color-mix(in srgb, #f0e7da 58%, transparent);\n    --color-on-surface-faint: color-mix(in srgb, #f0e7da 26%, transparent);\n    --color-edge:        color-mix(in srgb, #f0e7da 15%, transparent);\n    --color-edge-strong: color-mix(in srgb, #f0e7da 24%, transparent);\n    --color-brand: #c2404e;\n    color-scheme: dark;\n  }\n\nЗначения взяты из самого образца design/preview/bir-dunyo-v10.html — там :root { --ink:#17130F; --fg:#F0E7DA; --bloom:#C2404E; --muted/--faint/--line через color-mix от --fg }. Обратите внимание: акцент в тёмной редакции ДРУГОЙ — #C2404E вместо #a33b48. Это не каприз: #a33b48 на #17130f почти не читается. Значит одним переворотом фон/текст не обойтись в любом случае, и это ещё один довод против переопределения существующих токенов.\n\nШАГ 3. Перевести на ролевые токены ТОЛЬКО общие и лендинговые компоненты: Header, Footer, SectionHeading, TemplateCard, GalleryTabs, Reveal/Eyebrow, Button (primary/secondary/ghost), LocaleSwitcher, Hero, StorySection, MemoriesSection, FeelingSection (светлая половина). Светлые маршруты при этом получают НУЛЕВОЙ диф в поведении: они не ставят атрибут, читают :root, значения те же самые.\n\nШАГ 4. Что оставить на литеральной палитре НАМЕРЕННО:\n  • PhoneFrame.tsx:34,50 — bg-ink переименовать в bg-noir. Это чёрный пластик, он чёрный в обеих темах.\n  • BouquetSection, ClosingCta, FeelingSection (оверлей), WorkViewer, PreviewBar, PhotoStep — оставить bg-noir + text-paper КАК ЕСТЬ. Это не «светлая тема», это «тёмная секция», и она обязана выглядеть одинаково до и после.\n  • Wordmark tone='paper' — заморозить на литералах, но fill=\"#a33b48\" в первом path заменить на var(--wm-accent, #a33b48), иначе марка останется тёмно-бордовой на тёмном.\n  • Button variant='inverse' — заморозить, он по определению живёт на тёмной секции.\n  • lib/db/types.ts (clay/gold/sage/ink-muted/accent/ink-faint) — админка, не трогать.\n\n=== ПОЧЕМУ ЭТО БЕЗОПАСНО ДЛЯ ОТКРЫТОК ===\n\nГлавный аргумент в пользу скоупа: открытки иммунны ПО УСТРОЙСТВУ, а не по договорённости. Grep по components/cards/** и templates/** даёт ровно ноль вхождений bg-paper, text-ink, bg-noir, text-accent, border-line — ни одного брендового токена. .card-scope сам задаёт background-color: var(--card-bg) и color: var(--card-ink), а секции читают только --card-*. Так что ни /c/[code], ни превью шаблонов внутри TemplateStage на лендинге не может задеть ничем, что определено на предке. Единственная ниточка — глобальное * { border-color: var(--color-line) }; её надо либо оставить как есть (мы --color-line не переопределяем), либо, если решите всё-таки трогать, продублировать внутри .card-scope через --card-line.\n\n=== ЧТО ЕЩЁ ПРИДЁТСЯ СДЕЛАТЬ, ИНАЧЕ ТЁМНАЯ ТЕМА БУДЕТ «ПОЧТИ» ===\n\n1. body. globals.css:116 — body { background-color: var(--color-paper) }. Обёртка внутри body, вверх не наследует. На iOS резиновый оверскролл и любой недобор высоты покажут кремовую полосу. Лечится однострочником body:has([data-theme='noir']) { background-color: var(--color-surface) } либо переносом лендинга в route group со своим layout (больше churn).\n2. viewport. app/layout.tsx:59-60 жёстко задаёт themeColor:'#f6f2ec' и colorScheme:'light' на весь сайт. Лендингу нужен свой export const viewport — прецедент уже есть: app/c/[code]/page.tsx:44-45 и app/templates/[slug]/page.tsx:41 делают ровно это от палитры. Иначе строка состояния мобильного браузера останется кремовой над тёмной страницей.\n3. Тени. Все три --shadow-* — чернильные rgba, на тёмном фоне их просто нет. Перекрыть в скоупе (либо перейти на внутреннюю светлую линию/свечение). 18 мест используют их через shadow-[var(--shadow-*)].\n4. Зерно. .grain::after — mix-blend-mode: multiply, на тёмном поле не делает ничего. .grain-invert (screen, opacity .14) уже существует и уже висит на BouquetSection/ClosingCta. Добавить [data-theme='noir'] .grain::after { mix-blend-mode: screen; opacity: .14 }, но следить, чтобы не удвоилось на секциях, у которых grain-invert уже стоит.\n5. ::selection и :focus-visible — глобальные, завязаны на accent-soft/accent-deep/accent. Заскоупить на --color-brand.\n6. 3D. Atmosphere.tsx:122 вне .card-scope падает на FALLBACK_COLORS, а Hero.tsx:13 и ClosingCta.tsx:8 передают хардкод-массивы BRAND_PARTICLES, подобранные под кремовый фон. На тёмном их надо пересобрать. Плюс useStudioEnvironment и BouquetStage.tsx:14 — свет сцены ставился под бумажный фон.\n7. Мёртвые токены как подарок: --color-noir-soft (0 использований) и --color-line-inverse (0 использований) — готовые имена под тёмную поверхность второго уровня и под инверсную границу. Тёмные секции сейчас вместо line-inverse пишут border-white/10 в пяти местах и border-paper/25 в шестом — это стоит свести к одному токену заодно.\n8. Хардкоды, которые надо вычистить до, а не после: MemoriesSection.tsx:49,68 — bg-white/70 (две карточки станут слепяще белыми на тёмном лендинге); Hero.tsx:58 — «бумажная подложка» from-paper/70 via-paper/80 to-paper поверх 3D-сцены, это поверхность, значит ролевой токен; BouquetSection.tsx:22 — qrSvg(..., { dark: '#f6f2ec' }), QR-код нарисован кремовым для тёмной секции, при смене поверхности пересчитать.",
+    "risks": [
+      "Переопределение --color-paper/--color-ink в обёртке: BouquetSection.tsx:41 и ClosingCta.tsx:16 останутся на bg-noir (его не трогали), но весь их текст text-paper и text-paper/70 станет тёмно-чернильным на почти чёрном. Две целые секции лендинга станут нечитаемы. Ровно то же в FeelingSection.tsx:121-133, где text-paper/85 лежит поверх видео под градиентом from-noir/80.",
+      "PhoneFrame.tsx:34 и :50 используют bg-ink как КОРПУС ТЕЛЕФОНА и его «чёлку», а не как текст. При инверсии ink корпус станет кремовым, и рамка перестанет читаться как телефон. Этот же компонент рендерится на /works и /shops — если решить проблему пропом, придётся трогать светлые маршруты.",
+      "Wordmark.tsx:35 при tone='paper' ставит --wm-ink: var(--color-paper) и --wm-surface: var(--color-noir). При инверсии paper обе стороны марки становятся тёмными и логотип в BouquetSection исчезает целиком. Отдельно: первый path имеет хардкод fill=\"#a33b48\" (строка 46) — он останется тёмно-бордовым на тёмном фоне при ЛЮБОМ подходе, если его не заменить на переменную.",
+      "Button.tsx variant='inverse' (bg-paper text-ink) существует специально чтобы стоять НА тёмной секции. При инверсии токенов он превратится в тёмную кнопку на тёмном фоне и пропадёт. Симметрично variant='primary' (bg-ink text-paper) — это чёрная пилюля, у неё та же двойная роль.",
+      "Правило @layer base { * { border-color: var(--color-line) } } в globals.css:86-88 применяется к КАЖДОМУ элементу документа, включая всё содержимое .card-scope. Это единственный канал, по которому брендовый токен вообще дотягивается до открыток. Переопределение --color-line в скоупе лендинга подкрасит границы внутри превью карточек в TemplateStage — единственная реальная утечка темы в открытки.",
+      "Атрибут/класс на СЕКЦИИ вместо корня: Header в app/page.tsx отрендерен рядом с <main>, а не внутри него, и он position: fixed z-50. Никакой посекционный скоуп до него не дойдёт — шапка осядет в bg-paper/85 backdrop-blur-xl поверх тёмной страницы. То же с Footer (bg-paper) и с выпадающим меню LocaleSwitcher.tsx:74 (bg-paper), которое рендерится внутри шапки.",
+      "Обёртка <div> вокруг фрагмента в app/page.tsx: если на неё когда-нибудь попадёт transform, filter, backdrop-filter, contain или will-change, она станет containing block для fixed-потомков и Header с PreviewBar оторвутся от вьюпорта. Скоуп-обёртка должна нести ТОЛЬКО кастомные свойства и background-color, ничего из перечисленного. По той же причине на неё нельзя вешать класс grain (он ставит position: relative).",
+      "body { background-color: var(--color-paper) } (globals.css:116) выше скоупа и вверх не наследует. Резиновый оверскролл на iOS, недобор высоты и область за пределами последней секции покажут кремовую полосу под тёмным лендингом.",
+      "app/layout.tsx:59-60 задаёт themeColor:'#f6f2ec' и colorScheme:'light' на ВЕСЬ сайт. Без собственного export const viewport у лендинга строка состояния мобильного браузера останется кремовой, а colorScheme:'light' заставит браузер рисовать светлые скроллбары и светлую автозаполняемую подложку форм поверх тёмной страницы.",
+      "Все три --shadow-lift/float/deep — чернильные rgba(25,21,18,...). На тёмной поверхности их физически не видно. Затронуто 18 мест через shadow-[var(--shadow-*)], в том числе PhoneFrame (shadow-deep — именно она отрывает телефон от фона) и обе тени Button.",
+      "MemoriesSection.tsx:49 и :68 — bg-white/70 хардкодом. Две карточки останутся слепяще белыми на тёмном лендинге и ролевой токен их не спасёт. Тот же класс проблемы: Button.tsx:17 hover:bg-white, PreviewBar.tsx:73 bg-white.",
+      "BouquetSection.tsx:22 вызывает qrSvg(cardUrl(...), { dark: '#f6f2ec' }) — QR нарисован кремовым модулем под тёмную секцию. Если поверхность этой секции изменится (например станет --surface-3 вместо bg-noir), контраст QR упадёт и код перестанет сканироваться. Это отказ функции, а не косметика.",
+      "Лендинг сейчас построен на чередовании светлое→тёмное→светлое: Hero светлый, FeelingSection полутёмный, StorySection светлый (bg-paper-warm), BouquetSection и ClosingCta тёмные. Сплошная тёмная редакция уничтожает этот ритм — BouquetSection и ClosingCta перестанут читаться как смена регистра и сольются с остальным. Им нужна собственная поверхность (--surface-3 / noir-soft), иначе тёмная тема технически сработает, а композиционно лендинг развалится.",
+      "3D-слой лендинга: Atmosphere.tsx:122 вне .card-scope падает на FALLBACK_COLORS = ['#e79a9a','#c96b74','#f3cfc6'], а Hero.tsx:13 и ClosingCta.tsx:8 передают хардкод-массивы, подобранные под кремовый фон. Плюс BouquetStage.tsx:14 и useStudioEnvironment — свет сцены и clear color ставились под бумагу. Тёмная тема без пересборки сцен даст выцветшие частицы и пересвеченный букет.",
+      "Токены clay, gold, sage не имеют ни одного tailwind-класса и живут ТОЛЬКО как строки 'var(--color-clay)' в lib/db/types.ts (тона статусов заказов в админке). Массовый рефактор палитры с удалением «неиспользуемых» токенов сломает StatusPill в /admin молча — grep по классам их не находит.",
+      "Глобальные ::selection (accent-soft на accent-deep) и :focus-visible (outline accent) не заскоуплены. На тёмном лендинге выделение текста останется светло-розовым с тёмно-бордовым текстом, а фокус-кольцо #a33b48 на #17130f почти не видно — это уже доступность, а не вкус.",
+      "Утилита .grain::after использует mix-blend-mode: multiply, которая на тёмной поверхности не делает ничего. Существующий .grain-invert (screen) уже висит на BouquetSection и ClosingCta — если добавить глобальное переопределение grain внутри скоупа, на этих двух секциях эффект удвоится."
+    ],
+    "notes": "Прочитанные файлы (все пути абсолютные):\n\nОсновное:\n- c:/Users/HP/Desktop/проджэктыы/digital_greeting_cards/app/globals.css — единственный источник токенов, Tailwind v4 CSS-first через @theme\n- c:/Users/HP/Desktop/проджэктыы/digital_greeting_cards/postcss.config.mjs — только @tailwindcss/postcss\n- c:/Users/HP/Desktop/проджэктыы/digital_greeting_cards/app/layout.tsx — viewport с жёстким themeColor/colorScheme на весь сайт\n- c:/Users/HP/Desktop/проджэктыы/digital_greeting_cards/lib/design/palettes.ts — 11 палитр открыток + paletteVars()\n- c:/Users/HP/Desktop/проджэктыы/digital_greeting_cards/components/cards/CardRenderer.tsx — прецедент data-scheme\n- c:/Users/HP/Desktop/проджэктыы/digital_greeting_cards/components/marketing/TemplateStage.tsx — второй прецедент data-scheme\n- c:/Users/HP/Desktop/проджэктыы/digital_greeting_cards/design/preview/bir-dunyo-v10.html — читался ПО ИНСТРУКЦИИ: скрипты вырезаны регуляркой re.S в c:/Users/HP/AppData/Local/Temp/v10-lite.html (934809 -> 50107 байт), исходник не открывался целиком\n\nВАЖНО: файла tailwind.config.js/ts в проекте НЕТ. Tailwind v4, вся конфигурация — блок @theme в globals.css. Это принципиально для ответа: @theme эмитирует переменные в :root, а утилиты компилируются в var(--color-*), поэтому переопределение в предке работает на любой глубине, включая модификаторы прозрачности (text-paper/65 -> color-mix(in oklab, var(--color-paper) 65%, transparent)). Механизм скоупа надёжен — вопрос был только в том, ЧТО переопределять.\n\nОтдельно замечено, к теме отношения не имеет, но чинить дёшево:\n- --color-noir-soft и --color-line-inverse не используются НИГДЕ (0 вхождений). При этом тёмные секции вручную пишут border-white/10 в пяти местах (PreviewBar:44, WorkViewer:76,124,134, app/c/[code]/preview:76) и border-paper/25 в шестом (BouquetSection:134) — то есть мёртвый токен line-inverse существует ровно под эту нужду и просто забыт.\n- Значения #e7c9c6 и #c1836a продублированы хардкодом в Hero.tsx:13, ClosingCta.tsx:8, BouquetStage.tsx:14 вместо чтения --color-accent-soft/--color-clay. Это те же самые цвета, набранные вручную.\n\nПро жёсткое правило словарей: задача чисто про CSS-токены, ни одной видимой строки я не трогал и не предлагаю трогать. Но стоит отметить — если тёмная редакция потребует переключателя тем, его подпись обязана прийти из lib/i18n/dictionaries/ (по образцу dict.ui.localeSwitcher.label, который Header уже прокидывает как strings.language), а не из компонента.\n\nРаботал только на чтение. В репозитории ничего не создано и не изменено; единственный созданный файл — облегчённая копия образца в системном temp."
+  },
+  "mobile": {
+    "problem": "На 390 px композиция разваливается не из-за отсутствия гейта, а из-за того, что в three.js `fov` — вертикальный. `BouquetAssemblyCanvas.tsx:45` задаёт `camera={{ position: [0, 1.2, 6.2], fov: 38 }}`, и R3F при ресайзе пересчитывает только `aspect`, но никогда position/fov. Видимая высота на плоскости букета остаётся 2·6.2·tan(19°) ≈ 4.27 мировых единиц при любой ширине, а видимая ШИРИНА = 4.27·aspect. Десктоп 1440×900 (aspect 1.60) → 6.83 ед. Телефон 390×844 (aspect 0.462) → 1.97 ед. Собранный букет занимает ≈3 ед. (головы стоят на x = ±1.02, `BouquetAssembly.tsx:103`, каждая ≈0.8–1.0 в ширину), а на фазе разлёта лепестки уходят на радиус 1.5–2.8 вокруг каждой головы (`BouquetAssembly.tsx:121`) — ≈7 ед. То есть в кадр телефона влезает ~65% собранного букета и ~28% разлёта. Кадр не «подстраивается под телефон» — он просто обрезает бока.\n\nВторая половина проблемы — вёрстка. `app/design/bouquet/page.tsx:104` центрирует текст по вертикали (`flex min-h-svh items-center`), а `:106` задаёт колонке `max-w-[34rem]` = 544 px, что шире 390 px вьюпорта. Значит «левая колонка» на телефоне становится полноширинным блоком ровно в центре экрана. Букет по центру, текст по центру — это одни и те же пиксели, столкновение гарантировано геометрией, а не случайностью.\n\nГЛАВНОЕ, ЧТО ВЫЯСНИЛОСЬ: в `design/preview/bir-dunyo-v10.html` эта задача уже решена автором сцены, и решена НЕ отключением 3D. Строки 984–985: `const fit = Math.max(1, 1.5/Math.max(camera.aspect, .35)); camera.position.sub(look).multiplyScalar(fit).add(look);` — камера отъезжает от точки взгляда во столько раз, чтобы горизонтальное поле сравнялось с десктопным. При aspect 0.462 это ×3.25, видимая ширина становится 6.4 ед. против десктопных 6.83 — расхождение 6%. При aspect ≥ 1.5 множитель равен 1, десктоп не трогается вообще; `Math.max(aspect, .35)` ограничивает отъезд потолком ×4.29.\n\nИ происхождение мифа про гейт: записка «3D включается от 680 px» существует, но прочитана неверно. `bir-dunyo-v10.html:621` — `const NARROW = innerWidth < 680; // 3D работает и на планшете`. Переменная `NARROW` используется ровно в одном месте, строка 1062: `const op = scene3d ? (innerWidth < 900 ? .6 : 1) : (NARROW ? .14 : .45);` — она задаёт прозрачность SVG-ЗАГЛУШКИ на случай, когда WebGL не поднялся. Когда сцена собирается, узкие экраны получают её всё равно, просто на opacity .6. Автор никогда не выключал 3D по ширине — он его приглушал. STATUS.md:112–117 прав в том, что гейта нет, и неточен в том, чего хотели.",
+    "options": [
+      {
+        "approach": "Подстроить камеру под ширину — перенести `fit` из образца. Камера отъезжает от точки взгляда на множитель, вычисленный из aspect, так что горизонтальное поле на телефоне сравнивается с десктопным. Формула из `bir-dunyo-v10.html:984-985` переносится один в один: `Math.max(1, 1.5 / Math.max(aspect, 0.35))`. Идиома в репозитории уже есть — `GlassHeart.tsx:22,29-30` читает `useThree(state => state.viewport)` и масштабируется от него, `PetalDrift.tsx:53,59-60` тем же способом задаёт объём спавна. `BouquetAssembly` — единственная сцена, которая вьюпорт игнорирует.",
+        "files": "c:/Users/HP/Desktop/проджэктыы/digital_greeting_cards/components/three/BouquetAssemblyCanvas.tsx:45 — фиксированный `camera={{ position: [0, 1.2, 6.2], fov: 38, near: 0.1, far: 100 }}`; это только начальная конфигурация, корень проблемы.\nc:/Users/HP/Desktop/проджэктыы/digital_greeting_cards/components/three/scenes/BouquetAssembly.tsx:215 — `useFrame(() => {` сейчас выбрасывает аргумент state. Меняется на `useFrame((state) => {`, и в конец колбэка (после блока бирки, :318-327) добавляется отъезд `state.camera`. Это ровно тот слот, где отъезд живёт в образце (его `layout(p, time)`).\nАльтернативное размещение: отдельный `<FitCamera />` соседом к `<BouquetAssembly>` в BouquetAssemblyCanvas.tsx:58.\nБолее дешёвый подвариант: масштаб корневой `<group>` в BouquetAssembly.tsx:331 на `min(1, aspect/1.5)`; прецедент — SceneCanvas.tsx:106 (`<group scale={1.55} position={[0, 0.1, 0]}>`).\nСпутник: BouquetAssemblyCanvas.tsx:44 `dpr={[1, 1.75]}` — в образце на узких 1.5 (bir-dunyo-v10.html:691).",
+        "cost": "~10 строк в одном-двух файлах. Ни одной новой видимой строки, словари не трогаются, вёрстка не трогается, поведение на десктопе математически неизменно (при aspect ≥ 1.5 множитель = 1).",
+        "downside": "Чинит кадрирование, но не перекрытие. Правильно закадрированный букет на телефоне по-прежнему стоит по центру, и текст в `page.tsx:104` по-прежнему по центру — вместо обрезанного букета под словами получится целый букет под словами. Само по себе это половина решения. Подвариант с масштабом группы дешевле на строку, но честно хуже: он сжимает сцену к началу координат группы, а не к точке взгляда, и меняет перспективное сокращение и то, как ложится свет, — а сцена собиралась по свету очень аккуратно (экспозиция 0.82, тонированный sheen). Проверить всё это можно только глазами на устройстве — тот же класс изменений, который уже дважды приводил к откату."
+      },
+      {
+        "approach": "Увести текст из-под букета: перестать центрировать колонку по вертикали на узких экранах и приглушить слой сцены, как это делает образец. Текст уходит вниз, букет остаётся сверху, слой сцены на узких идёт на opacity .6. Именно эта пара и работает в `bir-dunyo-v10.html`: `.sticky{padding-top:clamp(92px,13vh,132px);padding-bottom:clamp(28px,7vh,64px)}` плюс строка 1062 с приглушением.",
+        "files": "c:/Users/HP/Desktop/проджэктыы/digital_greeting_cards/app/design/bouquet/page.tsx:104 — `sticky top-0 flex min-h-svh items-center px-[var(--spacing-gutter)]`; `items-center` и есть механизм столкновения. Форма правки: `items-end pb-[10svh] md:items-center md:pb-0`.\nc:/Users/HP/Desktop/проджэктыы/digital_greeting_cards/app/design/bouquet/page.tsx:106 — `max-w-[34rem]` (544 px) шире 390 px вьюпорта, поэтому «левая колонка» на телефоне полноширинная и центральная.\nc:/Users/HP/Desktop/проджэктыы/digital_greeting_cards/components/marketing/BouquetStage.tsx:68 — `cn('pointer-events-none fixed inset-0 -z-10', className)`; сюда добавляется `opacity-60 md:opacity-100`, это перенос bir-dunyo-v10.html:1062.\nc:/Users/HP/Desktop/проджэктыы/digital_greeting_cards/app/design/bouquet/page.tsx:64 (`h-[420vh]`) и :103 (`h-[210vh]`) — в образце высоты сцен на узких сокращаются: `#step1` 190vh→170vh (bir-dunyo-v10.html:251, 262), `#bridge` 220vh→190vh.",
+        "cost": "2–4 правки Tailwind-классов. Ноль JS, ноль новых строк, словари не трогаются.",
+        "downside": "Само по себе не делает ничего с кадрированием: текст уедет вниз, а букет останется обрезанным по обоим краям — зритель будет смотреть на середину букета, уходящего за оба края экрана. Плюс жёсткое ограничение: закрывать текст плашкой, карточкой или `backdrop-blur` здесь нельзя (`page.tsx:84-90` и STATUS.md:100-105) — непрозрачное перед слоем `-z-10` это ровно тот баг, из-за которого букет снимали дважды. Значит только позиция и прозрачность, никаких подложек. И ещё: на десктопе образец сдвигает букет в сторону (`shift = -1.35`, bir-dunyo-v10.html:981-982), а на узких оставляет по центру — то есть две ширины требуют разного обращения с камерой, и вариант 1 всё равно затягивается обратно."
+      },
+      {
+        "approach": "Закрыть 3D медиазапросом — добавить тот гейт, который все считали существующим.",
+        "files": "c:/Users/HP/Desktop/проджэктыы/digital_greeting_cards/lib/hooks/useMotionPrefs.ts:22-42 — `measureRichness()`, внешне самое очевидное место: `if (window.innerWidth < 680) return false;`.\nc:/Users/HP/Desktop/проджэктыы/digital_greeting_cards/lib/hooks/useMotionPrefs.ts:47-57 — эффект подписан только на `change` у prefers-reduced-motion. Гейту по ширине нужна такая же подписка на `matchMedia('(min-width: 680px)')`, иначе поворот телефона или ресайз окна оставляют `rich` протухшим, а `rich` монтирует и размонтирует динамический чанк — это видимый баг, а не косметика.\nСДЕРЖАННЫЙ ВАРИАНТ (без радиуса поражения): гейт только внутри c:/Users/HP/Desktop/проджэктыы/digital_greeting_cards/components/marketing/BouquetStage.tsx — `useNarrow()` рядом с `useMotionPrefs()` на :37 и складывается в `enabled` на :62.",
+        "cost": "1 строка в общем хуке, либо ~12 строк в сдержанном варианте.",
+        "downside": "В общем хуке это ловушка. `rich` читают три компонента, а не один: BouquetStage.tsx:37, Atmosphere.tsx:41, BouquetShowcase.tsx:31. `Atmosphere` — гейт ВСЕХ WebGL-сцен продукта (Atmosphere.tsx:25-39 так и говорит), то есть опубликованных открыток. Проверка ширины в `measureRichness` молча снимает 3D-атмосферу с каждой открытки на каждом телефоне, а открытки открывают именно с телефона. Это регрессия продукта, замаскированная под правку лендинга.\nНо главное возражение против варианта целиком, в любом размещении: это единственный из трёх, который делает телефон хуже намеренно. Букет — то, ради чего затеян редизайн (STATUS.md:9, 31, 86), а доставка продукта — QR на бирке, привязанной к физическому букету, то есть сканер по построению телефон. И под `BouquetStage` нет CSS-запасного слоя: `Atmosphere.tsx:50` всегда рисует `<CssAtmosphere>`, а `BouquetStage.tsx:70-78` при `enabled === false` возвращает `null`. На тёмной странице, спроектированной вокруг букета, гейт по ширине даёт буквально пустой тёмный экран с текстом."
+      }
+    ],
+    "recommendation": "Делать 1 + 2 одним дифом, во время вёрстки тёмной редакции. Вариант 3 не делать — ни в общем хуке, ни в сдержанном виде.\n\nТри причины, по убыванию веса.\n\nПервая: вариант 3 отменяет цель работы. Букет — то, ради чего делается редизайн, и выключить его на телефоне значит показать половине посетителей пустую тёмную страницу, потому что запасного CSS-слоя под `BouquetStage` не существует (`BouquetStage.tsx:70-78` возвращает `null`, в отличие от `Atmosphere.tsx:50`). Для продукта, который открывают, отсканировав QR с бирки на букете, «выключим на телефоне» означает «выключим для основного сценария».\n\nВторая: 1 + 2 — это не изобретение, а перенос. Автор сцены уже прошёл ровно этот путь в `design/preview/bir-dunyo-v10.html` и оставил обе половины: отъезд камеры по aspect (984–985) и приглушение слоя вместо отключения (1062), плюс сокращение высот залипающих секций на узких (251, 262). Образец — источник истины для этого редизайна, и в его блоке «АДАПТИВ» (строки 232–292) нет ни одного правила, которое гасит `#scene`: единственное, что прячется под 900 px, это `#diag`, отладочная панель. Мы не выбираем между тремя гипотезами — мы выбираем между тем, что уже отработало у автора, и тем, чего он не делал.\n\nТретья: по объёму 1 + 2 дешевле честного варианта 3. Отъезд камеры это ~10 строк в `BouquetAssembly.tsx:215` (`useFrame(() => {` → `useFrame((state) => {`), вёрстка это 3–4 Tailwind-класса в `app/design/bouquet/page.tsx:104` и `components/marketing/BouquetStage.tsx:68`. Сдержанный вариант 3 с корректной подпиской на matchMedia — примерно столько же кода и даёт меньше.\n\nПорядок работ. Начинать с `/design/bouquet`, а не с лендинга. Это единственное место, где сцена сейчас смонтирована (`app/design/bouquet/page.tsx:64` — единственная точка монтирования; в `app/page.tsx` ссылок на неё нет), страница уже noindex и уже тёмная. Значит обе правки можно сделать и посмотреть глазами на 390 px до того, как тёмная редакция вообще появится. Это ломает то самое проклятие «3D-сцену, которую нельзя увидеть до деплоя», из-за которого букет снимали дважды.\n\nЧто взять из варианта 3 по-настоящему полезного: не гейт, а заглушку. В образце есть `#fallback` — SVG-контур букета, который проявляется, когда WebGL не поднялся. Под `BouquetStage` такого слоя нет вообще, и это единственная реальная дыра в его гейте (`WebGLBoundary` ловит падение, но потом показывает пустоту). Приделать сюда CSS/SVG-неподвижку по образцу `CssAtmosphere` — лучшее применение тех же усилий, чем медиазапрос, и оно закрывает и слабые устройства, и заблокированный WebGL, и `prefers-reduced-motion`, а не только узкий экран.",
+    "notes": "Читал только, ничего не менял и не создавал в репозитории. Временные файлы (облегчённая копия образца без `<script>` и извлечённый авторский JS) лежат в c:\\Users\\HP\\AppData\\Local\\Temp\\claude\\c--Users-HP-Desktop------------digital-greeting-cards\\85b4f7ce-fd48-4df2-bd0c-b733ea19dd42\\scratchpad\\ — v10-lite.html и v10-authored.js. Гигантскую строку с минифицированным three.js не читал: вырезал регуляркой по re.S, как предписано.\n\nПроверенные факты, на которых стоят выводы:\n1. Гейта по ширине действительно нет нигде. Grep по `matchMedia|innerWidth|min-width|max-width|useMediaQuery|clientWidth` по всем ts/tsx/css: в `lib/hooks/useMotionPrefs.ts` только prefers-reduced-motion (:25, :48), `window.innerWidth` встречается ровно в двух местах и оба не про букет — `SceneCanvas.tsx:128` (бюджет частиц) и `WorkPreview.tsx:86` (масштаб айфрейма). STATUS.md:112-117 подтверждается полностью.\n2. Радиус поражения `rich` — три потребителя: `BouquetStage.tsx:37`, `Atmosphere.tsx:41`, `BouquetShowcase.tsx:31`. Это и делает правку в `measureRichness` опасной.\n3. Идиома «читать вьюпорт внутри сцены» в проекте уже есть и работает: `GlassHeart.tsx:22,29-30` и `PetalDrift.tsx:53,59-60`. `BouquetAssembly.tsx` — единственная сцена без неё. Вариант 1 не вводит новый паттерн.\n4. Числа по кадру считал сам из `BouquetAssemblyCanvas.tsx:45` и координат в `BouquetAssembly.tsx:101-121`; арифметика в поле problem. Ключевое: в three.js `fov` вертикальный, поэтому сужение экрана режет ширину и не трогает высоту.\n5. В образце есть ещё две вещи, которых нет у нас и которые стоит забрать заодно: анимированная траектория камеры по прогрессу (таблица camKeys, `bir-dunyo-v10.html` около 329-333, дистанция едет 6.0 → 7.2) — у нас камера статична; и сдвиг букета вбок на широких, чтобы он не стоял по центру под текстом (981-982). Оба относятся к варианту 1, но выходят за рамки минимальной починки узкого экрана, поэтому в опции я их не закладывал.\n\nЧего я не делал: не запускал `next dev` и не смотрел сцену на 390 px вживую. Все выводы о композиции — из геометрии кода и из образца. Перед мержем это обязательно посмотреть глазами на `/design/bouquet`, потому что откатывали эту сцену оба раза именно из-за того, что её судили по коду."
+  }
+}
