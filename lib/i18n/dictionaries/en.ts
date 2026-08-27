@@ -178,6 +178,7 @@ export const en: Dictionary = {
           eyebrow: 'The shape of it',
           question: 'Choose a story.',
           hint: 'Based on your answers we would pick {name}. You can overrule us.',
+          skip: 'Choose one for me',
           suggested: 'Suggested for you',
         },
         language: {
@@ -589,6 +590,8 @@ export const en: Dictionary = {
         unitMb: 'MB',
         unitKb: 'KB',
       },
+      composeOverridden: 'The code currently opens the uploaded card, not this composition. You can still rebuild it — but to see the result, remove the uploaded card first.',
+      qrNotLive: 'This address does not resolve yet. It starts working when the status becomes Published. The tag can be printed before that: the code already belongs to this order.',
       previewDraft: 'Open the draft',
       howTitle: 'What to do with this order',
       howSteps: [

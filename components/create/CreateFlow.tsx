@@ -435,6 +435,17 @@ export function CreateFlow({
             onBack={back}
             onNext={next}
             canContinue
+            // Выбирать необязательно. Подбор по ответам уже работает и стоит
+            // в `suggested`; кнопка просто говорит вслух, что можно на него
+            // положиться. Пропуск чистит `templateId`, поэтому дальше берётся
+            // подобранный — а не тот, на который случайно нажали и передумали.
+            skip={{
+              label: copy.steps.template.skip,
+              onSkip: () => {
+                patch({ templateId: '' });
+                next();
+              },
+            }}
           >
             {/* The miniature moved here from the step after next.
 

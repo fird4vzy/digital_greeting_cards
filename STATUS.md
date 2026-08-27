@@ -5,11 +5,12 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 27 August 2026 — **the dark edition is live and now moves
-like the sample.** Theme scrubs night→paper→night around the bridge, the scene
-eases toward its target instead of tracking the wheel, the camera runs the
-sample's five keyframes, and the preloader and the letter reveal are in. What
-remains of `design/preview/bir-dunyo-v10.html` is taste, not mechanics.
+**Last updated:** 27 August 2026 — the dark edition moves like the sample, and
+the admin now says out loud what it used to do silently: an uploaded card
+overrides the composition, and a code does not resolve before publishing.
+Template choice is optional in the flow. **One thing is still half-done: the
+`/shops` button leads to `@birdunyobot`, and nobody reads what is written
+there.**
 
 **Если вы открыли этот файл, чтобы понять, что делать** — следующий раздел, он
 первый и по-русски. Всё остальное ниже объясняет «почему».
@@ -247,7 +248,17 @@ as `NEW`, and stored its brief.
    found* means the id is wrong or the bot was never added to the group;
    *Unauthorized* means the token is dead. Nothing about it creates an order,
    which is the point — see item 3.
-3. **One test order is on production** and should be deleted from the
+3. **Флорист пишет в пустоту.** Кнопка на `/shops` теперь ведёт на
+   `@birdunyobot` — адрес существует, в отличие от прежнего `@birdunyo`,
+   который открывался ошибкой Telegram. Но бот только отправляет:
+   `lib/notify/telegram.ts` ничего не опрашивает и не имеет вебхука, поэтому
+   написанное боту не увидит никто. Два выхода, оба честные:
+   поставить в `lib/shops/offer.ts` личный username человека — одна строка,
+   работает сегодня; или сделать вебхук, который пересылает любое
+   сообщение боту в ту же группу — маршрут, регистрация адреса у Telegram
+   и проверка секретного токена в заголовке. До этого страницу лучше не
+   раздавать магазинам.
+4. **One test order is on production** and should be deleted from the
    dashboard: `RWNPJV`. It is unpublished, so the delete button is offered.
    The pair of junk orders that prompted the panel in item 2 came from the only
    way to test a deployment that used to exist: placing a real order against it.

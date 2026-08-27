@@ -182,6 +182,7 @@ export const uz: Dictionary = {
           eyebrow: 'Shakli',
           question: 'Hikoyani tanlang.',
           hint: "Javoblaringizga qarab biz «{name}»ni tanlagan bo'lardik. Rozi bo'lmasangiz ham bo'ladi.",
+          skip: 'O‘zingiz tanlang',
           suggested: "Biz shuni tanlagan bo'lardik",
         },
         language: {
@@ -596,6 +597,8 @@ export const uz: Dictionary = {
         unitMb: 'MB',
         unitKb: 'KB',
       },
+      composeOverridden: 'Hozir kod bo‘yicha yuklangan otkritka ochiladi, bu yig‘ma emas. Qayta yig‘ish mumkin — lekin natijani ko‘rish uchun avval o‘z otkritkangizni olib tashlang.',
+      qrNotLive: 'Bu manzil hali ochilmaydi. U holat «Опубликован» bo‘lganda ishlaydi. Yorliqni oldinroq chop etish mumkin: kod allaqachon shu buyurtmaga biriktirilgan.',
       previewDraft: 'Qoralamani ochish',
       howTitle: 'Bu buyurtma bilan nima qilinadi',
       howSteps: [

@@ -202,7 +202,14 @@ export type Dictionary = {
           count: string;
           remove: string;
         };
-        template: { eyebrow: string; question: string; hint: string; suggested: string };
+        template: {
+          eyebrow: string;
+          question: string;
+          hint: string;
+          suggested: string;
+          /** Пропустить выбор — подберём сами. */
+          skip: string;
+        };
         language: { label: string; hint: string };
         preview: {
           eyebrow: string;
@@ -532,6 +539,14 @@ export type Dictionary = {
       previewCard: string;
       /** Same button before publishing — it opens the draft, not the live card. */
       previewDraft: string;
+      /**
+       * Что сборка движка сейчас никуда не показывается: по коду открывается
+       * загруженная папка. Без этой строки кнопка «Собрать открытку» честно
+       * работает, а оператор видит, что «ничего не происходит».
+       */
+      composeOverridden: string;
+      /** Адрес не откроется, пока заказ не опубликован. */
+      qrNotLive: string;
       /**
        * Открытка, написанная руками и загруженная оператором.
        *

@@ -59,8 +59,16 @@ export const OFFER = {
     cardsPerMonth: { min: 1, max: 60, step: 1, default: 15 },
   },
 
-  /** Where a shop actually reaches a human. Set this before the page is shared. */
-  telegram: '@birdunyo',
+  /**
+   * Куда флорист пишет.
+   *
+   * Это бот, а не человек: username оканчивается на `bot`. Бот принимает
+   * сообщения молча — у него нет ни вебхука, ни опроса, — поэтому написанное
+   * сюда никто не прочитает, пока это не будет сделано. До тех пор пусть
+   * лучше ведёт на существующий адрес, чем на выдуманный `@birdunyo`,
+   * который открывался ошибкой Telegram.
+   */
+  telegram: '@birdunyobot',
 } as const;
 
 /** The card price this offer suggests beside a bouquet of `bouquetPrice`. */

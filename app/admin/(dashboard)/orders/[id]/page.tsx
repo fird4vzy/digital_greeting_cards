@@ -230,6 +230,16 @@ export default async function OrderDetail({ params }: Props) {
                 <ActionButton type="submit">{t.generate}</ActionButton>
               </form>
 
+              {/* Кнопка выше работает всегда, но при загруженной открытке её
+                  результат никуда не показывается — по коду идёт папка. Без
+                  этой строки оператор жмёт и видит, что «ничего не
+                  происходит»: действие есть, следа нет. */}
+              {order.customEntry ? (
+                <p className="rounded-[0.5rem] border border-accent/30 bg-accent/[0.05] p-3 text-[0.75rem] leading-relaxed text-ink-soft">
+                  {t.composeOverridden}
+                </p>
+              ) : null}
+
               {/* Before publishing, this points at the preview route rather
                   than at nothing.
 
@@ -299,6 +309,12 @@ export default async function OrderDetail({ params }: Props) {
                 <CopyButton value={url} label={t.copyUrl} copiedLabel={dict.admin.cards.copied} />
               </div>
             </div>
+            {order.status !== 'PUBLISHED' ? (
+              <p className="mt-4 rounded-[0.5rem] border border-line bg-paper-warm p-3 text-[0.75rem] leading-relaxed text-ink-soft">
+                {t.qrNotLive}
+              </p>
+            ) : null}
+
             <p className="mt-4 break-all text-[0.7rem] leading-relaxed text-ink-faint">{url}</p>
           </Panel>
 
