@@ -5,10 +5,11 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 27 August 2026 — `/design/landing` is now the sample's
-landing, not a recolour: the bouquet assembles behind «Выберите чувство», the
-works ride a scroll-driven rail, the bridge says the door line, and the phone
-frame is held by camera maths instead of a gate. Open it on a phone.
+**Last updated:** 27 August 2026 — **the dark edition is live on `/`.** The
+homepage and `/design/landing` render one shared `DarkLanding` component, so
+the stand can never drift from production. The scene plays in two acts —
+petals on «Выберите чувство», wrap-ribbon-tag on the bridge — and the tag
+finally sits on the wrap, on a cord, instead of floating mid-air.
 
 **Если вы открыли этот файл, чтобы понять, что делать** — следующий раздел, он
 первый и по-русски. Всё остальное ниже объясняет «почему».
@@ -107,8 +108,12 @@ frame is held by camera maths instead of a gate. Open it on a phone.
 Осталось: зерно и тонкая типографика, второй акт сцены на мосту (сейчас
 букет собирается целиком в первом), шнурок бирки, и две почти
 одинаковые фразы про дверь рядом — `doorLine` моста и `note` шагов,
-какая остаётся — решение глазами. Затем шаг 13 — подмена главной,
-только после вашего просмотра стенда.
+какая остаётся — решение глазами. Шаг 13 сделан 27 августа
+после просмотра стенда на проде: тёмная редакция стоит на `/`, бирка
+на шнурке, сцена в два акта. Прежняя светлая композиция — в
+`FeelingSection`/`StorySection` и в истории git; остальные страницы сайта
+по-прежнему светлые — их очередь следующая, если решим вести тёмное
+дальше главной.
 
 **Почему букет последним.** Его уже выкатывали на светлый лендинг и сняли в тот
 же день: канвас рисуется на `-z-10`, а секции лендинга непрозрачные и просто
