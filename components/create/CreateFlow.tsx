@@ -571,7 +571,9 @@ export function CreateFlow({
                         )}
                       >
                         <div className="flex items-baseline justify-between gap-3">
-                          <span className="font-display text-[1.3rem] leading-none">{template.name}</span>
+                          <span className="text-[1.0625rem] font-medium leading-snug tracking-[-0.01em]">
+                            {template.name}
+                          </span>
                           <span className="flex gap-1">
                             {palette.swatches.map((swatch) => (
                               <span
@@ -584,8 +586,8 @@ export function CreateFlow({
                         </div>
                         <span
                           className={cn(
-                            'mt-2.5 block text-caption leading-snug',
-                            selected ? 'text-paper/60' : 'text-ink-muted',
+                            'mt-2 block text-[0.875rem] leading-[1.55]',
+                            selected ? 'text-paper/70' : 'text-ink-muted',
                           )}
                         >
                           {template.tagline}
@@ -647,7 +649,9 @@ export function CreateFlow({
                         className="block aspect-[16/9] w-full object-cover"
                       />
                       <span className="flex items-baseline justify-between gap-3 p-4">
-                        <span className="font-display text-[1.15rem] leading-none">{work.title}</span>
+                        <span className="text-[1.0625rem] font-medium leading-snug tracking-[-0.01em]">
+                          {work.title}
+                        </span>
                         <span
                           className={cn('text-caption', selected ? 'text-paper/50' : 'text-ink-muted')}
                         >
@@ -698,18 +702,49 @@ export function CreateFlow({
             strings={{ back: copy.back, continue: copy.continue, progress: copy.progress }}
             eyebrow={copy.steps.preview.eyebrow}
             question={copy.steps.preview.question}
-            hint={copy.steps.preview.hint}
+            hint={wish ? copy.steps.preview.wishHint : copy.steps.preview.hint}
             onBack={back}
             onNext={next}
             nextLabel={copy.steps.preview.looksRight}
             canContinue
           >
+            {/*
+              ЧЕЛОВЕКУ, НЕ ВЫБИРАВШЕМУ ШАБЛОН, ШАБЛОН НЕ ПОКАЗЫВАЕМ.
+
+              Миниатюра показывает конкретный шаблон, и на предыдущем шаге он
+              был выбран — либо подобран, если заказчик согласился. Но если
+              заказчик описал свою идею или показал на нашу работу, то
+              миниатюра показывает не его открытку, а ту, которую он только что
+              отклонил. Это сбивает: экран называется «вот она», а «она» —
+              чужая. Вместо неё пересказываем его собственный ответ.
+            */}
             <div className="flex flex-col items-center gap-8">
-              {stage}
+              {wish ? (
+                <div className="w-full max-w-[26rem] rounded-[1rem] border border-accent/30 bg-accent/[0.04] p-6">
+                  <p className="eyebrow text-ink-muted">{copy.steps.preview.wishTitle}</p>
+                  {wish.kind === 'work' ? (
+                    <p className="mt-3 text-body leading-relaxed text-ink-soft">
+                      {t(copy.steps.preview.wishWork, {
+                        title: works.find((work) => work.id === wish.workId)?.title ?? wish.workId,
+                      })}
+                    </p>
+                  ) : (
+                    <p className="mt-3 whitespace-pre-line text-body leading-relaxed text-ink-soft">
+                      {wish.text}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                stage
+              )}
               <dl className="w-full max-w-[26rem] space-y-2.5 text-caption">
                 <Summary label={copy.steps.preview.for}>{draft.recipientName || '—'}</Summary>
                 <Summary label={copy.steps.preview.from}>{draft.senderName || '—'}</Summary>
-                <Summary label={copy.steps.preview.template}>{activeTemplate?.name ?? '—'}</Summary>
+                {/* Строку про шаблон показываем только когда шаблон и правда
+                    выбран: иначе она называет тот, который заказчик отклонил. */}
+                {wish ? null : (
+                  <Summary label={copy.steps.preview.template}>{activeTemplate?.name ?? '—'}</Summary>
+                )}
                 <Summary label={copy.steps.preview.photos}>{draft.photos.length || copy.steps.preview.none}</Summary>
               </dl>
             </div>

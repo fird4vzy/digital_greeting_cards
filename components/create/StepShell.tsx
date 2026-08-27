@@ -144,12 +144,28 @@ export function Choice({
         className,
       )}
     >
-      <span className="block font-display text-[1.3rem] leading-none">{title}</span>
+      {/*
+        ПОДПИСЬ КАРТОЧКИ — ОСНОВНЫМ ШРИФТОМ, НЕ ДИСПЛЕЙНЫМ.
+
+        Здесь стоял `font-display` — Cormorant Garamond, — и от него жаловались
+        на «шрифт, от которого болят глаза». Жалоба верная: Cormorant дисплейный,
+        его штрихи тонкие по замыслу, он для заголовка в 48 пикселей, а не для
+        подписи кнопки в двадцать. Заголовок шага серифом и остаётся — разница
+        между «названием экрана» и «подписью элемента» как раз и нужна.
+
+        Начертание 500, а не 400: подпись должна держать вес рядом с описанием
+        под ней, иначе обе строки читаются одинаково и карточка теряет верх.
+      */}
+      <span className="block text-[1.0625rem] font-medium leading-snug tracking-[-0.01em]">
+        {title}
+      </span>
       {line ? (
         <span
           className={cn(
-            'mt-2.5 block text-caption leading-snug',
-            selected ? 'text-paper/60' : 'text-ink-muted',
+            // 14 пикселей, а не 13: описание — это текст, который читают,
+            // а не подпись, которую опознают.
+            'mt-2 block text-[0.875rem] leading-[1.55]',
+            selected ? 'text-paper/70' : 'text-ink-muted',
           )}
         >
           {line}

@@ -221,6 +221,11 @@ export type Dictionary = {
           question: string;
           hint: string;
           looksRight: string;
+          /** Подсказка, когда шаблон не выбирали. */
+          wishHint: string;
+          wishTitle: string;
+          /** `{title}` — название работы. */
+          wishWork: string;
           for: string;
           from: string;
           template: string;
@@ -555,6 +560,12 @@ export type Dictionary = {
        * работает, а оператор видит, что «ничего не происходит».
        */
       composeOverridden: string;
+      /** Загруженная открытка уже отвечает по коду. */
+      customLive: string;
+      /** …но статус ещё не «Опубликован». */
+      customNextPublish: string;
+      /** …и статус уже «Опубликован». */
+      customPublished: string;
       /** Адрес не откроется, пока заказ не опубликован. */
       qrNotLive: string;
       /**

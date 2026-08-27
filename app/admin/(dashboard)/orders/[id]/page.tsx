@@ -262,6 +262,26 @@ export default async function OrderDetail({ params }: Props) {
 
           <Panel title={t.panelCard}>
             <div className="space-y-2.5">
+              {/*
+                ЧТО ДЕЛАТЬ ДАЛЬШЕ — ПЕРВОЙ СТРОКОЙ, А НЕ ПОСЛЕ КНОПКИ.
+
+                Загруженная папка и есть готовая открытка: собирать после неё
+                нечего, по коду уже идёт она. Но панель начиналась с кнопки
+                «Собрать открытку», и её читали как следующий шаг — жали,
+                ничего видимого не происходило, и вывод получался «кнопка не
+                работает». Она работает; просто это кнопка другого пути.
+
+                Настоящий следующий шаг — статус «Опубликован»: до него
+                `/c/<код>` не отвечает никому, включая QR на бирке. Поэтому
+                состояние и шаг стоят выше всех кнопок.
+              */}
+              {order.customEntry ? (
+                <p className="rounded-[0.5rem] border border-accent/30 bg-accent/[0.05] p-3 text-[0.75rem] leading-relaxed text-ink-soft">
+                  {t.customLive}{' '}
+                  {order.status === 'PUBLISHED' ? t.customPublished : t.customNextPublish}
+                </p>
+              ) : null}
+
               <form action={regenerate}>
                 <input type="hidden" name="id" value={order.id} />
                 <select
