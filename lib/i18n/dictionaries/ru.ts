@@ -23,6 +23,11 @@ export const ru: Dictionary = {
       viewSite: 'На сайт',
     },
 
+    loader: {
+      linePlain: 'Маленький мир,',
+      lineItalic: 'сделанный для одного человека.',
+      label: 'Собираем',
+    },
     hero: {
       eyebrow: 'Цифровая карточка для настоящего букета',
       line1: 'Некоторые чувства',

@@ -21,6 +21,11 @@ export const uz: Dictionary = {
       viewSite: 'Saytga',
     },
 
+    loader: {
+      linePlain: 'Kichkina dunyo,',
+      lineItalic: 'bitta odam uchun yaratilgan.',
+      label: 'Yig‘ilmoqda',
+    },
     hero: {
       eyebrow: 'Haqiqiy guldasta uchun raqamli kartochka',
       line1: "Ba'zi tuyg'ular",

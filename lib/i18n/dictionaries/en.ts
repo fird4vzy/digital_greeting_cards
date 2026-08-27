@@ -17,6 +17,11 @@ export const en: Dictionary = {
       viewSite: 'View site',
     },
 
+    loader: {
+      linePlain: 'A little world,',
+      lineItalic: 'made for exactly one person.',
+      label: 'Assembling',
+    },
     hero: {
       eyebrow: 'A digital card for a real bouquet',
       line1: 'Some feelings',

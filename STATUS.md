@@ -5,12 +5,11 @@ machine, or by an assistant starting a session with no history. The README
 explains how the product works; this says what state it is in right now and
 what is waiting.
 
-**Last updated:** 27 August 2026 — **the dark edition is live on `/`,
-`/templates` and `/works`.** One shared `DarkLanding` for the homepage and the
-stand; the galleries carry the same scope page-locally. Film grain from the
-sample lies over the dark pages, the door line lives only on the bridge now,
-and the old bot token is revoked — the notification chain was tested
-end-to-end with a throwaway order (`S75QJH`, deleted the same minute).
+**Last updated:** 27 August 2026 — **the dark edition is live and now moves
+like the sample.** Theme scrubs night→paper→night around the bridge, the scene
+eases toward its target instead of tracking the wheel, the camera runs the
+sample's five keyframes, and the preloader and the letter reveal are in. What
+remains of `design/preview/bir-dunyo-v10.html` is taste, not mechanics.
 
 **Если вы открыли этот файл, чтобы понять, что делать** — следующий раздел, он
 первый и по-русски. Всё остальное ниже объясняет «почему».
@@ -1040,6 +1039,30 @@ every string into `ru`/`en`/`uz`, and only then `BouquetStage` wired to the
 stages it was written for. The four bouquet files are already in the tree,
 building, unused — wiring them back is one line in `app/page.tsx`, and it
 should be the *last* step, not the first.
+
+---
+
+## Как переносилась механика образца
+
+Сначала была перенесена вёрстка и сцена, а не движение, и владелец сказал
+главное: «отличается». Сравнение нашего кода со скриптом внутри образца
+дало пять механик, и ни одна из них не была про цвет:
+
+- **Инерция.** `p += (target - p) * 0.1` каждый кадр. Без неё сборка идёт
+  один в один за колесом и встаёт мгновенно. Это и есть «собирается красивее».
+- **Камера по ключам**, пять точек. Статичная камера показывает, как объект
+  меняется; движущаяся — как за ним идут.
+- **Сдвиг вправо** на широких окнах: текст слева, букет не по центру. Это
+  была не вёрстка, а недостающий сдвиг камеры.
+- **Параллакс от мыши** — мелочь, которая делает сцену живой.
+- **Тема по прокрутке** — её перенесли заходом раньше.
+
+**Гейт сцены всё ещё нельзя делать по ширине** — причина выше, в шаге 4.
+
+Из образца не переносились и не будут: панель переключения шрифтов и
+отладочная панель 3D — это инструменты автора образца, не часть продукта.
+GSAP тоже не переносился: 120 КБ ради интерполяций, которые делает rAF-цикл,
+уже есть в проекте.
 
 ---
 

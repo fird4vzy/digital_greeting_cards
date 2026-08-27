@@ -6,6 +6,7 @@ import { BridgeStage } from './BridgeStage';
 import { ClosingCta } from '@/components/marketing/ClosingCta';
 import { Hero } from '@/components/marketing/Hero';
 import { MemoriesSection } from '@/components/marketing/MemoriesSection';
+import { Preloader } from './Preloader';
 import { Step1Stage } from './Step1Stage';
 import { ThemeScrub } from './ThemeScrub';
 import { WorksStage } from './WorksStage';
@@ -39,6 +40,9 @@ import type { Dictionary } from '@/lib/i18n/types';
 export function DarkLanding({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   return (
     <div id="noir-scope" data-theme="noir" className="text-on-surface">
+      {/* Заставка первой загрузки: уезжает вверх, открывая страницу. */}
+      <Preloader strings={dict.ui.loader} />
+
       {/* Страница светлеет к мосту и темнеет за ним — как в образце. */}
       <ThemeScrub scopeId="noir-scope" sectionId="bridge" />
 

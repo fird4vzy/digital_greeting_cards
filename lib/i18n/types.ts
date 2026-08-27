@@ -80,6 +80,20 @@ export type Dictionary = {
       ctaWorks: string;
       scroll: string;
     };
+
+    /**
+     * Заставка первой загрузки.
+     *
+     * `linePlain` и `lineItalic` — две половины одной фразы, а не одна строка,
+     * разрезанная по запятой. Резать перевод в компоненте нельзя: в en и uz
+     * запятая стоит в другом месте, а курсивом здесь набирается ровно вторая,
+     * смысловая половина — то же правило, что во всех заголовках лендинга.
+     */
+    loader: {
+      linePlain: string;
+      lineItalic: string;
+      label: string;
+    };
     feeling: { eyebrow: string; title: string; lead: string; explore: string };
     story: {
       eyebrow: string;

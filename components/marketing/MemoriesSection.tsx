@@ -1,4 +1,5 @@
 import { Reveal, RevealGroup } from '@/components/ui/Reveal';
+import { ScrubReveal } from './landing/ScrubReveal';
 import { palettes, photoColors } from '@/lib/design/palettes';
 import type { Dictionary } from '@/lib/i18n/types';
 import { photoPlaceholder } from '@/lib/utils/placeholder';
@@ -19,7 +20,9 @@ function ingredients(dict: Dictionary) {
     { label: labels.name, body: samples.name, display: true, tilt: '-1.6deg', span: 'sm:col-span-4' },
     { label: labels.date, body: samples.date, tilt: '1.2deg', span: 'sm:col-span-5' },
     { label: labels.detail, body: samples.detail, tilt: '-0.8deg', span: 'sm:col-span-3' },
-    { label: labels.message, body: samples.message, tilt: '0.9deg', span: 'sm:col-span-7' },
+    // Письмо — единственная карточка, которая открывается по строке по мере
+    // прокрутки: текст письма читают, а не осматривают.
+    { label: labels.message, body: samples.message, tilt: '0.9deg', span: 'sm:col-span-7', scrub: true },
     { label: labels.memory, body: samples.memory, tilt: '-1.1deg', span: 'sm:col-span-5' },
   ];
 }
@@ -46,6 +49,7 @@ export function MemoriesSection({ dict, counter }: { dict: Dictionary; counter?:
         <RevealGroup step={0.09} className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-12 sm:gap-5">
           {ingredients(dict).map((item) => (
             <Reveal key={item.label} preset="fade" className={item.span}>
+              <Card scrub={'scrub' in item && item.scrub === true}>
               <div
                 className="h-full rounded-[1.25rem] border border-edge bg-surface-2/70 p-6 shadow-[var(--shadow-lift)] transition-transform duration-700 ease-[var(--ease-out-expo)] hover:rotate-0 sm:p-7"
                 style={{ rotate: item.tilt }}
@@ -61,6 +65,7 @@ export function MemoriesSection({ dict, counter }: { dict: Dictionary; counter?:
                   {item.body}
                 </p>
               </div>
+              </Card>
             </Reveal>
           ))}
 
@@ -94,4 +99,14 @@ export function MemoriesSection({ dict, counter }: { dict: Dictionary; counter?:
       </div>
     </section>
   );
+}
+
+/**
+ * Обёртка на одну карточку: письму — раскрытие по прокрутке, остальным —
+ * ничего. Условная обёртка, а не условный класс, потому что `ScrubReveal`
+ * везёт свой rAF-цикл, и вешать его на все пять карточек ради одной значило
+ * бы платить пятикратно за один эффект.
+ */
+function Card({ scrub, children }: { scrub: boolean; children: React.ReactNode }) {
+  return scrub ? <ScrubReveal>{children}</ScrubReveal> : <>{children}</>;
 }
