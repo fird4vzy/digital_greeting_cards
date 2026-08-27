@@ -47,8 +47,12 @@ what is waiting.
 Это не код, это доступы и живая база. Ни одну из них я сделать не могу.
 
 1. **Применить миграцию 006** — она добавляет колонку `wish`, куда пишется
-   «своя идея» и «как ваша работа». `npm run db:migrate` (скрипт сам читает
-   `.env.local`). Запускать можно когда угодно, до выкладки или после:
+   «своя идея» и «как ваша работа». `npm run db:migrate`.
+   Если ответит `DATABASE_URL is not set` — это не поломка, а отсутствующий
+   `.env.local`: он в `.gitignore` и с `git pull` не приходит. Один раз на
+   машину: `npx vercel link`, затем `npx vercel env pull .env.local` — и файл
+   появится со всеми переменными сразу. Подробности в Things that will bite.
+   Саму миграцию запускать можно когда угодно, до выкладки или после:
    `postgres.ts` спрашивает базу один раз за процесс, есть ли колонка, и пока
    её нет — форма работает, желание просто не сохраняется.
 2. **Починить уведомления. Причина уже найдена, осталось три действия.**
@@ -379,6 +383,22 @@ long version.
   in unison, which reads as broken rather than as animating — it was reported
   as "the new templates don't render", and the templates were fine. The beats
   are `absolute inset-0`, so they can simply crossfade.
+- **`.env.local` не приезжает с `git pull` и не приедет.** Он в `.gitignore`
+  (`.env*.local`), потому что в нём пароль от базы — там ему и место. Отсюда
+  `DATABASE_URL is not set` на каждой новой машине, и это **не поломка**: 22
+  августа чинили то, что скрипт вообще не читал файл, — теперь читает, о чём
+  сама ошибка и сообщает («no .env.local or .env supplied it» значит «искал и
+  не нашёл»). Файла на домашней машине не было никогда.
+  Лечится раз на машину, и копировать строку руками не нужно:
+
+  ```
+  npx vercel link                 # выбрать этот проект
+  npx vercel env pull .env.local
+  ```
+
+  После этого `DATABASE_URL`, `ADMIN_PASSWORD` и телеграм-переменные читают все
+  команды проекта, а не только `next dev`. Подсказка про это теперь стоит и в
+  самом сообщении об ошибке `db:migrate` — чтобы ответ был там же, где вопрос.
 - **A plain `git fetch` fails on this repository.** It hangs, or dies with
   `fatal: fetch-pack: invalid index-pack output`, because `public/` is 87 MB —
   `tebe` alone is 50 MB, 43 of that two mp4 files. What gets through:

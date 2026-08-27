@@ -90,6 +90,14 @@ if (!url) {
   console.error('    DATABASE_URL=postgres://...\n');
   console.error('  The string is in Vercel under Settings -> Environment Variables,');
   console.error('  or in the Neon dashboard.\n');
+  // Один и тот же тупик встречают на каждой новой машине, и не потому, что
+  // что-то сломалось: `.env*.local` стоит в .gitignore — там пароль от базы,
+  // ему там и место, — поэтому `git pull` этот файл не приносит и не
+  // принесёт никогда. Копировать строку руками при этом не обязательно:
+  // Vercel отдаёт весь набор одной командой, и делается это раз на машину.
+  console.error('  Or let Vercel write the file for you — once per machine:\n');
+  console.error('    npx vercel link                 # pick this project');
+  console.error('    npx vercel env pull .env.local\n');
   console.error('  Just this once, without a file:');
   console.error('    PowerShell:  $env:DATABASE_URL = "postgres://..."; npm run db:migrate');
   console.error('    bash:        DATABASE_URL="postgres://..." npm run db:migrate');
