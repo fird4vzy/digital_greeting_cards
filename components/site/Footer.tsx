@@ -3,6 +3,17 @@ import type { Dictionary } from '@/lib/i18n/types';
 import { SITE } from '@/lib/site';
 import { Wordmark } from './Wordmark';
 
+/**
+ * Здесь не осталось ссылок на конкретную открытку, и это не упрощение.
+ *
+ * Их было две — «посмотреть готовую карточку» и «бирка на печать», обе на код
+ * `8FJ29K`. Это демо-заказ из файлового хранилища: он есть в `npm run dev` и
+ * его нет ни в одной боевой базе, так что на живом сайте обе строчки отдавали
+ * 404 — на каждой странице, в подвале, где их видит и заказчик, и флорист.
+ *
+ * Заменять их на реальный код нельзя: любой код — это чьё-то письмо. Витрина
+ * живёт в `/works`, где лежат работы, сделанные для показа.
+ */
 export function Footer({ strings }: { strings: Dictionary['ui']['footer'] }) {
   const columns = [
     {
@@ -11,7 +22,6 @@ export function Footer({ strings }: { strings: Dictionary['ui']['footer'] }) {
         { href: '/templates', label: strings.links.templates },
         { href: '/works', label: strings.links.works },
         { href: '/create', label: strings.links.create },
-        { href: '/c/8FJ29K', label: strings.links.seeCard },
       ],
     },
     {
@@ -22,7 +32,6 @@ export function Footer({ strings }: { strings: Dictionary['ui']['footer'] }) {
         { href: '/shops', label: strings.links.shops },
         { href: '/admin', label: strings.links.dashboard },
         { href: '/admin/orders', label: strings.links.orders },
-        { href: '/c/8FJ29K/qr', label: strings.links.printable },
       ],
     },
   ];

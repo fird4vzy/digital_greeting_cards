@@ -157,12 +157,10 @@ export type Dictionary = {
       links: {
         templates: string;
         create: string;
-        seeCard: string;
         works: string;
         shops: string;
         dashboard: string;
         orders: string;
-        printable: string;
       };
     };
     templates: {

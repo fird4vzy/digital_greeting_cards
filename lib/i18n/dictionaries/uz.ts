@@ -107,12 +107,10 @@ export const uz: Dictionary = {
       links: {
         templates: 'Shablonlar',
         create: 'Kartochka yaratish',
-        seeCard: "Tayyor kartochkani ko'rish",
         works: 'Bizning ishlarimiz',
         shops: 'Do‘konlarga: bu qancha beradi',
         dashboard: "Do'kon paneli",
         orders: 'Buyurtmalar',
-        printable: 'Bosma QR-kartochka',
       },
     },
 

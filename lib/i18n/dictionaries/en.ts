@@ -103,12 +103,10 @@ export const en: Dictionary = {
       links: {
         templates: 'Templates',
         create: 'Create a card',
-        seeCard: 'See a real card',
         works: 'Our work',
         shops: 'For shops: what it pays',
         dashboard: 'Shop dashboard',
         orders: 'Orders',
-        printable: 'Printable QR card',
       },
     },
 

@@ -109,12 +109,10 @@ export const ru: Dictionary = {
       links: {
         templates: 'Шаблоны',
         create: 'Создать карточку',
-        seeCard: 'Посмотреть готовую карточку',
         works: 'Наши работы',
         shops: 'Салонам: сколько это даёт',
         dashboard: 'Панель магазина',
         orders: 'Заказы',
-        printable: 'QR-карточка для печати',
       },
     },
 
