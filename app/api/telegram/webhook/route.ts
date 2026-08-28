@@ -1,3 +1,4 @@
+import { constantTimeEqual } from '@/lib/auth/admin';
 import { forwardIncoming } from '@/lib/notify/telegram';
 
 /**
@@ -31,7 +32,12 @@ export async function POST(request: Request) {
   // для любого прохожего слать в рабочую группу что угодно от имени бота.
   if (!secret) return new Response('Not found', { status: 404 });
 
-  if (request.headers.get('x-telegram-bot-api-secret-token') !== secret) {
+  // Сравнение за постоянное время. По сети угадывать UUID посимвольно по
+  // времени ответа непрактично, но правило в этом коде уже принято — см.
+  // `constantTimeEqual` в lib/auth/admin.ts, — и исключение из него пришлось
+  // бы объяснять каждому, кто прочтёт обе строки.
+  const supplied = request.headers.get('x-telegram-bot-api-secret-token');
+  if (!supplied || !(await constantTimeEqual(supplied, secret))) {
     return new Response('Unauthorized', { status: 401 });
   }
 

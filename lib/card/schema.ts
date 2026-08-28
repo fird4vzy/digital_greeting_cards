@@ -13,9 +13,46 @@ import { z } from 'zod';
  * Nothing else in the application needs to change.
  */
 
+/**
+ * Предел длины ссылки на изображение.
+ *
+ * Фотографии приезжают как `data:`-URL: `lib/utils/image.ts` ужимает их до
+ * ~600 КБ в base64, и восемьсот тысяч знаков — потолок с запасом, а не
+ * рабочий размер. Без потолка `url` был `z.string()` — любая строка любой
+ * длины, — и тридцать таких строк по десять мегабайт проходили проверку.
+ * Спасал только лимит тела запроса у Vercel в 4,5 МБ, то есть чужая
+ * настройка, которой на своём хостинге не будет.
+ */
+const MAX_IMAGE_URL = 800_000;
+
+/**
+ * Схема источника изображения: только картинка и только оттуда, откуда ждём.
+ *
+ * `z.string()` пропускал `javascript:` и `data:text/html`. Отрисовщик
+ * подставляет это в `src`, и хотя браузер картинкой такое не покажет, класть
+ * в базу заказа непроверенный URL с чужой схемой незачем.
+ *
+ * `svg+xml` в списке есть, и это не оплошность: заглушки рисует
+ * `lib/utils/placeholder.ts`, они и есть SVG. Опасны такие данные там, где
+ * документ исполняется, — во фрейме или объекте; `CardPhoto` рисует их через
+ * `<img>`, а в нём браузер не выполняет скрипты и не ходит за внешними
+ * ресурсами. Если картинка когда-нибудь начнёт показываться иначе, эту
+ * строчку надо пересмотреть первой.
+ */
+const imageUrl = z
+  .string()
+  .max(MAX_IMAGE_URL)
+  .refine(
+    (value) =>
+      /^data:image\/(jpeg|png|webp|gif|avif|svg\+xml)[;,]/.test(value) ||
+      /^https:\/\//.test(value) ||
+      value.startsWith('/'),
+    'Unsupported image source',
+  );
+
 export const photoSchema = z.object({
   id: z.string(),
-  url: z.string(),
+  url: imageUrl,
   alt: z.string().optional(),
   caption: z.string().optional(),
   /** Intrinsic size, when known, so the renderer can reserve space (no CLS). */

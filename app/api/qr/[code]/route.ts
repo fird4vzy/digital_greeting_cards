@@ -25,14 +25,29 @@ export async function GET(
   }
 
   const url = new URL(request.url);
-  const dark = url.searchParams.get('dark') ?? '#191512';
   const size = Number(url.searchParams.get('size') ?? 512);
 
-  const svg = await qrSvg(cardUrl(await siteOrigin(), order.code), {
-    dark,
-    light: '#00000000',
-    width: Number.isFinite(size) ? Math.min(Math.max(size, 128), 2048) : 512,
-  });
+  // Цвет проверяется здесь, хотя библиотека проверяет его тоже.
+  //
+  // `qrcode` действительно отвергает и «red», и попытку внедрить разметку —
+  // это проверено, инъекции в SVG тут нет. Но отвергает он исключением, а
+  // исключение из необёрнутого обработчика — это 500, и в разработке ещё и со
+  // стеком вызовов наружу. Кривой параметр в ссылке не повод показывать
+  // человеку ошибку сервера: берём цвет по умолчанию.
+  const requested = url.searchParams.get('dark');
+  const dark = requested && /^#[0-9a-fA-F]{3,8}$/.test(requested) ? requested : '#191512';
+
+  let svg: string;
+  try {
+    svg = await qrSvg(cardUrl(await siteOrigin(), order.code), {
+      dark,
+      light: '#00000000',
+      width: Number.isFinite(size) ? Math.min(Math.max(size, 128), 2048) : 512,
+    });
+  } catch (error) {
+    console.error(`[qr] не удалось нарисовать код: ${(error as Error).message}`);
+    return NextResponse.json({ error: 'Could not render the QR code' }, { status: 500 });
+  }
 
   return new NextResponse(svg, {
     headers: {
