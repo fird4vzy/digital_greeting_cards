@@ -1,5 +1,4 @@
-import { cookies } from 'next/headers';
-import { ADMIN_SESSION_COOKIE, verifyAdminSession } from '@/lib/auth/admin';
+import { adminOnly } from '@/lib/auth/guard';
 import { listOrders } from '@/lib/db';
 
 /**
@@ -16,9 +15,8 @@ import { listOrders } from '@/lib/db';
  * emails and phone numbers included, would be one URL away.
  */
 export async function GET() {
-  if (!(await verifyAdminSession((await cookies()).get(ADMIN_SESSION_COOKIE)?.value))) {
-    return new Response('Not authenticated', { status: 401 });
-  }
+  const denied = await adminOnly();
+  if (denied) return denied;
 
   const orders = await listOrders();
 

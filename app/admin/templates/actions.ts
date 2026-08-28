@@ -1,8 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { cookies } from 'next/headers';
-import { ADMIN_SESSION_COOKIE, verifyAdminSession } from '@/lib/auth/admin';
+import { hasAdminSession } from '@/lib/auth/guard';
 import { templateRecipeDraftSchema } from '@/lib/card/recipe';
 import { getTemplateStore } from '@/lib/db';
 import { listTemplates } from '@/templates';
@@ -26,10 +25,20 @@ import type { TemplateImport } from '@/lib/ai/import-schema';
 
 export type SaveResult = { ok: true; id: string } | { ok: false; error: string };
 
+/**
+ * Отказ, если сессии нет, иначе `null`.
+ *
+ * Здесь действия отвечают объектом, а не бросают, — форма показывает текст
+ * ошибки, — поэтому общая `requireAdmin` из guard.ts не подходит по форме,
+ * но кука читается всё равно в одном месте на весь проект.
+ */
+async function requireAdmin(): Promise<{ ok: false; error: string } | null> {
+  return (await hasAdminSession()) ? null : { ok: false, error: 'Not authenticated' };
+}
+
 export async function saveTemplate(payload: unknown): Promise<SaveResult> {
-  if (!(await verifyAdminSession((await cookies()).get(ADMIN_SESSION_COOKIE)?.value))) {
-    return { ok: false, error: 'Not authenticated' };
-  }
+  const denied = await requireAdmin();
+  if (denied) return denied;
 
   const parsed = templateRecipeDraftSchema.safeParse(payload);
   if (!parsed.success) {
@@ -58,9 +67,8 @@ export async function saveTemplate(payload: unknown): Promise<SaveResult> {
 }
 
 export async function deleteTemplate(id: string): Promise<SaveResult> {
-  if (!(await verifyAdminSession((await cookies()).get(ADMIN_SESSION_COOKIE)?.value))) {
-    return { ok: false, error: 'Not authenticated' };
-  }
+  const denied = await requireAdmin();
+  if (denied) return denied;
 
   const store = await getTemplateStore();
   const removed = await store.remove(id);
@@ -91,9 +99,8 @@ export async function importFromRepository(
   | { ok: true; recipe: TemplateImport }
   | { ok: false; error: string }
 > {
-  if (!(await verifyAdminSession((await cookies()).get(ADMIN_SESSION_COOKIE)?.value))) {
-    return { ok: false, error: 'Not authenticated' };
-  }
+  const denied = await requireAdmin();
+  if (denied) return denied;
 
   return importTemplate(url);
 }
@@ -118,9 +125,8 @@ export async function importFromFiles(
   | { ok: true; recipe: TemplateImport }
   | { ok: false; error: string }
 > {
-  if (!(await verifyAdminSession((await cookies()).get(ADMIN_SESSION_COOKIE)?.value))) {
-    return { ok: false, error: 'Not authenticated' };
-  }
+  const denied = await requireAdmin();
+  if (denied) return denied;
 
   return importFiles(files, folderName);
 }

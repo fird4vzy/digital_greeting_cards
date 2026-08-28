@@ -1,5 +1,4 @@
-import { cookies } from 'next/headers';
-import { ADMIN_SESSION_COOKIE, verifyAdminSession } from '@/lib/auth/admin';
+import { adminOnly } from '@/lib/auth/guard';
 import { getCardFileStore, getOrder, updateOrder } from '@/lib/db';
 import {
   MAX_CARD_BYTES,
@@ -21,15 +20,12 @@ import {
  * запись. Без этой проверки маршрут был бы открыт всему интернету.
  */
 
-async function requireAdmin(): Promise<boolean> {
-  return verifyAdminSession((await cookies()).get(ADMIN_SESSION_COOKIE)?.value);
-}
-
 const bad = (message: string, status = 400) =>
   Response.json({ error: message }, { status });
 
 export async function POST(request: Request) {
-  if (!(await requireAdmin())) return bad('Unauthorized', 401);
+  const denied = await adminOnly();
+  if (denied) return denied;
 
   const form = await request.formData();
   const orderId = String(form.get('orderId') ?? '');
@@ -81,7 +77,8 @@ export async function POST(request: Request) {
  * иногда открывать не ту страницу.
  */
 export async function PATCH(request: Request) {
-  if (!(await requireAdmin())) return bad('Unauthorized', 401);
+  const denied = await adminOnly();
+  if (denied) return denied;
 
   const { orderId, entry } = (await request.json()) as {
     orderId?: string;
@@ -112,7 +109,8 @@ export async function PATCH(request: Request) {
 
 /** Убирает всю загруженную папку и возвращает заказ к сборке движком. */
 export async function DELETE(request: Request) {
-  if (!(await requireAdmin())) return bad('Unauthorized', 401);
+  const denied = await adminOnly();
+  if (denied) return denied;
 
   const { searchParams } = new URL(request.url);
   const orderId = searchParams.get('orderId');

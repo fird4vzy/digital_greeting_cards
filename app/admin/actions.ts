@@ -1,12 +1,11 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { ADMIN_SESSION_COOKIE, verifyAdminSession } from '@/lib/auth/admin';
+import { requireAdmin } from '@/lib/auth/guard';
 import { composeConfigForOrderAnywhere } from '@/lib/card/compose-server';
 import { getOrder, removeOrder, updateOrder } from '@/lib/db';
-import { ORDER_STATUSES, isDeletable, type OrderStatus } from '@/lib/db/types';
+import { ORDER_STATUSES, canTransition, isDeletable, type OrderStatus } from '@/lib/db/types';
 import { findChats, sendTestNotification, type ChatLookup, type TestResult } from '@/lib/notify/telegram';
 import { siteOrigin } from '@/lib/site-origin';
 
@@ -26,12 +25,6 @@ import { siteOrigin } from '@/lib/site-origin';
  * lives on — so routing is the wrong place to make a mutation safe.
  */
 
-async function requireAdmin(): Promise<void> {
-  if (!(await verifyAdminSession((await cookies()).get(ADMIN_SESSION_COOKIE)?.value))) {
-    throw new Error('Not authenticated');
-  }
-}
-
 export async function setOrderStatus(id: string, status: string) {
   await requireAdmin();
 
@@ -40,6 +33,13 @@ export async function setOrderStatus(id: string, status: string) {
 
   const order = await getOrder(id);
   if (!order) return;
+
+  // Переход проверяется, а не только сам статус. См. ALLOWED_TRANSITIONS:
+  // отмена необратима, потому что бирка уже напечатана.
+  if (!canTransition(order.status, status as OrderStatus)) {
+    console.warn(`[orders] запрещённый переход ${order.status} → ${status} для ${id}`);
+    return;
+  }
 
   // Publishing an order with no composed card would produce an empty page.
   const config = order.config ?? (status === 'PUBLISHED' ? await composeConfigForOrderAnywhere(order) : null);

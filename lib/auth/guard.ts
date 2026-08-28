@@ -22,11 +22,32 @@ import { ADMIN_SESSION_COOKIE, verifyAdminSession } from '@/lib/auth/admin';
  * забытая строка выглядит как пропуск: у соседних маршрутов она есть, и в
  * `grep -L adminOnly app/api` её отсутствие видно списком.
  */
-export async function adminOnly(): Promise<Response | null> {
-  const session = (await cookies()).get(ADMIN_SESSION_COOKIE)?.value;
-  if (await verifyAdminSession(session)) return null;
+export async function hasAdminSession(): Promise<boolean> {
+  return verifyAdminSession((await cookies()).get(ADMIN_SESSION_COOKIE)?.value);
+}
 
-  // Ровно «не аутентифицирован» и ничего больше: отвечать «нет такого
-  // заказа» или «нет прав» значит рассказать анониму, что заказ существует.
+/**
+ * Для обработчиков маршрутов: `null` — пускать, иначе готовый ответ.
+ *
+ * Ровно «не аутентифицирован» и ничего больше: отвечать «нет такого заказа»
+ * или «нет прав» значит рассказать анониму, что заказ существует.
+ */
+export async function adminOnly(): Promise<Response | null> {
+  if (await hasAdminSession()) return null;
   return Response.json({ error: 'Not authenticated' }, { status: 401 });
+}
+
+/**
+ * Для серверных действий, которые ничего не возвращают наружу.
+ *
+ * Бросает, а не возвращает: действие без прав не должно доехать до строки,
+ * которая что-то меняет, а `if` можно забыть проверить.
+ *
+ * Серверное действие — это POST-эндпоинт, до которого можно достучаться,
+ * зная его идентификатор, ни разу не открыв страницу, где он живёт. Поэтому
+ * проверка в разметке страницы не значит ничего, и каждое действие обязано
+ * спрашивать само.
+ */
+export async function requireAdmin(): Promise<void> {
+  if (!(await hasAdminSession())) throw new Error('Not authenticated');
 }

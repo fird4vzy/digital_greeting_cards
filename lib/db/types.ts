@@ -39,6 +39,35 @@ export const STATUS_META: Record<OrderStatus, { label: string; hint: string; ton
   CANCELLED: { label: 'Cancelled', hint: 'Called off; the code stays reserved', tone: 'var(--color-ink-faint)' },
 };
 
+/**
+ * Какие переходы статуса разрешены.
+ *
+ * Раньше проверялось только то, что статус вообще существует, а любая пара
+ * принималась: `PUBLISHED → NEW → PUBLISHED` проходил, и `CANCELLED` —
+ * задуманный надгробием — снимался обратно. Задумка держалась на том, что в
+ * интерфейсе таких кнопок нет; кнопки не механизм.
+ *
+ * Из `CANCELLED` выхода нет намеренно. Отмена значит, что напечатанная бирка
+ * ведёт на закрытую страницу, и вернуть её к жизни — значит опубликовать
+ * открытку под кодом, который магазин уже считает мёртвым.
+ *
+ * Возврат назад по цепочке разрешён: оператор перечитал и вернул в работу —
+ * обычный рабочий случай, а не нарушение.
+ */
+export const ALLOWED_TRANSITIONS: Record<OrderStatus, readonly OrderStatus[]> = {
+  NEW: ['PROCESSING', 'REVIEW', 'CANCELLED'],
+  PROCESSING: ['NEW', 'REVIEW', 'CANCELLED'],
+  REVIEW: ['PROCESSING', 'READY', 'CANCELLED'],
+  READY: ['REVIEW', 'PROCESSING', 'PUBLISHED', 'CANCELLED'],
+  PUBLISHED: ['CANCELLED'],
+  CANCELLED: [],
+};
+
+/** Разрешён ли переход. Переход в тот же статус — да: это просто ничего. */
+export function canTransition(from: OrderStatus, to: OrderStatus): boolean {
+  return from === to || ALLOWED_TRANSITIONS[from].includes(to);
+}
+
 export type Customer = {
   name: string;
   /** Остаётся у старых заказов; в форме больше не спрашивается. */
