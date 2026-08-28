@@ -484,6 +484,8 @@ export const ru: Dictionary = {
       noMatch: 'Ничего не найдено.',
       from: 'от',
       export: 'Скачать все',
+      newer: 'Новее',
+      older: 'Старее',
       columns: {
         recipient: 'Получатель',
         for: 'Кто это',

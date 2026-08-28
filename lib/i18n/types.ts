@@ -452,6 +452,8 @@ export type Dictionary = {
       noMatch: string;
       from: string;
       export: string;
+      newer: string;
+      older: string;
       columns: {
         recipient: string;
         for: string;

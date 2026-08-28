@@ -18,16 +18,54 @@ export async function generateMetadata() {
   return { title: dict.admin.nav.orders };
 }
 
-type Props = { searchParams: Promise<{ status?: string; q?: string }> };
+type Props = { searchParams: Promise<{ status?: string; q?: string; page?: string }> };
+
+/**
+ * Сколько заказов на странице.
+ *
+ * Двадцать пять, а не пятьдесят: каждая строка несёт фотографии заказа в
+ * base64, потому что они лежат в JSONB прямо в ней. Пока фотографии не уедут
+ * в объектное хранилище, размер страницы — это размер ответа в мегабайтах, а
+ * не число строк.
+ */
+const PAGE_SIZE = 25;
 
 export default async function OrdersPage({ searchParams }: Props) {
   const { locale, dict } = await getI18n();
   const t = dict.admin.orders;
 
-  const { status, q } = await searchParams;
+  const { status, q, page: rawPage } = await searchParams;
   const active = ORDER_STATUSES.includes(status as OrderStatus) ? (status as OrderStatus) : undefined;
 
-  const orders = await listOrders({ status: active, search: q });
+  const page = Math.max(1, Math.floor(Number(rawPage)) || 1);
+
+  /**
+   * Берём на один больше, чем показываем.
+   *
+   * Так «есть ли дальше» узнаётся без второго запроса `count(*)`, который на
+   * таблице с фотографиями в строках стоит дороже самой выдачи. Лишняя строка
+   * отбрасывается.
+   *
+   * Раньше лимита не было совсем: страница читала весь список целиком.
+   */
+  const fetched = await listOrders({
+    status: active,
+    search: q,
+    limit: PAGE_SIZE + 1,
+    offset: (page - 1) * PAGE_SIZE,
+  });
+
+  const hasOlder = fetched.length > PAGE_SIZE;
+  const orders = hasOlder ? fetched.slice(0, PAGE_SIZE) : fetched;
+
+  const pageHref = (target: number) => {
+    const params = new URLSearchParams();
+    if (active) params.set('status', active);
+    if (q) params.set('q', q);
+    if (target > 1) params.set('page', String(target));
+    const query = params.toString();
+    return query ? `/admin/orders?${query}` : '/admin/orders';
+  };
 
   return (
     <>
@@ -158,6 +196,25 @@ export default async function OrdersPage({ searchParams }: Props) {
             </tbody>
           </table>
         </div>
+      )}
+
+      {(page > 1 || hasOlder) && (
+        <nav className="mt-8 flex items-center justify-between">
+          {page > 1 ? (
+            <FilterLink href={pageHref(page - 1)} active={false}>
+              ← {t.newer}
+            </FilterLink>
+          ) : (
+            <span />
+          )}
+          {hasOlder ? (
+            <FilterLink href={pageHref(page + 1)} active={false}>
+              {t.older} →
+            </FilterLink>
+          ) : (
+            <span />
+          )}
+        </nav>
       )}
     </>
   );

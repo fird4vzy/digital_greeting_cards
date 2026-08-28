@@ -474,6 +474,8 @@ export const uz: Dictionary = {
       noMatch: 'Hech narsa topilmadi.',
       from: 'kimdan:',
       export: 'Hammasini yuklab olish',
+      newer: 'Yangiroq',
+      older: 'Eskiroq',
       columns: {
         recipient: 'Kimga',
         for: 'Kim bo‘ladi',

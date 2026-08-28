@@ -77,7 +77,9 @@ export const fileStore: OrderRepository = {
       .filter((order) => matchesFilter(order, filter))
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
-    return filter.limit ? matched.slice(0, filter.limit) : matched;
+    // Тот же контракт, что у postgres: сначала пропустить, потом ограничить.
+    const from = filter.offset ?? 0;
+    return filter.limit ? matched.slice(from, from + filter.limit) : matched.slice(from);
   },
 
   async get(id: string) {

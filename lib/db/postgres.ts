@@ -303,9 +303,11 @@ export async function createPostgresStore(
 
       const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
       const limit = filter.limit ? `LIMIT ${Number(filter.limit)}` : '';
+      const offset = filter.offset ? `OFFSET ${Number(filter.offset)}` : '';
 
       const result = await pool.query<OrderRow>(
-        `SELECT ${columnsFor(await optionalColumns(pool))} FROM orders ${where} ORDER BY created_at DESC ${limit}`,
+        `SELECT ${columnsFor(await optionalColumns(pool))} FROM orders ${where}
+           ORDER BY created_at DESC ${limit} ${offset}`,
         values,
       );
       return result.rows.map(toOrder);

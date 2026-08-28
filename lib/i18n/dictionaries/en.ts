@@ -467,6 +467,8 @@ export const en: Dictionary = {
       noMatch: 'No orders match that.',
       from: 'from',
       export: 'Download all',
+      newer: 'Newer',
+      older: 'Older',
       columns: {
         recipient: 'Recipient',
         for: 'For',
