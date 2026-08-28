@@ -104,6 +104,13 @@ what is waiting.
 Маршрут, пересылка и скрипт регистрации готовы; осталось то, что требует
 доступа к Vercel.
 
+0. **Положить `TELEGRAM_BOT_TOKEN` в свой `.env.local`.** Скрипт ходит в
+   Telegram напрямую с вашей машины, а не через сайт, поэтому секрета вебхука
+   ему мало — нужен сам токен. Одна строка рядом с `DATABASE_URL`:
+   `TELEGRAM_BOT_TOKEN=<токен от @BotFather>`.
+   Тянуть из Vercel тоже можно, но помните две вещи: `vercel env pull` без
+   `--environment=production` приносит переменные Development, а не те, что вы
+   задавали, и **перезаписывает `.env.local` целиком**.
 1. **Придумать секрет и положить его в Vercel** как `TELEGRAM_WEBHOOK_SECRET`
    (Production) и в свой `.env.local`. Сгенерировать:
    `node -e "console.log(crypto.randomUUID())"`. **Redeploy.**
@@ -485,6 +492,12 @@ long version.
   --enable-unsafe-swiftshader`. Without them WebGL never initialises and the
   scene is simply absent from the frame — which is exactly what "the pixels
   cannot be checked" turned out to mean. It also takes production URLs.
+- **`&&` не работает в PowerShell 5.1.** Оболочка владельца — именно она, и
+  `npx vercel link && npx vercel env pull` падает с `The token '&&' is not a
+  valid statement separator in this version`. Это не ошибка Vercel и не
+  сломанный npx. Команды даём по одной строке; если нужна связка — `;` или
+  `if ($?) { … }`. Ловушка попала прямо в текст ошибки одного из скриптов и
+  оттуда — в инструкцию, то есть размножилась.
 - **Stop the dev server before pulling.** The admin pages moved into the route
   group `app/admin/(dashboard)/`, and on Windows git could not remove the old
   directories while a watcher held them open. It asks

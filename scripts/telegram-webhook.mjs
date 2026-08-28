@@ -41,8 +41,17 @@ const secret = process.env.TELEGRAM_WEBHOOK_SECRET;
 
 if (!token) {
   console.error('TELEGRAM_BOT_TOKEN не задан.\n');
-  console.error('  Положите его в .env.local — тот же файл, что и DATABASE_URL:');
-  console.error('    npx vercel link && npx vercel env pull .env.local\n');
+  console.error('  Токен нужен здесь, на вашей машине: скрипт ходит в Telegram');
+  console.error('  напрямую, а не через сайт. Секрета вебхука для этого мало.\n');
+  console.error('  Проще всего — дописать одну строку в .env.local, рядом с DATABASE_URL:\n');
+  console.error('    TELEGRAM_BOT_TOKEN=<токен от @BotFather>\n');
+  console.error('  Или вытянуть всё из Vercel. Команды по одной — в PowerShell');
+  console.error('  разделителя && нет:\n');
+  console.error('    npx vercel link');
+  console.error('    npx vercel env pull .env.local --environment=production\n');
+  console.error('  Без --environment=production придут переменные Development,');
+  console.error('  а токен и секрет вы задавали для Production.');
+  console.error('  Учтите: pull ПЕРЕЗАПИШЕТ .env.local целиком.\n');
   process.exit(1);
 }
 
