@@ -39,8 +39,38 @@ const sans = Inter({
   fallback: ['system-ui', 'sans-serif'],
 });
 
+/**
+ * Адрес сайта, из которого нельзя уронить сборку.
+ *
+ * `new URL()` бросает на любой мусор, а `metadataBase` вычисляется при сборке
+ * — то есть плохое значение переменной валит не страницу, а весь `next build`
+ * с сообщением про `/_not-found`, где ни слова о причине.
+ *
+ * Мусор здесь не гипотетический: `vercel env pull` отказывается отдавать
+ * секретные значения и записывает вместо них строку `[SENSITIVE]`. После
+ * одного такого вытягивания локальная сборка перестала собираться совсем.
+ * Непонятная переменная должна откатываться к localhost, а не останавливать
+ * работу.
+ */
+function siteUrl(): URL {
+  const configured = process.env.NEXT_PUBLIC_SITE_URL;
+
+  if (configured) {
+    try {
+      return new URL(configured);
+    } catch {
+      console.warn(
+        `[site] NEXT_PUBLIC_SITE_URL не похож на адрес (${configured}) — беру localhost. ` +
+          'Если это [SENSITIVE], значение затёр `vercel env pull`: впишите настоящее руками.',
+      );
+    }
+  }
+
+  return new URL('http://localhost:3000');
+}
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
+  metadataBase: siteUrl(),
   title: {
     default: SITE.name,
     template: `%s · ${SITE.name}`,

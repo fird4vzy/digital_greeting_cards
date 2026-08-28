@@ -11,7 +11,24 @@ import { headers } from 'next/headers';
  */
 export async function siteOrigin(): Promise<string> {
   const configured = process.env.NEXT_PUBLIC_SITE_URL;
-  if (configured) return configured.replace(/\/$/, '');
+
+  // Настроенное значение принимается, только если это настоящий адрес.
+  //
+  // Здесь непроверенная строка опаснее, чем в метаданных: этот origin уходит
+  // в QR-коды, а те печатаются на бирках и привязываются к букетам. Ошибка
+  // не всплывёт при сборке — она всплывёт у человека с бумажкой в руках,
+  // который отсканирует код и никуда не попадёт. `vercel env pull` умеет
+  // записать сюда `[SENSITIVE]` вместо секрета, поэтому проверка не
+  // теоретическая.
+  if (configured) {
+    try {
+      return new URL(configured).origin;
+    } catch {
+      console.warn(
+        `[site] NEXT_PUBLIC_SITE_URL не похож на адрес (${configured}) — беру адрес запроса.`,
+      );
+    }
+  }
 
   try {
     const list = await headers();
