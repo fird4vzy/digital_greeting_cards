@@ -1,6 +1,11 @@
 import 'server-only';
 
 import type { Order } from '@/lib/db/types';
+import { getDictionary } from '@/lib/i18n';
+import { localiseTemplate, occasionLabel } from '@/lib/i18n/localise';
+import { resolveTemplateAnywhere } from '@/lib/card/registry';
+import { toSummary } from '@/lib/card/template';
+import { getWork } from '@/lib/works';
 
 /**
  * Tells the shop a new order has arrived.
@@ -84,14 +89,31 @@ function escapeHtml(value: string): string {
     .replaceAll("'", '&#39;');
 }
 
-function buildMessage(order: Order, adminUrl: string): string {
+/**
+ * Сообщение о заказе — словами, а не идентификаторами.
+ *
+ * Раньше здесь печаталось `Повод: anniversary` и `Шаблон: romantic`: сырые
+ * ключи из базы, английские, одинаковые во всех трёх языках. Это тот же баг,
+ * что когда-то был в панели оператора, и правило записано там же — **имя
+ * показывают человеку, идентификатор остаётся в коде**. Читает это живой
+ * человек в телеграме, а не разработчик в логах.
+ *
+ * И главное: **просьба заказчика идёт первой**. Если он не выбирал шаблон, а
+ * описал свою идею или показал на готовую работу, то шаблон в заказе —
+ * подобранный нами, и называть его как выбор клиента прямо неверно. Раньше
+ * этой строки не было вовсе: самое важное, что сказал человек, до группы не
+ * доезжало.
+ */
+function buildMessage(order: Order, adminUrl: string, templateName: string): string {
+  const dict = getDictionary(order.locale);
   const lines = [
     `<b>Новый заказ · ${escapeHtml(order.code)}</b>`,
     '',
     `Кому: ${escapeHtml(order.recipient.name)}`,
     `От кого: ${escapeHtml(order.customer.name)}`,
-    `Повод: ${escapeHtml(order.occasion)}`,
-    `Шаблон: ${escapeHtml(order.templateId)}`,
+    `Повод: ${escapeHtml(occasionLabel(order.occasion, dict))}`,
+    // Когда заказчик шаблон не выбирал, честнее сказать, что он подобран.
+    `Шаблон: ${escapeHtml(templateName)}${order.wish ? ' (подобрали сами)' : ''}`,
   ];
 
   // Телеграм первым: по нему и отвечают. Почта — только у старых заказов.
@@ -101,6 +123,23 @@ function buildMessage(order: Order, adminUrl: string): string {
   if (contact) lines.push(`Связь: ${escapeHtml(contact)}`);
 
   if (order.photos.length > 0) lines.push(`Фотографий: ${order.photos.length}`);
+
+  // Просьба заказчика — до пожеланий салону и до всего остального: с неё
+  // начинается работа над открыткой.
+  if (order.wish) {
+    lines.push('', '<b>Заказчик не выбирал шаблон</b>');
+
+    if (order.wish.kind === 'work') {
+      const title = getWork(order.wish.workId)?.title ?? order.wish.workId;
+      lines.push(`Хочет как работа «${escapeHtml(title)}».`);
+    } else {
+      const text = order.wish.text.trim();
+      lines.push(
+        'Описал свою идею:',
+        escapeHtml(text.length > 600 ? `${text.slice(0, 600)}…` : text),
+      );
+    }
+  }
 
   if (order.brief?.trim()) {
     // Long briefs are truncated: Telegram rejects messages over 4096
@@ -150,7 +189,15 @@ export async function notifyNewOrder(order: Order, origin: string): Promise<void
     return;
   }
 
-  const text = buildMessage(order, `${origin}/admin/orders/${order.id}`);
+  // Имя шаблона — из общего реестра, включая собранные оператором: в
+  // словаре их нет, и без реестра такой шаблон снова стал бы идентификатором.
+  const template = await resolveTemplateAnywhere(order.templateId);
+  const templateName = localiseTemplate(
+    toSummary(template),
+    getDictionary(order.locale),
+  ).name;
+
+  const text = buildMessage(order, `${origin}/admin/orders/${order.id}`, templateName);
 
   try {
     const response = await fetch(`${API}/bot${token}/sendMessage`, {
