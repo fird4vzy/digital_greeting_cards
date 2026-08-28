@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createOrder, listOrders } from '@/lib/db';
 import { adminOnly } from '@/lib/auth/guard';
+import { RATE_LIMITS, rateLimit, tooManyRequests } from '@/lib/security/rate-limit';
 import { ORDER_STATUSES } from '@/lib/db/types';
 import { photoSchema } from '@/lib/card/schema';
 import { composeConfigForOrderAnywhere } from '@/lib/card/compose-server';
@@ -131,6 +132,13 @@ function pageSize(raw: string | null): number {
 
 /** POST /api/orders — create an order. Публикует не заказчик, а магазин. */
 export async function POST(request: Request) {
+  // Десять заказов в час с одного адреса. Живой заказчик оформляет один,
+  // редко два; без потолка это была неограниченная запись в базу — каждый
+  // заказ до тридцати фотографий — и неограниченный поток сообщений в
+  // рабочую группу магазина.
+  const attempt = await rateLimit(RATE_LIMITS.createOrder);
+  if (!attempt.ok) return tooManyRequests(attempt);
+
   const parsed = draftSchema.safeParse(await request.json().catch(() => null));
 
   if (!parsed.success) {

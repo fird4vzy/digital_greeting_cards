@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { adminOnly } from '@/lib/auth/guard';
+import { RATE_LIMITS, rateLimit, tooManyRequests } from '@/lib/security/rate-limit';
 import { z } from 'zod';
 import { composeConfig } from '@/lib/card/service';
 import { isAiEnabled, planCard, planToStoryInput } from '@/lib/ai/planner';
@@ -39,6 +40,11 @@ const bodySchema = z.object({
 export async function POST(request: Request) {
   const denied = await adminOnly();
   if (denied) return denied;
+
+  // Потолок нужен и за сессией: украденная кука иначе означала бы не только
+  // доступ к заказам, но и открытый счёт в Anthropic.
+  const attempt = await rateLimit(RATE_LIMITS.aiPlan);
+  if (!attempt.ok) return tooManyRequests(attempt);
 
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));
 

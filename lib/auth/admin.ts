@@ -55,21 +55,31 @@ export function isAdminConfigured(): boolean {
  * Compares two strings without leaking their common prefix through timing.
  *
  * Hand-rolled because the Edge runtime has no `crypto.timingSafeEqual`.
- * Lengths are folded into the accumulator rather than short-circuiting on
- * them, so the comparison runs over a fixed number of code units.
+ *
+ * Сравниваются не строки, а их хеши, и это исправление двух ошибок в прежнем
+ * варианте. Он крутил цикл `Math.max(a.length, b.length)` раз — то есть время
+ * ответа зависело от длины присланного пароля, ровно та утечка, ради которой
+ * функция и написана, пусть и только про длину. И он брал `codePointAt`, а
+ * тот на первой половине суррогатной пары возвращает весь символ целиком:
+ * пароль с эмодзи дальше сравнивался со сдвигом индекса.
+ *
+ * Хеш всегда 32 байта, так что цикл фиксирован по определению, а не по
+ * договорённости.
  */
-function constantTimeEqual(a: string, b: string): boolean {
-  let diff = a.length ^ b.length;
-  const length = Math.max(a.length, b.length);
+async function constantTimeEqual(a: string, b: string): Promise<boolean> {
+  const [left, right] = await Promise.all([digest(a), digest(b)]);
 
-  for (let i = 0; i < length; i += 1) {
-    diff |= (a.codePointAt(i) ?? 0) ^ (b.codePointAt(i) ?? 0);
-  }
+  let diff = 0;
+  for (let i = 0; i < left.length; i += 1) diff |= left[i]! ^ right[i]!;
 
   return diff === 0;
 }
 
-export function verifyAdminPassword(supplied: string): boolean {
+async function digest(value: string): Promise<Uint8Array> {
+  return new Uint8Array(await crypto.subtle.digest('SHA-256', encoder.encode(value)));
+}
+
+export async function verifyAdminPassword(supplied: string): Promise<boolean> {
   const expected = process.env.ADMIN_PASSWORD;
 
   // Dev with no password set: any non-empty value opens the door, matching the
@@ -78,6 +88,8 @@ export function verifyAdminPassword(supplied: string): boolean {
 
   return constantTimeEqual(supplied, expected);
 }
+
+export { constantTimeEqual };
 
 function toBase64Url(bytes: Uint8Array): string {
   let binary = '';
@@ -152,5 +164,5 @@ export async function verifyAdminSession(token: string | undefined): Promise<boo
   const expiresAt = Number(expiry);
   if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) return false;
 
-  return constantTimeEqual(signature, await sign(payload));
+  return await constantTimeEqual(signature, await sign(payload));
 }
