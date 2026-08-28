@@ -22,6 +22,7 @@ import { plural } from '@/lib/i18n/plural';
 // именем: переименовывать объект ради одной строки дороже, чем импорт.
 import { t as fill } from '@/lib/i18n';
 import { cardUrl } from '@/lib/qr';
+import { viewStats } from '@/lib/db/views';
 import { siteOrigin } from '@/lib/site-origin';
 import { resolveTemplateAnywhere, listAllTemplates } from '@/lib/card/registry';
 import { paragraphs } from '@/lib/card/schema';
@@ -38,6 +39,7 @@ export default async function OrderDetail({ params }: Props) {
 
   const origin = await siteOrigin();
   const url = cardUrl(origin, order.code);
+  const views = await viewStats(order.code);
   const template = localiseTemplate(await resolveTemplateAnywhere(order.templateId), dict);
 
   const dateTime = (value: string) =>
@@ -387,6 +389,17 @@ export default async function OrderDetail({ params }: Props) {
               <div className="min-w-0 flex-1 space-y-2">
                 <ActionLink href={`/c/${order.code}/qr`}>{t.printable}</ActionLink>
                 <CopyButton value={url} label={t.copyUrl} copiedLabel={dict.admin.cards.copied} />
+                {/*
+                  Единственная цифра, которая говорит, дошло ли до человека.
+                  Таблица card_views была в схеме с самого начала и всё это
+                  время оставалась пустой: магазин не мог ответить на вопрос
+                  «открыли?», а мы — на вопрос «работает ли идея вообще».
+                */}
+                <p className="text-[0.75rem] text-ink-soft">
+                  {views.total > 0
+                    ? t.opened.replace('{n}', String(views.total))
+                    : t.openedNever}
+                </p>
               </div>
             </div>
             {order.status !== 'PUBLISHED' ? (

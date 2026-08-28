@@ -25,6 +25,9 @@ import { createPostgresCardFileStore, type CardFileStore } from './card-files';
 type QueryResult<T> = { rows: T[] };
 type Pool = { query<T = OrderRow>(text: string, values?: unknown[]): Promise<QueryResult<T>> };
 
+/** Пул под произвольный запрос — без привязки к строке заказа. */
+export type SqlPool = { query<T>(text: string, values?: unknown[]): Promise<QueryResult<T>> };
+
 type OrderRow = {
   id: string;
   code: string;
@@ -235,6 +238,15 @@ export async function createPostgresStore(
   orders: OrderRepository;
   templates: TemplateStore;
   cardFiles: CardFileStore;
+  /**
+   * Тот же пул наружу — для таблиц, у которых нет своего хранилища.
+   *
+   * Сейчас это только счётчик просмотров: три строки SQL, ради которых
+   * заводить репозиторий не за чем, а второй пул тем более. Всё, что дорастёт
+   * до собственного контракта, должно уехать в отдельный модуль, а не
+   * размножать запросы здесь.
+   */
+  pool: SqlPool;
 } | null> {
   let pool: Pool;
 
@@ -515,5 +527,6 @@ export async function createPostgresStore(
     orders: store,
     templates: createPostgresTemplateStore(pool),
     cardFiles: createPostgresCardFileStore(pool),
+    pool: pool as SqlPool,
   };
 }

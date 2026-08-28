@@ -630,6 +630,8 @@ export const en: Dictionary = {
       printable: 'Printable card',
       copyUrl: 'Copy URL',
       qrAlt: 'QR code for the card',
+      opened: 'Opened {n} times',
+      openedNever: 'Not opened yet',
     },
   },
 

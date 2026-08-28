@@ -629,6 +629,9 @@ export type Dictionary = {
       printable: string;
       copyUrl: string;
       qrAlt: string;
+      /** Сколько раз открытку открывали. `{n}` — число. */
+      opened: string;
+      openedNever: string;
     };
   };
 

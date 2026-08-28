@@ -5,7 +5,7 @@ import { cache } from 'react';
 import { fileStore } from './file-store';
 import { fileTemplateStore, type TemplateStore } from './templates';
 import { memoryCardFileStore, type CardFileStore } from './card-files';
-import { createPostgresStore } from './postgres';
+import { createPostgresStore, type SqlPool } from './postgres';
 import type { OrderRepository } from './repository';
 import type { Order, PublishedCard } from './types';
 
@@ -33,7 +33,13 @@ import type { Order, PublishedCard } from './types';
  * Упавшая страница — это то, что видно. Тихая память — это бизнес, который
  * нельзя свести.
  */
-type Stores = { orders: OrderRepository; templates: TemplateStore; cardFiles: CardFileStore };
+type Stores = {
+  orders: OrderRepository;
+  templates: TemplateStore;
+  cardFiles: CardFileStore;
+  /** Есть только у postgres: файловому хранилищу подставлять нечего. */
+  pool?: SqlPool;
+};
 
 let storesPromise: Promise<Stores> | null = null;
 
@@ -112,6 +118,16 @@ export async function getTemplateStore(): Promise<TemplateStore> {
  */
 export async function getCardFileStore(): Promise<CardFileStore> {
   return (await getStores()).cardFiles;
+}
+
+/**
+ * Пул для запросов, у которых нет своего хранилища (счётчик просмотров).
+ *
+ * `null` на файловом хранилище — и это правильный ответ, а не заглушка:
+ * считать сканирования там негде и незачем.
+ */
+export async function getPool(): Promise<SqlPool | null> {
+  return (await getStores()).pool ?? null;
 }
 
 /** Convenience wrappers so pages do not repeat the await dance. */

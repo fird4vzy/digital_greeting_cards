@@ -637,6 +637,8 @@ export const uz: Dictionary = {
       printable: 'Chop etish uchun yorliq',
       copyUrl: 'Havolani nusxalash',
       qrAlt: 'Otkritkaning QR kodi',
+      opened: '{n} marta ochilgan',
+      openedNever: 'Hali ochilmagan',
     },
   },
 

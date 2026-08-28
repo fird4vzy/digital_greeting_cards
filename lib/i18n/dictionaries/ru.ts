@@ -664,6 +664,8 @@ export const ru: Dictionary = {
       printable: 'Бирка на печать',
       copyUrl: 'Скопировать ссылку',
       qrAlt: 'QR-код открытки',
+      opened: 'Открывали {n} раз',
+      openedNever: 'Пока не открывали',
     },
   },
 

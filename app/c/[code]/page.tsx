@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { after } from 'next/server';
+import { headers } from 'next/headers';
 import { CustomCardFrame } from '@/components/cards/CustomCardFrame';
 import { CardRenderer } from '@/components/cards/CardRenderer';
 import { parseCardConfig } from '@/lib/card/schema';
@@ -8,6 +10,7 @@ import { composeConfigForOrderAnywhere } from '@/lib/card/compose-server';
 import { resolveTemplateAnywhere } from '@/lib/card/registry';
 import { toSummary } from '@/lib/card/template';
 import { getOrderByCode } from '@/lib/db';
+import { recordCardView } from '@/lib/db/views';
 import { getPalette } from '@/lib/design/palettes';
 import { getDictionary } from '@/lib/i18n';
 import { SITE } from '@/lib/site';
@@ -66,6 +69,24 @@ export default async function CardPage({ params }: Props) {
   const order = await getOrderByCode(code);
 
   if (!order || order.status !== 'PUBLISHED') notFound();
+
+  /**
+   * Сканирование засчитывается — после ответа, а не до него.
+   *
+   * `after` выполняет это, когда страница уже ушла к человеку: получатель
+   * стоит над букетом с телефоном, и ни одна миллисекунда его ожидания не
+   * стоит строчки статистики. Ошибка записи проглатывается внутри
+   * `recordCardView` по той же причине.
+   *
+   * Реферер — только чужой. Свой домен в статистике не значит ничего, а
+   * пишется реферер затем, чтобы знать, откуда переходят: из камеры, из
+   * телеграма, из переписки.
+   */
+  after(async () => {
+    const referrer = (await headers()).get('referer');
+    const external = referrer && !referrer.includes('/c/') ? referrer.slice(0, 500) : null;
+    await recordCardView(order.code, external);
+  });
 
   // Ручная открытка перебивает сборку движка: если оператор сел и написал
   // открытку сам, показывать надо её, а не то, что собралось из шаблона.
