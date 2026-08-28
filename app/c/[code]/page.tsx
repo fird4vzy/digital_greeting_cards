@@ -15,6 +15,18 @@ import { SITE } from '@/lib/site';
 type Props = { params: Promise<{ code: string }> };
 
 /**
+ * Никакого кеша маршрута.
+ *
+ * Сегодня страница и так динамическая — в `prerender-manifest.json` её нет
+ * ни в статике, ни в ISR, потому что данные приходят прямым запросом в
+ * postgres, а не через `fetch`. Но это следствие, а не решение: достаточно
+ * кому-то однажды завернуть чтение в кешируемый источник, и отменённая
+ * открытка останется публично читаемой, хотя магазин её закрыл. Здесь
+ * решение записано явно.
+ */
+export const dynamic = 'force-dynamic';
+
+/**
  * A published card is effectively public — the code is printed and handed
  * over — but it is written for exactly one person, so it must never be
  * indexed, previewed in a link unfurl, or otherwise leak out of the moment

@@ -9,7 +9,12 @@ const nextConfig: NextConfig = {
   },
   images: {
     formats: ['image/avif', 'image/webp'],
-    remotePatterns: [{ protocol: 'https', hostname: '**' }],
+    // remotePatterns здесь нет намеренно. Стояло `hostname: '**'`, и это
+    // превращало /_next/image в бесплатный открытый прокси-ресайзер для всего
+    // интернета: чужой трафик за наш счёт, чужие картинки с нашего домена.
+    // Оптимизировать нечего — фотографии заказов приходят как data-URL, всё
+    // остальное лежит в public/. Понадобится внешний хост — вписать его сюда
+    // поимённо.
   },
   async headers() {
     return [

@@ -37,7 +37,12 @@ type Props = { params: Promise<{ code: string }> };
 export default async function QrCardPage({ params }: Props) {
   const { code } = await params;
   const order = await getOrderByCode(code);
-  if (!order) notFound();
+
+  // Та же граница, что у `/preview`: страница показывает имена получателя и
+  // заказчика, и для отменённого заказа показывать их нечего. За сессию
+  // оператора её не убрать — сюда приходит и заказчик, сразу после того как
+  // собрал открытку (`components/create/PublishedCard.tsx`).
+  if (!order || order.status === 'CANCELLED') notFound();
 
   const { dict } = await getI18n();
   const t = dict.ui.qr;

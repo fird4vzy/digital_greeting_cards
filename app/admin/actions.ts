@@ -50,6 +50,12 @@ export async function setOrderStatus(id: string, status: string) {
   revalidatePath('/admin/orders');
   revalidatePath(`/admin/orders/${id}`);
   revalidatePath('/admin/cards');
+
+  // И сама открытка: смена статуса — единственное, что делает её публичной
+  // или закрывает, и страховка на случай, если чтение когда-нибудь начнёт
+  // кешироваться. Дешевле, чем узнать об этом от получателя.
+  revalidatePath(`/c/${order.code}`);
+  revalidatePath(`/c/${order.code}/preview`);
 }
 
 /** Recomposes the card from the order's current fields and template. */
