@@ -290,7 +290,8 @@ export async function createPostgresStore(
        * оператора. Пара «имя + значение» делает такую потерю невозможной:
        * забыть значение нельзя, не убрав колонку.
        */
-      const fields: [string, unknown][] = [
+      // `code` и `id` пересчитываются на каждой попытке — см. цикл ниже.
+      const buildFields = (): [string, unknown][] => [
         ['id', generateId('ord')],
         ['code', generateCode()],
         ['customer_name', draft.customer.name],
@@ -314,23 +315,33 @@ export async function createPostgresStore(
         ['brief', draft.brief ?? null],
       ];
 
-      // Необязательные — только если миграция уже прошла.
-      if (present.moods) fields.push(['moods', draft.moods?.length ? draft.moods : [draft.mood]]);
-      if (present.wish) fields.push(['wish', draft.wish ? JSON.stringify(draft.wish) : null]);
-      if (present.telegram) {
-        fields.push(['customer_telegram', draft.customer.telegram ?? null]);
-      }
-
-      const statusIndex = fields.findIndex(([name]) => name === 'status') + 1;
-      const columnSql = fields.map(([name]) => name).join(', ');
-      const placeholders = fields
-        .map((_, index) => (index + 1 === statusIndex ? `$${index + 1}::order_status` : `$${index + 1}`))
-        .join(',');
-      const values = fields.map(([, value]) => value);
-
-      // Retry on the unique-code constraint rather than pre-checking: the read
-      // would be a race anyway, and a collision is a one-in-millions event.
+      /**
+       * Retry on the unique-code constraint rather than pre-checking: the read
+       * would be a race anyway, and a collision is a one-in-millions event.
+       *
+       * Сборка полей — внутри цикла, и это исправление, а не стиль. Раньше
+       * `generateCode()` вычислялся один раз снаружи, поэтому повтор пять раз
+       * подряд слал в базу тот же самый занятый код и заканчивался тем же
+       * исключением. Цикл существовал ровно ради этого случая и ровно его не
+       * обрабатывал.
+       */
       for (let attempt = 0; attempt < 5; attempt += 1) {
+        const fields = buildFields();
+
+        // Необязательные — только если миграция уже прошла.
+        if (present.moods) fields.push(['moods', draft.moods?.length ? draft.moods : [draft.mood]]);
+        if (present.wish) fields.push(['wish', draft.wish ? JSON.stringify(draft.wish) : null]);
+        if (present.telegram) {
+          fields.push(['customer_telegram', draft.customer.telegram ?? null]);
+        }
+
+        const statusIndex = fields.findIndex(([name]) => name === 'status') + 1;
+        const columnSql = fields.map(([name]) => name).join(', ');
+        const placeholders = fields
+          .map((_, index) => (index + 1 === statusIndex ? `$${index + 1}::order_status` : `$${index + 1}`))
+          .join(',');
+        const values = fields.map(([, value]) => value);
+
         try {
           const result = await pool.query<OrderRow>(
             `INSERT INTO orders (
@@ -350,21 +361,6 @@ export async function createPostgresStore(
 
           const row = result.rows[0];
           if (!row) continue;
-
-          // `wish` дописывается вторым запросом, а не встраивается в INSERT
-          // выше. Тот считает номера плейсхолдеров от того, есть ли колонка
-          // `moods`; третья необязательная колонка превратила бы этот счёт в
-          // разбор случаев, где ошибка на единицу тихо запишет данные не в то
-          // поле. Лишний UPDATE случается только когда желание есть, то есть
-          // редко, и заказ уже создан — если он не пройдёт, потеряется
-          // пожелание, а не заказ.
-          if (draft.wish && present.wish) {
-            const updated = await pool.query<OrderRow>(
-              `UPDATE orders SET wish = $1 WHERE id = $2 RETURNING ${columnsFor(present)}`,
-              [JSON.stringify(draft.wish), row.id],
-            );
-            if (updated.rows[0]) return toOrder(updated.rows[0]);
-          }
 
           return toOrder(row);
         } catch (error) {

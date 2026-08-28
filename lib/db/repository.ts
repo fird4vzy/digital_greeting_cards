@@ -1,3 +1,4 @@
+import { randomInt, randomUUID } from 'node:crypto';
 import type { Order, OrderDraft, OrderFilter, OrderPatch } from './types';
 
 /**
@@ -21,17 +22,32 @@ export interface OrderRepository {
 /** Codes people read off a printed card: no 0/O, no 1/I/L, no vowels. */
 const ALPHABET = '23456789ACDEFGHJKMNPQRSTUVWXYZ';
 
-export function generateCode(length = 6): string {
+/**
+ * Код открытки — единственное, что её защищает.
+ *
+ * По коду открывается `/c/`, `/preview` и печатная бирка; пароля нет и быть
+ * не может — человек читает код с бумажки, стоя над букетом. Значит код обязан
+ * быть неугадываемым, а `Math.random()` таким не бывает: V8 крутит
+ * xorshift128+, его состояние восстанавливается по нескольким выданным
+ * значениям, после чего все следующие предсказуемы. Раздавал это состояние
+ * наружу сам `generateId` — он клал сырые биты одного `Math.random()` в
+ * идентификатор, который API возвращал заказчику.
+ *
+ * Восемь знаков вместо шести: 30⁸ против 30⁶ — перебор становится тяжелее в
+ * тысячу раз, а строка остаётся такой, что её списывают с бирки не сбиваясь.
+ * **Старые шестизначные коды не трогать.** Они напечатаны на бумаге, лежащей
+ * у людей дома; длина здесь про новые заказы, а не про формат.
+ */
+export function generateCode(length = 8): string {
   let code = '';
   for (let i = 0; i < length; i += 1) {
-    code += ALPHABET.charAt(Math.floor(Math.random() * ALPHABET.length));
+    code += ALPHABET.charAt(randomInt(ALPHABET.length));
   }
   return code;
 }
 
 export function generateId(prefix: string): string {
-  const random = Math.random().toString(36).slice(2, 10);
-  return `${prefix}_${Date.now().toString(36)}${random}`;
+  return `${prefix}_${randomUUID().replaceAll('-', '')}`;
 }
 
 export function matchesFilter(order: Order, filter: OrderFilter = {}): boolean {
