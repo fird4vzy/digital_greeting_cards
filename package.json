@@ -12,7 +12,8 @@
     "db:schema": "cat lib/db/schema.sql",
     "db:apply": "node scripts/apply-schema.mjs",
     "db:migrate": "node scripts/migrate.mjs",
-    "tg:webhook": "node scripts/telegram-webhook.mjs"
+    "tg:webhook": "node scripts/telegram-webhook.mjs",
+    "brand:export": "node scripts/brand-export.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.116.0",

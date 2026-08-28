@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <rect width="1024" height="1024" fill="#17130f"/>
+  <g transform="translate(-34.133333333333326 -34.133333333333326) scale(27.30666666666667)">
+  <!-- The tab mark. Both halves of the business in one glyph: the card with
+       its corner turned — the same object that sits in the bowl of the d in
+       the wordmark — with a blossom on its face.
+
+       Drawn by hand rather than cut out of the wordmark. Extracting the card
+       from the letter gave a fragment shaped to fit the letterform, which at
+       sixteen pixels was a smudge. And the card alone, without the flower,
+       reads as a file icon in a strip of tabs. -->
+  
+  <path d="M18 8h11a1.6 1.6 0 0 1 1.6 1.6v20.8A1.6 1.6 0 0 1 29 32H11a1.6 1.6 0 0 1-1.6-1.6V16.6Z" fill="#c2404e"/>
+  <!-- The turned corner: a wedge of the page lying back on the card. -->
+  <path d="M18 8 9.4 16.6h7a1.6 1.6 0 0 0 1.6-1.6Z" fill="#d9868d"/>
+  <!-- Five petals knocked out of the card, on the same 72° step as the
+       wordmark's blossom. -->
+  <g fill="#17130f">
+    <ellipse cx="20" cy="18.2" rx="2.1" ry="3.2"/>
+    <ellipse cx="20" cy="18.2" rx="2.1" ry="3.2" transform="rotate(72 20 21.4)"/>
+    <ellipse cx="20" cy="18.2" rx="2.1" ry="3.2" transform="rotate(144 20 21.4)"/>
+    <ellipse cx="20" cy="18.2" rx="2.1" ry="3.2" transform="rotate(216 20 21.4)"/>
+    <ellipse cx="20" cy="18.2" rx="2.1" ry="3.2" transform="rotate(288 20 21.4)"/>
+  </g>
+</g>
+</svg>
