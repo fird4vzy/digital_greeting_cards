@@ -148,6 +148,22 @@ const BASE_COLUMNS = `id, code, customer_name, customer_email, customer_phone, s
  */
 const columnCache = new Map<string, Promise<boolean>>();
 
+/**
+ * Кешируется только «колонка есть». «Нет» и «не смог спросить» — никогда.
+ *
+ * Раньше кешировался любой ответ, навсегда, и из этого следовали две тихие
+ * поломки. Первая: обещание «миграцию можно применить когда угодно — до
+ * выкладки, после или через неделю» переставало быть правдой для уже
+ * запущенного процесса. Он спросил один раз, услышал «нет» и продолжал
+ * молча выбрасывать `moods`, `wish` и телеграм заказчика до самой пересборки.
+ * Вторая хуже: `.catch(() => false)` не отличает «колонки нет» от «база
+ * моргнула». Один разрыв связи на первой же проверке убеждал инстанс, что
+ * колонки нет, — навсегда, и заказы теряли поля без единой ошибки в логе.
+ *
+ * «Есть» кешировать безопасно: колонку никто не удаляет, а миграции только
+ * добавляют. Лишний запрос до миграции — цена куда меньшая, чем потерянное
+ * поле после неё.
+ */
 function hasColumn(pool: Pool, column: string): Promise<boolean> {
   let probe = columnCache.get(column);
 
@@ -160,8 +176,15 @@ function hasColumn(pool: Pool, column: string): Promise<boolean> {
          ) AS present`,
         [column],
       )
-      .then((result) => Boolean((result.rows[0] as { present?: boolean } | undefined)?.present))
-      .catch(() => false);
+      .then((result) => {
+        const present = Boolean((result.rows[0] as { present?: boolean } | undefined)?.present);
+        if (!present) columnCache.delete(column);
+        return present;
+      })
+      .catch(() => {
+        columnCache.delete(column);
+        return false;
+      });
 
     columnCache.set(column, probe);
   }
@@ -223,10 +246,19 @@ export async function createPostgresStore(
 
     pool = new PoolCtor({
       connectionString,
-      max: 10,
+      // Пять, а не десять. Это предел на инстанс, а инстансов у Vercel
+      // столько, сколько он решит поднять: десять на каждый упираются в
+      // потолок Neon раньше, чем в него упрётся трафик.
+      max: 5,
       idleTimeoutMillis: 30_000,
       ssl: sslOptionsFor(connectionString),
     });
+
+    // Настоящий запрос, а не только успешный конструктор. `new Pool()`
+    // соединение не открывает и с неверной строкой не падает — без этой
+    // проверки «хранилище готово» означало бы лишь «объект создан», и первая
+    // же настоящая ошибка вылезла бы на заказчике.
+    await pool.query('SELECT 1');
   } catch {
     return null;
   }
@@ -242,7 +274,11 @@ export async function createPostgresStore(
       }
 
       if (filter.search?.trim()) {
-        values.push(`%${filter.search.trim()}%`);
+        // `%` и `_` экранируются. Инъекции здесь нет — запрос параметрический,
+        // — но без экранирования поиск по «%» совпадал со всеми заказами
+        // сразу, а поиск по имени с подчёркиванием находил лишнее.
+        const needle = filter.search.trim().replace(/([%_\\])/g, '\\$1');
+        values.push(`%${needle}%`);
         const i = values.length;
         conditions.push(
           `(code ILIKE $${i} OR customer_name ILIKE $${i} OR recipient_name ILIKE $${i} OR shop ILIKE $${i})`,

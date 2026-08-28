@@ -170,11 +170,19 @@ type PgClient = {
  */
 let tableProbe: Promise<boolean> | null = null;
 
+/** Кешируется только «таблица есть» — см. `hasColumn` в postgres.ts. */
 function hasTable(pool: PgClient): Promise<boolean> {
   tableProbe ??= pool
     .query("SELECT to_regclass('public.card_files') IS NOT NULL AS present")
-    .then(({ rows }) => Boolean((rows[0] as { present?: boolean } | undefined)?.present))
-    .catch(() => false);
+    .then(({ rows }) => {
+      const present = Boolean((rows[0] as { present?: boolean } | undefined)?.present);
+      if (!present) tableProbe = null;
+      return present;
+    })
+    .catch(() => {
+      tableProbe = null;
+      return false;
+    });
 
   return tableProbe;
 }
