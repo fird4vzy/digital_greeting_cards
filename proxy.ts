@@ -67,5 +67,12 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!c/|api/|_next/|.*\\..*).*)'],
+  /**
+   * `monitoring` в списке исключений — это туннель Sentry (`tunnelRoute` в
+   * next.config.ts). Через него браузер отправляет отчёты об ошибках нашим же
+   * адресом, чтобы их не резали блокировщики рекламы. Посреднику там делать
+   * нечего, а документация Sentry прямо предупреждает: если маршрут попадёт
+   * под middleware, отчёты с клиента перестанут доходить — молча.
+   */
+  matcher: ['/((?!c/|api/|monitoring|_next/|.*\\..*).*)'],
 };
