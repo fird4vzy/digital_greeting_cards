@@ -11,7 +11,29 @@ import type { StoryInput, TemplateDefinition } from './template';
  * operator are byte-identical in structure.
  */
 
-export function orderToStoryInput(order: Order): StoryInput {
+/**
+ * Что сборке нужно от заказа — и ничего сверх того.
+ *
+ * Не `Order` целиком, потому что сборка не читает ни id, ни код, ни статус.
+ * Ей можно отдать черновик, которого ещё нет в базе, и именно так теперь
+ * работает создание заказа: открытка собирается до вставки и пишется вместе с
+ * ней, одной записью. Пока тип был `Order`, ради этого пришлось бы выдумывать
+ * пустые id и даты — и подпись врала бы о том, что читается.
+ */
+export type StorySource = Pick<
+  Order,
+  | 'recipient'
+  | 'locale'
+  | 'occasion'
+  | 'mood'
+  | 'message'
+  | 'photos'
+  | 'moments'
+  | 'memories'
+  | 'wishes'
+> & { customer: Pick<Order['customer'], 'name'> };
+
+export function orderToStoryInput(order: StorySource): StoryInput {
   return {
     recipientName: order.recipient.name,
     senderName: order.customer.name,

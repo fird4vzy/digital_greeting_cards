@@ -1,7 +1,6 @@
 import 'server-only';
 
-import type { Order } from '@/lib/db/types';
-import { orderToStoryInput, composeConfigWithTemplate } from './service';
+import { orderToStoryInput, composeConfigWithTemplate, type StorySource } from './service';
 import { resolveTemplateAnywhere } from './registry';
 import type { CardConfig } from './schema';
 import type { StoryInput } from './template';
@@ -26,7 +25,7 @@ export async function composeConfigAnywhere(
 }
 
 export async function composeConfigForOrderAnywhere(
-  order: Order,
+  order: StorySource & { templateId: string },
   templateId?: string,
 ): Promise<CardConfig> {
   return composeConfigAnywhere(orderToStoryInput(order), templateId ?? order.templateId);

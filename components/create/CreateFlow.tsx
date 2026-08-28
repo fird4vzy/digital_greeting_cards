@@ -132,6 +132,34 @@ const EMPTY: Draft = {
 };
 
 const STORAGE_KEY = 'mtab:draft:v1';
+const REQUEST_KEY = 'mtab:draft:request:v1';
+
+/**
+ * Идентификатор этой отправки — один на черновик, а не на нажатие.
+ *
+ * Двойное нажатие на медленной связи создавало два заказа, два кода и два
+ * сообщения в рабочую группу: заказчик платил один раз, магазин видел работу
+ * на два букета. Флага `publishing` ниже для этого мало — он не переживает
+ * ни перезагрузку страницы на полпути, ни повтор запроса самим браузером.
+ *
+ * Поэтому идентификатор кладётся в localStorage рядом с черновиком: вторая
+ * попытка присылает тот же, и сервер возвращает уже созданный заказ. Стирается
+ * вместе с черновиком, когда открытка создана.
+ */
+function requestId(): string {
+  try {
+    const saved = window.localStorage.getItem(REQUEST_KEY);
+    if (saved) return saved;
+
+    const fresh = crypto.randomUUID();
+    window.localStorage.setItem(REQUEST_KEY, fresh);
+    return fresh;
+  } catch {
+    // Приватный режим или заблокированное хранилище: защиты от повтора не
+    // будет, но заказ должен пройти — это важнее.
+    return crypto.randomUUID();
+  }
+}
 
 /** Три пути на шаге выбора. Порядок — порядок кнопок. */
 const ROUTES = ['template', 'own', 'work'] as const;
@@ -263,6 +291,7 @@ export function CreateFlow({
           // инструкция магазину, а не как отмена сборки.
           wish,
           brief: draft.brief.trim() || undefined,
+          requestId: requestId(),
           // Публикует магазин, а не заказчик: код попадает на бирку только
           // после того, как человек прочитал открытку целиком. Раньше здесь
           // ехало `publish: false` — и это была просьба, а не правило: сервер
@@ -278,6 +307,7 @@ export function CreateFlow({
         url: `${window.location.origin}/c/${payload.order.code}`,
       });
       window.localStorage.removeItem(STORAGE_KEY);
+      window.localStorage.removeItem(REQUEST_KEY);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Something went wrong.');
     } finally {

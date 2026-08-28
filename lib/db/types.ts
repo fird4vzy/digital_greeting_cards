@@ -141,6 +141,14 @@ export type Order = {
    * this is the instruction that comes with it.
    */
   brief?: string;
+  /**
+   * Ключ повторной отправки: клиент выдаёт его один раз на черновик.
+   *
+   * Нужен ровно в момент создания и ни для чего потом, но лежит на `Order`, а
+   * не отдельным типом, чтобы оба хранилища сравнивали одно и то же поле:
+   * контракт, который зависит от того, поднята база или нет, — не контракт.
+   */
+  idempotencyKey?: string;
   createdAt: string;
   updatedAt: string;
   publishedAt?: string | null;

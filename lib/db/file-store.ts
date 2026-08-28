@@ -95,6 +95,14 @@ export const fileStore: OrderRepository = {
     return transact(async () => {
       const orders = await load();
 
+      // Та же семантика, что у postgres: повторная отправка возвращает уже
+      // созданный заказ. Контракт хранилищ должен совпадать, иначе поведение
+      // зависит от того, поднята база или нет.
+      if (draft.idempotencyKey) {
+        const existing = orders.find((order) => order.idempotencyKey === draft.idempotencyKey);
+        if (existing) return existing;
+      }
+
       let code = generateCode();
       while (orders.some((order) => order.code === code)) code = generateCode();
 

@@ -32,6 +32,7 @@ type OrderRow = {
   customer_email: string | null;
   customer_phone: string | null;
   customer_telegram: string | null;
+  idempotency_key?: string | null;
   shop: string | null;
   recipient_name: string;
   relationship: string;
@@ -111,6 +112,7 @@ function toOrder(row: OrderRow): Order {
     moods: row.moods?.length ? row.moods : row.mood ? [row.mood] : [],
     customEntry: row.custom_entry ?? null,
     wish: row.wish ?? null,
+    idempotencyKey: row.idempotency_key ?? undefined,
     locale: row.locale ?? 'ru',
     message: row.message,
     photos: row.photos ?? [],
@@ -194,13 +196,14 @@ function hasColumn(pool: Pool, column: string): Promise<boolean> {
 
 /** Какие из необязательных колонок уже есть. Спрашивается раз за процесс. */
 async function optionalColumns(pool: Pool) {
-  const [moods, customEntry, wish, telegram] = await Promise.all([
+  const [moods, customEntry, wish, telegram, idempotency] = await Promise.all([
     hasColumn(pool, 'moods'),
     hasColumn(pool, 'custom_entry'),
     hasColumn(pool, 'wish'),
     hasColumn(pool, 'customer_telegram'),
+    hasColumn(pool, 'idempotency_key'),
   ]);
-  return { moods, customEntry, wish, telegram };
+  return { moods, customEntry, wish, telegram, idempotency };
 }
 
 /** Что вернул `optionalColumns` — чтобы это не расписывать в каждой сигнатуре. */
@@ -214,6 +217,7 @@ const columnsFor = (present: Present) =>
     present.customEntry ? 'custom_entry' : null,
     present.wish ? 'wish' : null,
     present.telegram ? 'customer_telegram' : null,
+    present.idempotency ? 'idempotency_key' : null,
   ]
     .filter(Boolean)
     .join(', ');
@@ -316,6 +320,31 @@ export async function createPostgresStore(
       const present = await optionalColumns(pool);
 
       /**
+       * Повторная отправка возвращает уже созданный заказ, а не второй такой же.
+       *
+       * Двойное нажатие на медленной связи создавало два заказа, два кода и
+       * два сообщения в рабочую группу: заказчик платил один раз, магазин
+       * видел работу на два букета. Флаг `publishing` в форме от этого не
+       * спасает — он живёт в браузере.
+       *
+       * Проверка до вставки ловит обычный случай, гонка двух одновременных
+       * отправок — ниже, на уникальном индексе.
+       */
+      const byKey = async (key: string) => {
+        const found = await pool.query<OrderRow>(
+          `SELECT ${columnsFor(present)} FROM orders WHERE idempotency_key = $1`,
+          [key],
+        );
+        return found.rows[0] ? toOrder(found.rows[0]) : null;
+      };
+
+      const key = present.idempotency ? draft.idempotencyKey : undefined;
+      if (key) {
+        const existing = await byKey(key);
+        if (existing) return existing;
+      }
+
+      /**
        * Колонка и её значение объявляются вместе.
        *
        * Раньше здесь были два независимых списка — имена в SQL и значения в
@@ -370,6 +399,7 @@ export async function createPostgresStore(
         if (present.telegram) {
           fields.push(['customer_telegram', draft.customer.telegram ?? null]);
         }
+        if (key) fields.push(['idempotency_key', key]);
 
         const statusIndex = fields.findIndex(([name]) => name === 'status') + 1;
         const columnSql = fields.map(([name]) => name).join(', ');
@@ -400,8 +430,16 @@ export async function createPostgresStore(
 
           return toOrder(row);
         } catch (error) {
-          const code = (error as { code?: string }).code;
-          if (code !== '23505') throw error;
+          const failure = error as { code?: string; constraint?: string };
+          if (failure.code !== '23505') throw error;
+
+          // Столкнулись на ключе повторной отправки, а не на коде: значит
+          // параллельный запрос успел создать этот же заказ. Возвращаем его —
+          // это и есть нужный ответ, а не ошибка.
+          if (failure.constraint === 'orders_idempotency_key_idx' && key) {
+            const existing = await byKey(key);
+            if (existing) return existing;
+          }
         }
       }
 

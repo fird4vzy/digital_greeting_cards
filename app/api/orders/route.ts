@@ -90,6 +90,12 @@ const draftSchema = z.object({
   notes: z.string().optional(),
   /** The customer's instructions to the shop. Never rendered into the card. */
   brief: z.string().max(4000).optional(),
+  /**
+   * Ключ повторной отправки. Клиент выдаёт его один раз на черновик и
+   * присылает при каждой попытке; повторная отправка возвращает уже созданный
+   * заказ вместо второго такого же.
+   */
+  requestId: z.string().uuid().optional(),
 });
 
 /**
@@ -148,7 +154,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const draft = parsed.data;
+  const { requestId, ...draft } = parsed.data;
 
   // The card is always composed, so the shop opens a finished draft rather
   // than an empty record and the customer can see something immediately.
@@ -162,18 +168,30 @@ export async function POST(request: Request) {
   //
   // `moods` необязателен в контракте, а в заказе обязателен: клиент,
   // приславший одно настроение старым способом, получает список из него.
-  const created = await createOrder({
+  const seed = {
     ...draft,
     moods: draft.moods ?? [draft.mood],
     // Ручная открытка привязывается позже, оператором и вручную.
     customEntry: null,
-    status: 'NEW',
-    config: null,
-  });
-  const config = await composeConfigForOrderAnywhere(created);
+    status: 'NEW' as const,
+  };
 
-  const { updateOrder } = await import('@/lib/db');
-  const order = (await updateOrder(created.id, { config })) ?? created;
+  /**
+   * Открытка собирается **до** вставки, и заказ пишется вместе с ней.
+   *
+   * Раньше это были две записи подряд: создать заказ, собрать конфиг из него,
+   * дописать конфиг вторым запросом. Транзакции между ними нет, поэтому
+   * падение сборки — удалённый шаблон, кривой рецепт — оставляло в базе заказ
+   * с пустой открыткой, а заказчику отдавало 500. Такую строку потом не
+   * отличить от нормальной: она выглядит как заказ, по коду не открывается
+   * ничего, и никто об этом не узнает.
+   *
+   * Сборке нужны только поля черновика — `orderToStoryInput` не читает ни id,
+   * ни код, — так что порядок был свободен, а не вынужден.
+   */
+  const config = await composeConfigForOrderAnywhere(seed);
+
+  const order = await createOrder({ ...seed, config, idempotencyKey: requestId });
 
   // After the order is safely stored: a notification is not worth failing on.
   await notifyNewOrder(order, await siteOrigin());
