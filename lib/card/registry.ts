@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { cache } from 'react';
+
 import { getTemplateStore } from '@/lib/db';
 import { recipeToDefinition } from './recipe';
 import type { TemplateDefinition, TemplateSummary } from './template';
@@ -28,7 +30,17 @@ import { DEFAULT_TEMPLATE_ID, getTemplate, listTemplates } from '@/templates';
  * are in version control and a card may already be published against them.
  */
 
-async function storedDefinitions(): Promise<TemplateDefinition[]> {
+/**
+ * Шаблоны, собранные оператором. Один раз за запрос, а не на каждый вызов.
+ *
+ * Каждый вызов — это `SELECT * FROM card_templates` целиком плюс разбор
+ * рецепта каждой строки через Zod. На одном показе открытки
+ * `resolveTemplateAnywhere` зовётся дважды, и обе — полный скан таблицы.
+ * `cache` из React держит результат ровно в пределах запроса: следующий
+ * запрос читает заново, поэтому шаблон, только что созданный в админке,
+ * появляется сразу.
+ */
+const storedDefinitions = cache(async (): Promise<TemplateDefinition[]> => {
   try {
     const store = await getTemplateStore();
     const recipes = await store.list();
@@ -43,7 +55,7 @@ async function storedDefinitions(): Promise<TemplateDefinition[]> {
     console.error(`[registry] could not read stored templates: ${(error as Error).message}`);
     return [];
   }
-}
+});
 
 export async function listAllTemplates(): Promise<TemplateDefinition[]> {
   return [...listTemplates(), ...(await storedDefinitions())];
