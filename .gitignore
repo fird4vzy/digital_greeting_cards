@@ -28,3 +28,10 @@ tsconfig.tsbuildinfo
 dev.log
 dev.err.log
 LOCALSETUP.md
+# Дописано `vercel link`: здесь лежат идентификаторы проекта.
+.vercel
+
+# Ключи. `.env*` шире, чем `.env*.local`, намеренно: `.env.local.bak` —
+# копия боевого файла, и под узкий шаблон она не попадала.
+.env*
+!.env.example
