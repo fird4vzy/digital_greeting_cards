@@ -19,20 +19,46 @@
  */
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const root = path.resolve(path.dirname(new URL(import.meta.url).pathname.slice(1)), '..');
+/**
+ * `fileURLToPath`, а не `new URL(...).pathname` — и это не педантизм.
+ *
+ * Путь проекта содержит кириллицу, а в file-URL она процентно-закодирована:
+ * `pathname` отдаёт `.../%D0%BF%D1%80.../scripts`, такой каталог не
+ * существует, `.env.local` не открывается — и переменные молча не грузятся.
+ * Скрипт отвечал «TELEGRAM_BOT_TOKEN не задан» при живом токене в файле.
+ * `fileURLToPath` декодирует и заодно ставит правильный разделитель Windows.
+ */
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+let envFileRead = false;
 
 for (const name of ['.env.local', '.env']) {
+  let text;
   try {
-    for (const line of readFileSync(path.join(root, name), 'utf8').split(/\r?\n/)) {
-      const m = /^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/.exec(line);
-      if (!m || process.env[m[1]] !== undefined) continue;
-      const v = m[2].trim();
-      const q = /^(['"])([\s\S]*)\1$/.exec(v);
-      process.env[m[1]] = q ? q[2] : v.split('#')[0].trim();
-    }
+    text = readFileSync(path.join(root, name), 'utf8');
   } catch {
-    /* нет файла — переменные могут прийти из окружения */
+    continue; // нет файла — нормально, переменные могут прийти из окружения
+  }
+
+  envFileRead = true;
+
+  for (const line of text.split(/\r?\n/)) {
+    const m = /^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/.exec(line);
+    if (!m || process.env[m[1]] !== undefined) continue;
+
+    const v = m[2].trim();
+    const q = /^(['"])([\s\S]*)\1$/.exec(v);
+    const value = q ? q[2] : v.split('#')[0].trim();
+
+    // `vercel env pull` пишет `[SENSITIVE]` вместо секретов, которые Vercel
+    // отказывается отдавать. Принять такую строку за значение — значит уйти
+    // в Telegram с мусорным токеном и получить невнятный отказ вместо
+    // понятного «не задан».
+    if (value === '[SENSITIVE]') continue;
+
+    process.env[m[1]] = value;
   }
 }
 
@@ -51,7 +77,9 @@ if (!token) {
   console.error('    npx vercel env pull .env.local --environment=production\n');
   console.error('  Без --environment=production придут переменные Development,');
   console.error('  а токен и секрет вы задавали для Production.');
-  console.error('  Учтите: pull ПЕРЕЗАПИШЕТ .env.local целиком.\n');
+  console.error('  Учтите два побочных эффекта pull: он ПЕРЕЗАПИСЫВАЕТ');
+  console.error('  .env.local целиком, а секретные значения Vercel вообще не отдаёт —');
+  console.error('  вместо них пишет [SENSITIVE]. Такие строки здесь игнорируются.\n');
   process.exit(1);
 }
 
