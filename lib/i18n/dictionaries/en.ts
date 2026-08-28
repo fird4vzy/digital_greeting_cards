@@ -10,6 +10,8 @@ import type { Dictionary } from '../types';
 export const en: Dictionary = {
   ui: {
     nav: {
+      forShops: 'For shops',
+      dashboard: 'Dashboard',
       templates: 'Templates',
       works: 'Our work',
       howItWorks: 'How it works',

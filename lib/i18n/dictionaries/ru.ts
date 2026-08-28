@@ -16,6 +16,8 @@ import type { Dictionary } from '../types';
 export const ru: Dictionary = {
   ui: {
     nav: {
+      forShops: 'Салонам',
+      dashboard: 'Панель',
       templates: 'Шаблоны',
       works: 'Наши работы',
       howItWorks: 'Как это работает',

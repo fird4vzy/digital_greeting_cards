@@ -246,6 +246,85 @@ export async function findChats(): Promise<ChatLookup> {
   }
 }
 
+/**
+ * Пересылает написанное боту в рабочую группу.
+ *
+ * Ровно то, чего не хватало кнопке на `/shops`: флорист пишет боту в личку,
+ * сообщение появляется там, где команда и так читает заказы. Без этого бот
+ * принимал сообщения молча — их не видел никто.
+ *
+ * **Петля разрывается здесь.** Бот состоит в той же группе, куда пересылает.
+ * Своих сообщений он не получает, но чужие в группе — вполне, если у него
+ * выключен режим приватности. Пересылка такого сообщения обратно в ту же
+ * группу дала бы эхо: каждое сообщение в чате возвращалось бы копией. Поэтому
+ * всё, что пришло ИЗ целевого чата, отбрасывается первым же условием.
+ *
+ * Пересылается текстом, а не `forwardMessage`: пересланное показало бы
+ * команде карточку отправителя, но не сказало бы, откуда он взялся. Здесь
+ * важнее контекст — кто написал и как с ним связаться, — поэтому шапка
+ * собирается своя, а `reply_markup` Telegram не нужен.
+ */
+export async function forwardIncoming(update: unknown): Promise<void> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  if (!token || !chatId) return;
+
+  const message = (update as { message?: TelegramMessage } | null)?.message;
+  if (!message) return;
+
+  // Пришло из самой группы — не пересылать, иначе эхо.
+  if (String(message.chat?.id) === chatId) return;
+
+  const from = message.from;
+  const name = [from?.first_name, from?.last_name].filter(Boolean).join(' ') || 'без имени';
+  const handle = from?.username ? `@${from.username}` : null;
+
+  const body = message.text?.trim();
+  // Не текст — фото, голосовое, стикер. Сказать, что оно было, полезнее, чем
+  // промолчать: команда напишет человеку сама.
+  const content = body
+    ? escapeHtml(body.length > 3000 ? `${body.slice(0, 3000)}…` : body)
+    : '<i>нетекстовое сообщение — откройте бота, чтобы посмотреть</i>';
+
+  const lines = [
+    '<b>Написали боту</b>',
+    '',
+    `От: ${escapeHtml(name)}${handle ? ` · ${escapeHtml(handle)}` : ''}`,
+    '',
+    content,
+  ];
+
+  if (!handle) {
+    // Без username ответить из группы невозможно: ссылка `tg://user?id=` в
+    // группах не всегда открывается. Честнее предупредить, чем оставить
+    // команду гадать, почему на человека нельзя нажать.
+    lines.push('', '<i>username не указан — ответить можно только из самого бота</i>');
+  }
+
+  try {
+    await fetch(`${API}/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: lines.join('\n'),
+        parse_mode: 'HTML',
+        disable_web_page_preview: true,
+      }),
+      signal: AbortSignal.timeout(5000),
+    });
+  } catch (error) {
+    console.error(`[telegram] не удалось переслать: ${scrub((error as Error).message)}`);
+  }
+}
+
+/** Ровно те поля апдейта, которые здесь читаются. */
+type TelegramMessage = {
+  chat?: { id: number };
+  from?: { first_name?: string; last_name?: string; username?: string };
+  text?: string;
+};
+
 export async function sendTestNotification(origin: string): Promise<TestResult> {
   const state = notificationState();
   if (state.kind === 'off') {

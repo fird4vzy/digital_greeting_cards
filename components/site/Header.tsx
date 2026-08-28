@@ -13,6 +13,8 @@ export type HeaderStrings = {
   templates: string;
   works: string;
   howItWorks: string;
+  forShops: string;
+  dashboard: string;
   createCard: string;
   language: string;
 };
@@ -34,6 +36,11 @@ export function Header({
     { href: '/templates', label: strings.templates },
     { href: '/works', label: strings.works },
     { href: '/#bouquet', label: strings.howItWorks },
+    // До этого в панель и к предложению магазинам можно было попасть
+    // только через футер, то есть прокрутив четыре экрана сцены. Для
+    // владельца это ежедневный маршрут, а не редкий.
+    { href: '/shops', label: strings.forShops },
+    { href: '/admin', label: strings.dashboard },
   ];
 
   const { scrollY } = useScroll();

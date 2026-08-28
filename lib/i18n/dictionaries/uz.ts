@@ -14,6 +14,8 @@ import type { Dictionary } from '../types';
 export const uz: Dictionary = {
   ui: {
     nav: {
+      forShops: 'Salonlarga',
+      dashboard: 'Panel',
       templates: 'Shablonlar',
       works: 'Bizning ishlarimiz',
       howItWorks: 'Qanday ishlaydi',

@@ -67,7 +67,20 @@ export type DemoStoryStrings = {
 
 export type Dictionary = {
   ui: {
-    nav: { templates: string; works: string; howItWorks: string; createCard: string; viewSite: string };
+    nav: {
+      templates: string;
+      works: string;
+      howItWorks: string;
+      createCard: string;
+      viewSite: string;
+      /**
+       * Две ссылки, которые до 28 августа жили только в футере: предложение
+       * магазинам и панель оператора. Для владельца это ежедневный маршрут, а
+       * добираться до него приходилось прокруткой через четыре экрана сцены.
+       */
+      forShops: string;
+      dashboard: string;
+    };
     hero: {
       eyebrow: string;
       line1: string;
