@@ -9,6 +9,7 @@ import {
   verifyAdminPassword,
 } from '@/lib/auth/admin';
 import { getI18n } from '@/lib/i18n/server';
+import { RATE_LIMITS, rateLimit } from '@/lib/security/rate-limit';
 
 export type LoginState = { error?: string };
 
@@ -17,10 +18,22 @@ export type LoginState = { error?: string };
  *
  * The failure message never distinguishes "wrong password" from anything else
  * a caller could probe for, and the only signal on success is the redirect.
+ *
+ * **Пять попыток за четверть часа.** Пароль здесь один на весь бизнес, и до
+ * 28 августа перебирать его можно было бесконечно: ни задержки, ни блокировки,
+ * ни строчки в логе. Счёт идёт до проверки пароля — иначе он считал бы только
+ * тех, кто уже угадал, — и до `isAdminConfigured`, чтобы ненастроенный вход не
+ * оставался бесплатным способом узнать, что стенд поднят.
  */
 export async function signIn(_state: LoginState, formData: FormData): Promise<LoginState> {
   const { dict } = await getI18n();
   const t = dict.admin.login;
+
+  const attempt = await rateLimit(RATE_LIMITS.login);
+  if (!attempt.ok) {
+    console.warn('[login] превышен лимит попыток входа');
+    return { error: t.errorTooMany };
+  }
 
   if (!isAdminConfigured()) {
     return { error: t.errorUnconfigured };
@@ -31,7 +44,10 @@ export async function signIn(_state: LoginState, formData: FormData): Promise<Lo
     return { error: t.errorEmpty };
   }
 
-  if (!verifyAdminPassword(password)) {
+  if (!(await verifyAdminPassword(password))) {
+    // Единственный след неудачного входа. Без него подбор не отличить от
+    // забывчивости оператора, а отличать надо.
+    console.warn('[login] неверный пароль');
     return { error: t.errorWrong };
   }
 

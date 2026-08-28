@@ -400,6 +400,7 @@ export type Dictionary = {
       errorEmpty: string;
       errorWrong: string;
       errorUnconfigured: string;
+      errorTooMany: string;
       /** Shown in place of the form when no password is configured at all. */
       unconfigured: string;
     };

@@ -421,6 +421,7 @@ export const uz: Dictionary = {
       errorEmpty: 'Parolni kiriting.',
       errorWrong: "Parol noto'g'ri.",
       errorUnconfigured: "Kirish sozlanmagan: ADMIN_PASSWORD belgilanmagan.",
+      errorTooMany: 'Urinishlar juda koʻp. Bir necha daqiqadan keyin urinib koʻring.',
       unconfigured:
         "Kirish sozlanmagan. ADMIN_PASSWORD muhit o'zgaruvchisini belgilang va qayta yig'ing.",
     },

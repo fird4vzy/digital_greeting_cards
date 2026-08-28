@@ -417,6 +417,7 @@ export const en: Dictionary = {
       errorEmpty: 'Enter the password.',
       errorWrong: 'Wrong password.',
       errorUnconfigured: 'Sign-in is not configured: ADMIN_PASSWORD is unset.',
+      errorTooMany: 'Too many attempts. Try again in a few minutes.',
       unconfigured:
         'Sign-in is not configured. Set the ADMIN_PASSWORD environment variable and redeploy.',
     },

@@ -423,6 +423,7 @@ export const ru: Dictionary = {
       errorEmpty: 'Введите пароль.',
       errorWrong: 'Неверный пароль.',
       errorUnconfigured: 'Вход не настроен: не задан ADMIN_PASSWORD.',
+      errorTooMany: 'Слишком много попыток. Попробуйте через несколько минут.',
       unconfigured:
         'Вход не настроен. Задайте переменную окружения ADMIN_PASSWORD и пересоберите приложение.',
     },
