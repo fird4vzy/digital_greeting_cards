@@ -230,7 +230,9 @@ export const en: Dictionary = {
           hint: 'Needed if the shop has a question about your card. One is enough.',
           phone: 'Phone',
           email: 'Email',
-          required: 'Leave a phone number or an email address.',
+          telegram: 'Telegram',
+          telegramHint: 'For example: @username',
+          required: 'Leave a phone number or a Telegram username.',
         },
       },
       done: {

@@ -41,8 +41,17 @@ export const STATUS_META: Record<OrderStatus, { label: string; hint: string; ton
 
 export type Customer = {
   name: string;
+  /** Остаётся у старых заказов; в форме больше не спрашивается. */
   email?: string;
   phone?: string;
+  /**
+   * Телеграм заказчика — основной канал связи.
+   *
+   * Хранится с `@`, как человек его и пишет: так его можно вставить в поиск
+   * Telegram без правки, а салону не приходится гадать, добавлять символ или
+   * нет.
+   */
+  telegram?: string;
   /** Which flower shop took the order. */
   shop?: string;
 };

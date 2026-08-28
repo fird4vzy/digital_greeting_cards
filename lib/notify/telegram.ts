@@ -94,7 +94,10 @@ function buildMessage(order: Order, adminUrl: string): string {
     `Шаблон: ${escapeHtml(order.templateId)}`,
   ];
 
-  const contact = [order.customer.phone, order.customer.email].filter(Boolean).join(' · ');
+  // Телеграм первым: по нему и отвечают. Почта — только у старых заказов.
+  const contact = [order.customer.telegram, order.customer.phone, order.customer.email]
+    .filter(Boolean)
+    .join(' · ');
   if (contact) lines.push(`Связь: ${escapeHtml(contact)}`);
 
   if (order.photos.length > 0) lines.push(`Фотографий: ${order.photos.length}`);
@@ -313,6 +316,14 @@ export async function forwardIncoming(update: unknown): Promise<void> {
   // Пришло из самой группы — не пересылать, иначе эхо.
   if (String(message.chat?.id) === chatId) return;
 
+  // `/start` — это не вопрос, а «я открыл бота». Пересылать такое в рабочую
+  // группу значит засорять её каждым любопытным; человеку нужен ответ, а
+  // команде — тишина. Отвечаем сами и выходим.
+  if (message.text?.trim().startsWith('/start')) {
+    await reply(token, message.chat?.id, welcome());
+    return;
+  }
+
   const from = message.from;
   const name = [from?.first_name, from?.last_name].filter(Boolean).join(' ') || 'без имени';
   const handle = from?.username ? `@${from.username}` : null;
@@ -353,6 +364,55 @@ export async function forwardIncoming(update: unknown): Promise<void> {
     });
   } catch (error) {
     console.error(`[telegram] не удалось переслать: ${scrub((error as Error).message)}`);
+  }
+}
+
+/**
+ * Что видит человек, впервые открывший бота.
+ *
+ * Живёт в коде, а не у @BotFather: описание в профиле показывается до первого
+ * действия, а это — ответ на него, и меняется он вместе с сайтом. Держать оба
+ * текста в одном месте нельзя, но менять их стоит вместе — второй ставится
+ * командой `npm run tg:webhook face`.
+ *
+ * Адреса берутся из `NEXT_PUBLIC_SITE_URL`, чтобы бот не рассылал ссылки на
+ * прежний домен после переезда.
+ */
+function welcome(): string {
+  const site = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://birdunyo.uz').replace(/\/+$/, '');
+
+  return [
+    '<b>Bir dunyo</b> — цифровые открытки к букетам.',
+    '',
+    'К цветам крепится маленькая бирка с кодом. Человек наводит телефон — и',
+    'открывается то, что вы для него собрали: письмо, фотографии, даты.',
+    '',
+    `Собрать открытку: ${site}/create`,
+    `Посмотреть примеры: ${site}/works`,
+    `Цветочным магазинам: ${site}/shops`,
+    '',
+    'Или просто напишите, что нужно, — ответим здесь.',
+  ].join('\n');
+}
+
+/** Короткий ответ в тот же чат. Ошибку глотаем: см. про повторы в маршруте. */
+async function reply(token: string, chatId: number | undefined, text: string): Promise<void> {
+  if (!chatId) return;
+
+  try {
+    await fetch(`${API}/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+        parse_mode: 'HTML',
+        disable_web_page_preview: true,
+      }),
+      signal: AbortSignal.timeout(5000),
+    });
+  } catch (error) {
+    console.error(`[telegram] не удалось ответить: ${scrub((error as Error).message)}`);
   }
 }
 

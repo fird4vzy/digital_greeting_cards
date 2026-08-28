@@ -234,7 +234,9 @@ export const uz: Dictionary = {
           hint: 'Salonda otkritkangiz bo‘yicha savol tug‘ilsa kerak bo‘ladi. Bittasi yetarli.',
           phone: 'Telefon',
           email: 'Pochta',
-          required: 'Telefon yoki pochta qoldiring.',
+          telegram: 'Telegram',
+          telegramHint: 'Masalan: @username',
+          required: 'Telefon yoki Telegram qoldiring.',
         },
       },
       done: {

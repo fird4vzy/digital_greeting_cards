@@ -31,6 +31,7 @@ type OrderRow = {
   customer_name: string;
   customer_email: string | null;
   customer_phone: string | null;
+  customer_telegram: string | null;
   shop: string | null;
   recipient_name: string;
   relationship: string;
@@ -98,6 +99,7 @@ function toOrder(row: OrderRow): Order {
       name: row.customer_name,
       email: row.customer_email ?? undefined,
       phone: row.customer_phone ?? undefined,
+      telegram: row.customer_telegram ?? undefined,
       shop: row.shop ?? undefined,
     },
     recipient: { name: row.recipient_name, relationship: row.relationship },
@@ -169,21 +171,26 @@ function hasColumn(pool: Pool, column: string): Promise<boolean> {
 
 /** Какие из необязательных колонок уже есть. Спрашивается раз за процесс. */
 async function optionalColumns(pool: Pool) {
-  const [moods, customEntry, wish] = await Promise.all([
+  const [moods, customEntry, wish, telegram] = await Promise.all([
     hasColumn(pool, 'moods'),
     hasColumn(pool, 'custom_entry'),
     hasColumn(pool, 'wish'),
+    hasColumn(pool, 'customer_telegram'),
   ]);
-  return { moods, customEntry, wish };
+  return { moods, customEntry, wish, telegram };
 }
 
+/** Что вернул `optionalColumns` — чтобы это не расписывать в каждой сигнатуре. */
+type Present = Awaited<ReturnType<typeof optionalColumns>>;
+
 /** Список колонок для SELECT и RETURNING, с `moods` только если он есть. */
-const columnsFor = (present: { moods: boolean; customEntry: boolean; wish: boolean }) =>
+const columnsFor = (present: Present) =>
   [
     BASE_COLUMNS,
     present.moods ? 'moods' : null,
     present.customEntry ? 'custom_entry' : null,
     present.wish ? 'wish' : null,
+    present.telegram ? 'customer_telegram' : null,
   ]
     .filter(Boolean)
     .join(', ');
@@ -271,18 +278,55 @@ export async function createPostgresStore(
     async create(draft: OrderDraft) {
       const status = draft.status ?? 'NEW';
       const present = await optionalColumns(pool);
-      const moods = present.moods;
 
-      // `moods` вставляется только когда колонка есть, поэтому номера
-      // плейсхолдеров после неё сдвигаются. Считаются, а не пишутся руками
-      // дважды: два списка $1..$22 разошлись бы при первой же правке.
-      const moodsColumnSql = moods ? 'mood, moods,' : 'mood,';
-      const statusIndex = moods ? 19 : 18;
-      const total = moods ? 22 : 21;
-      const placeholders = Array.from({ length: total }, (_, index) => {
-        const n = index + 1;
-        return n === statusIndex ? `$${n}::order_status` : `$${n}`;
-      }).join(',');
+      /**
+       * Колонка и её значение объявляются вместе.
+       *
+       * Раньше здесь были два независимых списка — имена в SQL и значения в
+       * массиве, — а номера плейсхолдеров считались вручную: `statusIndex =
+       * moods ? 19 : 18`. Каждая новая необязательная колонка удваивала число
+       * случаев, и одна уже потерялась молча: `wish` читался и выбирался, но
+       * никогда не вставлялся, поэтому «своя идея» клиента не доезжала до
+       * оператора. Пара «имя + значение» делает такую потерю невозможной:
+       * забыть значение нельзя, не убрав колонку.
+       */
+      const fields: [string, unknown][] = [
+        ['id', generateId('ord')],
+        ['code', generateCode()],
+        ['customer_name', draft.customer.name],
+        ['customer_email', draft.customer.email ?? null],
+        ['customer_phone', draft.customer.phone ?? null],
+        ['shop', draft.customer.shop ?? null],
+        ['recipient_name', draft.recipient.name],
+        ['relationship', draft.recipient.relationship],
+        ['occasion', draft.occasion],
+        ['mood', draft.mood],
+        ['locale', draft.locale],
+        ['message', draft.message],
+        ['photos', JSON.stringify(draft.photos ?? [])],
+        ['moments', JSON.stringify(draft.moments ?? [])],
+        ['memories', JSON.stringify(draft.memories ?? [])],
+        ['wishes', JSON.stringify(draft.wishes ?? [])],
+        ['template_id', draft.templateId],
+        ['status', status],
+        ['config', draft.config ? JSON.stringify(draft.config) : null],
+        ['notes', draft.notes ?? null],
+        ['brief', draft.brief ?? null],
+      ];
+
+      // Необязательные — только если миграция уже прошла.
+      if (present.moods) fields.push(['moods', draft.moods?.length ? draft.moods : [draft.mood]]);
+      if (present.wish) fields.push(['wish', draft.wish ? JSON.stringify(draft.wish) : null]);
+      if (present.telegram) {
+        fields.push(['customer_telegram', draft.customer.telegram ?? null]);
+      }
+
+      const statusIndex = fields.findIndex(([name]) => name === 'status') + 1;
+      const columnSql = fields.map(([name]) => name).join(', ');
+      const placeholders = fields
+        .map((_, index) => (index + 1 === statusIndex ? `$${index + 1}::order_status` : `$${index + 1}`))
+        .join(',');
+      const values = fields.map(([, value]) => value);
 
       // Retry on the unique-code constraint rather than pre-checking: the read
       // would be a race anyway, and a collision is a one-in-millions event.
@@ -290,10 +334,7 @@ export async function createPostgresStore(
         try {
           const result = await pool.query<OrderRow>(
             `INSERT INTO orders (
-               id, code, customer_name, customer_email, customer_phone, shop,
-               recipient_name, relationship, occasion, ${moodsColumnSql} locale, message, photos,
-               moments, memories, wishes, template_id, status, config, notes,
-               brief, published_at
+               ${columnSql}, published_at
              ) VALUES (
                ${placeholders},
                -- Both casts are load-bearing. The status placeholder appears
@@ -304,30 +345,7 @@ export async function createPostgresStore(
                CASE WHEN $${statusIndex}::order_status = 'PUBLISHED' THEN now() ELSE NULL END
              )
              RETURNING ${columnsFor(present)}`,
-            [
-              generateId('ord'),
-              generateCode(),
-              draft.customer.name,
-              draft.customer.email ?? null,
-              draft.customer.phone ?? null,
-              draft.customer.shop ?? null,
-              draft.recipient.name,
-              draft.recipient.relationship,
-              draft.occasion,
-              draft.mood,
-              ...(moods ? [draft.moods?.length ? draft.moods : [draft.mood]] : []),
-              draft.locale,
-              draft.message,
-              JSON.stringify(draft.photos ?? []),
-              JSON.stringify(draft.moments ?? []),
-              JSON.stringify(draft.memories ?? []),
-              JSON.stringify(draft.wishes ?? []),
-              draft.templateId,
-              status,
-              draft.config ? JSON.stringify(draft.config) : null,
-              draft.notes ?? null,
-              draft.brief ?? null,
-            ],
+            values,
           );
 
           const row = result.rows[0];
@@ -371,6 +389,9 @@ export async function createPostgresStore(
       if (patch.customer?.email !== undefined) push('customer_email', patch.customer.email ?? null);
       if (patch.customer?.phone !== undefined) push('customer_phone', patch.customer.phone ?? null);
       if (patch.customer?.shop !== undefined) push('shop', patch.customer.shop ?? null);
+      if (patch.customer?.telegram !== undefined && (await hasColumn(pool, 'customer_telegram'))) {
+        push('customer_telegram', patch.customer.telegram ?? null);
+      }
       if (patch.recipient?.name !== undefined) push('recipient_name', patch.recipient.name);
       if (patch.recipient?.relationship !== undefined) push('relationship', patch.recipient.relationship);
       if (patch.occasion !== undefined) push('occasion', patch.occasion);

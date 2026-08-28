@@ -23,6 +23,7 @@ CREATE TABLE orders (
   customer_name   TEXT NOT NULL,
   customer_email  TEXT,
   customer_phone  TEXT,
+  customer_telegram TEXT,
   shop            TEXT,
 
   recipient_name  TEXT NOT NULL,

@@ -92,7 +92,15 @@ type Draft = {
   brief: string;
   /** How the shop reaches them. At least one is required to submit. */
   phone: string;
-  email: string;
+  /**
+   * Телеграм заказчика.
+   *
+   * Заменил почту 28 августа: в Узбекистане связываются в телеграме, а почту
+   * не читают — поле стояло вторым и оставалось пустым. `email` из черновика
+   * убран совсем, но в заказе и в админке остался: старые заказы с почтой
+   * никуда не делись, и терять контакт живого клиента ради чистоты нельзя.
+   */
+  telegram: string;
   /** The language the card is written in.
    *
    *  Stored on the card and therefore independent of the reader's language by
@@ -119,7 +127,7 @@ const EMPTY: Draft = {
   wishWorkId: '',
   brief: '',
   phone: '',
-  email: '',
+  telegram: '',
   locale: '',
 };
 
@@ -237,7 +245,7 @@ export function CreateFlow({
           customer: {
             name: draft.senderName || 'Someone',
             phone: draft.phone.trim() || undefined,
-            email: draft.email.trim() || undefined,
+            telegram: draft.telegram.trim() || undefined,
           },
           recipient: { name: draft.recipientName || 'You', relationship: draft.recipientId || 'someone-special' },
           occasion: draft.occasion || 'just-because',
@@ -288,7 +296,7 @@ export function CreateFlow({
   }
 
   // Either channel will do; the API enforces the same rule server-side.
-  const hasContact = Boolean(draft.phone.trim() || draft.email.trim());
+  const hasContact = Boolean(draft.phone.trim() || draft.telegram.trim());
 
   const cardLocale = draft.locale || locale;
   const cardCopy = copyFor(draft.occasion || 'just-because', cardLocale);
@@ -781,9 +789,10 @@ export function CreateFlow({
                     onChange={(phone) => patch({ phone })}
                   />
                   <Field
-                    label={copy.steps.contact.email}
-                    value={draft.email}
-                    onChange={(email) => patch({ email })}
+                    label={copy.steps.contact.telegram}
+                    value={draft.telegram}
+                    onChange={(telegram) => patch({ telegram })}
+                    placeholder={copy.steps.contact.telegramHint}
                   />
                 </div>
 

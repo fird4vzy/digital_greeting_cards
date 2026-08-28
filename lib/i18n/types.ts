@@ -267,7 +267,10 @@ export type Dictionary = {
           question: string;
           hint: string;
           phone: string;
+          /** Остаётся для старых заказов; в форме больше не спрашивается. */
           email: string;
+          telegram: string;
+          telegramHint: string;
           required: string;
         };
       };

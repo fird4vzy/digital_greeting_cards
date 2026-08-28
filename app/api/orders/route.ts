@@ -18,15 +18,37 @@ const draftSchema = z.object({
       name: z.string().min(1),
       email: z.email().optional().or(z.literal('')),
       phone: z.string().optional(),
+      /**
+       * Телеграм заказчика — основной канал связи.
+       *
+       * `@` необязателен на входе и добавляется здесь: люди пишут и так и
+       * так, а салону нужен один вид, чтобы вставлять в поиск не задумываясь.
+       * Пустая строка приходит из формы, где поле не заполнили, и должна
+       * проходить как «не указано», а не падать на проверке username.
+       */
+      telegram: z
+        .string()
+        .max(64)
+        .optional()
+        .transform((value) => value?.trim().replace(/^@+/, '') ?? '')
+        .refine((value) => value === '' || /^[A-Za-z0-9_]{4,32}$/.test(value), {
+          message: 'Похоже, это не username',
+        })
+        .transform((value) => (value === '' ? undefined : `@${value}`)),
       shop: z.string().optional(),
     })
     // The shop has to be able to reach whoever ordered: an order it cannot
     // ask a question about is an order it cannot finish. Either channel will
     // do, but not neither.
-    .refine((customer) => Boolean(customer.email?.trim() || customer.phone?.trim()), {
-      message: 'Give a phone number or an email address',
-      path: ['phone'],
-    }),
+    //
+    // Почта осталась в списке ради заказов, принятых до 28 августа: форма её
+    // больше не спрашивает, но старый заказ с одной лишь почтой — всё ещё
+    // заказ, до которого можно дозвониться.
+    .refine(
+      (customer) =>
+        Boolean(customer.telegram?.trim() || customer.phone?.trim() || customer.email?.trim()),
+      { message: 'Give a phone number or a Telegram username', path: ['phone'] },
+    ),
   recipient: z.object({ name: z.string().min(1), relationship: z.string().min(1) }),
   occasion: z.string().min(1),
   mood: z.string().min(1),

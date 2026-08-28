@@ -81,6 +81,18 @@ export default async function OrderDetail({ params }: Props) {
                 {order.customer.phone ? (
                   <span className="block text-ink-muted">{order.customer.phone}</span>
                 ) : null}
+                {/* Ссылкой, а не текстом: оператор открывает переписку одним
+                    нажатием, вместо того чтобы копировать username в поиск. */}
+                {order.customer.telegram ? (
+                  <a
+                    href={`https://t.me/${order.customer.telegram.replace(/^@/, '')}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block text-ink-muted underline decoration-line-strong underline-offset-4 transition-colors hover:text-ink"
+                  >
+                    {order.customer.telegram}
+                  </a>
+                ) : null}
                 {order.customer.email ? (
                   <span className="block text-ink-muted">{order.customer.email}</span>
                 ) : null}
