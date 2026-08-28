@@ -17,7 +17,10 @@ export async function GET(
   const { code } = await params;
   const order = await getOrderByCode(code);
 
-  if (!order) {
+  // Отменённая открытка отвечает так же, как несуществующая. Иначе маршрут
+  // остаётся оракулом: подтверждает, что код живой, для заказа, который
+  // магазин уже закрыл, — а `lib/db/types.ts` описывает отмену как надгробие.
+  if (!order || order.status === 'CANCELLED') {
     return NextResponse.json({ error: 'Card not found' }, { status: 404 });
   }
 

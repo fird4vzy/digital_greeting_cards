@@ -263,9 +263,10 @@ export function CreateFlow({
           // инструкция магазину, а не как отмена сборки.
           wish,
           brief: draft.brief.trim() || undefined,
-          // The shop publishes, not the customer: a code only goes onto a tag
-          // once a person has read the card through.
-          publish: false,
+          // Публикует магазин, а не заказчик: код попадает на бирку только
+          // после того, как человек прочитал открытку целиком. Раньше здесь
+          // ехало `publish: false` — и это была просьба, а не правило: сервер
+          // принимал и `true`. Теперь поля нет ни здесь, ни в контракте.
         }),
       });
 

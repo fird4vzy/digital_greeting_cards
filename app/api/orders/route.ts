@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createOrder, listOrders } from '@/lib/db';
+import { adminOnly } from '@/lib/auth/guard';
 import { ORDER_STATUSES } from '@/lib/db/types';
 import { photoSchema } from '@/lib/card/schema';
 import { composeConfigForOrderAnywhere } from '@/lib/card/compose-server';
@@ -88,25 +89,47 @@ const draftSchema = z.object({
   notes: z.string().optional(),
   /** The customer's instructions to the shop. Never rendered into the card. */
   brief: z.string().max(4000).optional(),
-  /** Compose and publish in one call — used by the customer creation flow. */
-  publish: z.boolean().default(false),
 });
 
-/** GET /api/orders?status=NEW&search=alina — the shop-side queue. */
+/**
+ * GET /api/orders?status=NEW&search=alina — очередь заказов для магазина.
+ *
+ * **Только для оператора.** До 28 августа проверки здесь не было вообще, и
+ * маршрут отдавал весь список кому угодно: имена, телефоны, телеграмы,
+ * приватные письма получателям и фотографии — целиком, в теле ответа. Хуже
+ * того, `?search=+998` превращал его в адресный поиск по телефону.
+ */
 export async function GET(request: Request) {
+  const denied = await adminOnly();
+  if (denied) return denied;
+
   const url = new URL(request.url);
   const status = url.searchParams.get('status');
 
   const orders = await listOrders({
     status: ORDER_STATUSES.includes(status as never) ? (status as never) : undefined,
     search: url.searchParams.get('search') ?? undefined,
-    limit: Number(url.searchParams.get('limit') ?? 50),
+    limit: pageSize(url.searchParams.get('limit')),
   });
 
   return NextResponse.json({ orders });
 }
 
-/** POST /api/orders — create an order, optionally composing and publishing it. */
+/**
+ * Сколько заказов отдавать за раз.
+ *
+ * Отдельная функция ради одного знака: `Number('')` — это `0`, ноль ложен, а
+ * ложный лимит в хранилище означал «без LIMIT». То есть `?limit=` (пустой)
+ * возвращал таблицу целиком. Верхняя граница обязательна и сама по себе:
+ * `Number.isFinite` пропускает `1e9`.
+ */
+function pageSize(raw: string | null): number {
+  const requested = Math.floor(Number(raw));
+  if (!Number.isFinite(requested) || requested <= 0) return 50;
+  return Math.min(requested, 200);
+}
+
+/** POST /api/orders — create an order. Публикует не заказчик, а магазин. */
 export async function POST(request: Request) {
   const parsed = draftSchema.safeParse(await request.json().catch(() => null));
 
@@ -117,12 +140,18 @@ export async function POST(request: Request) {
     );
   }
 
-  const { publish, ...draft } = parsed.data;
+  const draft = parsed.data;
 
   // The card is always composed, so the shop opens a finished draft rather
   // than an empty record and the customer can see something immediately.
-  // `publish` decides only whether it is live: on the customer flow it is
-  // false, and a person reviews the draft before a code goes onto a tag.
+  //
+  // Заказ всегда создаётся со статусом NEW, и другого пути нет. Раньше тело
+  // запроса принимало `publish: true` и заказ уходил в публикацию сразу;
+  // форма слала `false`, но это уговор клиента, а не правило сервера, и
+  // `curl` его не соблюдал. Обещание продукта — что магазин смотрит открытку
+  // до того, как код попадёт на бирку, — держится теперь на одном месте:
+  // `setOrderStatus` в `app/admin/actions.ts`, за проверкой сессии.
+  //
   // `moods` необязателен в контракте, а в заказе обязателен: клиент,
   // приславший одно настроение старым способом, получает список из него.
   const created = await createOrder({
@@ -136,11 +165,7 @@ export async function POST(request: Request) {
   const config = await composeConfigForOrderAnywhere(created);
 
   const { updateOrder } = await import('@/lib/db');
-  const order =
-    (await updateOrder(created.id, {
-      config,
-      ...(publish ? { status: 'PUBLISHED' as const } : {}),
-    })) ?? created;
+  const order = (await updateOrder(created.id, { config })) ?? created;
 
   // After the order is safely stored: a notification is not worth failing on.
   await notifyNewOrder(order, await siteOrigin());

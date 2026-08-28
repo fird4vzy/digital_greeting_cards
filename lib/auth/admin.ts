@@ -24,6 +24,15 @@
  * request rather than waving it through; a forgotten env var must never be the
  * difference between a locked and an open order queue. Local development is
  * exempt so `npm run dev` still needs no setup.
+ *
+ * Это утверждение три недели было ложью, и аудит 28 августа её нашёл. Закрыт
+ * был только вход: `verifyAdminPassword` в проде без пароля отказывал всем.
+ * А проверка *сессии* шла мимо — `sign` подставлял вместо ключа строку
+ * `'development-only-unset-password'`, лежащую в публичном репозитории, и
+ * подписанная ею кука проходила `verifyAdminSession`. То есть забытая
+ * переменная не запирала админку, а открывала её любому, кто читал исходники.
+ * Теперь ключа без настройки не существует вовсе: `signingKey` в проде
+ * возвращает `null`, `sign` на этом падает, а проверка отвечает «нет».
  */
 
 export const ADMIN_SESSION_COOKIE = 'mtab_admin';
@@ -76,11 +85,28 @@ function toBase64Url(bytes: Uint8Array): string {
   return btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '');
 }
 
+/**
+ * Ключ подписи сессий — или `null`, если подписывать нечем.
+ *
+ * `ADMIN_SESSION_SECRET` идёт первым и необязателен: пока его нет, ключом
+ * служит пароль, и это осознанный размен — одной переменной меньше, а смена
+ * пароля заодно разлогинивает всех. Цена в том, что каждая выданная кука —
+ * оракул для офлайнового перебора пароля, поэтому у кого есть чем, тот
+ * задаёт отдельный секрет и размен снимает.
+ *
+ * В деве ключ подставляется, чтобы чистый клон работал без настройки. В
+ * проде — никогда: подставленный ключ и был дырой, которую здесь чинят.
+ */
+function signingKey(): string | null {
+  const configured = process.env.ADMIN_SESSION_SECRET ?? process.env.ADMIN_PASSWORD;
+  if (configured) return configured;
+
+  return process.env.NODE_ENV === 'production' ? null : 'development-only-unset-password';
+}
+
 async function sign(payload: string): Promise<string> {
-  // The password doubles as the signing key. A separate SESSION_SECRET would
-  // be one more variable to set and forget, and rotating the password ought to
-  // invalidate sessions anyway.
-  const secret = process.env.ADMIN_PASSWORD ?? 'development-only-unset-password';
+  const secret = signingKey();
+  if (!secret) throw new Error('ADMIN_PASSWORD не задан — подписывать сессию нечем');
 
   const key = await crypto.subtle.importKey(
     'raw',
@@ -107,6 +133,10 @@ export async function createAdminSession(): Promise<{ value: string; maxAge: num
 
 export async function verifyAdminSession(token: string | undefined): Promise<boolean> {
   if (!token) return false;
+
+  // Раньше эта проверка отсутствовала, и в этом была вся дыра: без пароля
+  // подпись всё равно вычислялась — подставленным ключом из репозитория.
+  if (!signingKey()) return false;
 
   const separator = token.lastIndexOf('.');
   if (separator === -1) return false;
