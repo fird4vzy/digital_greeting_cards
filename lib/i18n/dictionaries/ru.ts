@@ -459,6 +459,11 @@ export const ru: Dictionary = {
       unconfigured: 'Нечего проверять: не задана {missing}.',
       rejected: 'Telegram отказал: {detail}',
       unreachable: 'До Telegram не достучались: {detail}',
+      findChats: 'Найти chat id',
+      findingChats: 'Ищем…',
+      chatsNone: 'Бот не видел ни одного сообщения за последние сутки. Напишите что-нибудь в группу, где он состоит, и нажмите снова.',
+      chatsHint: 'Скопируйте нужный id целиком, вместе с минусом, в переменную TELEGRAM_CHAT_ID в Vercel и сделайте Redeploy.',
+      chatCurrent: 'сейчас настроен этот',
       redeploy: 'Переменные попадают только в новую сборку — после изменения нужен редеплой.',
     },
 

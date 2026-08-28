@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { testNotifications } from '@/app/admin/actions';
+import { lookUpChats, testNotifications } from '@/app/admin/actions';
+import type { ChatLookup } from '@/lib/notify/telegram';
 import type { NotificationState, TestResult } from '@/lib/notify/telegram';
 import { t } from '@/lib/i18n';
 
@@ -35,9 +36,15 @@ export function NotificationCheck({
     rejected: string;
     unreachable: string;
     redeploy: string;
+    findChats: string;
+    findingChats: string;
+    chatsNone: string;
+    chatsHint: string;
+    chatCurrent: string;
   };
 }) {
   const [result, setResult] = useState<TestResult | null>(null);
+  const [chats, setChats] = useState<ChatLookup | null>(null);
   const [pending, startTransition] = useTransition();
 
   const summary =
@@ -85,6 +92,24 @@ export function NotificationCheck({
             {pending ? strings.testing : strings.test}
           </button>
         ) : null}
+
+        {/* Отдельная кнопка, а не часть проверки: она нужна ровно тогда, когда
+            проверка ответила «chat not found», и спрашивает у Telegram другое —
+            не «принимаешь ли эти данные», а «какие чаты ты вообще видел». */}
+        {state.kind !== 'off' ? (
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() =>
+              startTransition(async () => {
+                setChats(await lookUpChats());
+              })
+            }
+            className="rounded-[0.5rem] border border-line px-4 py-2 text-caption text-ink-muted transition-colors hover:border-ink hover:text-ink disabled:opacity-50"
+          >
+            {pending ? strings.findingChats : strings.findChats}
+          </button>
+        ) : null}
       </div>
 
       <p className="mt-3 text-caption leading-relaxed text-ink-muted">{summary}</p>
@@ -102,6 +127,31 @@ export function NotificationCheck({
         >
           {message(result)}
         </p>
+      ) : null}
+
+      {chats ? (
+        <div className="mt-4 rounded-[0.6rem] bg-white px-4 py-3 text-caption leading-relaxed text-ink-soft">
+          {!chats.ok ? (
+            <p>{chats.kind === 'unconfigured' ? strings.unconfigured : chats.detail}</p>
+          ) : chats.chats.length === 0 ? (
+            <p>{strings.chatsNone}</p>
+          ) : (
+            <>
+              <ul className="space-y-1.5">
+                {chats.chats.map((chat) => (
+                  <li key={chat.id} className="flex flex-wrap items-baseline gap-x-3">
+                    <code className="text-ink tabular-nums">{chat.id}</code>
+                    <span className="text-ink-muted">{chat.title}</span>
+                    {chat.current ? (
+                      <span className="text-[0.7rem] text-accent">{strings.chatCurrent}</span>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-3 text-ink-faint">{strings.chatsHint}</p>
+            </>
+          )}
+        </div>
       ) : null}
     </section>
   );

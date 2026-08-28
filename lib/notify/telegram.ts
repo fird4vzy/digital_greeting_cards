@@ -178,6 +178,74 @@ export type TestResult =
  * to the group, and *Unauthorized* means the token is revoked or mistyped.
  * Translating those into something friendlier would throw away the diagnosis.
  */
+/** Чат, который бот видел: то, что нужно положить в `TELEGRAM_CHAT_ID`. */
+export type SeenChat = { id: string; title: string; type: string; current: boolean };
+
+export type ChatLookup =
+  | { ok: true; chats: SeenChat[] }
+  | { ok: false; kind: 'unconfigured' }
+  | { ok: false; kind: 'rejected'; detail: string };
+
+/**
+ * Показывает чаты, из которых бот получал сообщения.
+ *
+ * Существует ради одной конкретной ловушки, стоившей трёх сессий. Когда
+ * обычная группа превращается в супергруппу — а это происходит само, стоит
+ * включить топики, — её `chat_id` меняется на вид `-100…`, и прежний
+ * замолкает навсегда. Снаружи это выглядит как «бот перестал писать», а
+ * Telegram отвечает `chat not found`, что читается как «бота нет в группе».
+ *
+ * Достать новый id можно было только вручную: открыть группу в
+ * `web.telegram.org` и выковырять число из адресной строки. Кнопка делает то
+ * же самое за один запрос и сразу помечает, какой из чатов уже настроен.
+ *
+ * **`getUpdates` не работает при установленном вебхуке** — Telegram отдаёт
+ * 409, и это не ошибка, а сообщение: у бота есть вебхук, значит сообщения
+ * забирает он. Пробрасываем как есть.
+ *
+ * Ещё одно: `getUpdates` помнит только последние сутки. Если бот давно
+ * молчит, список будет пуст — тогда нужно написать в группу любое сообщение
+ * и нажать снова. Это сказано в подписи к кнопке.
+ */
+export async function findChats(): Promise<ChatLookup> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  if (!token) return { ok: false, kind: 'unconfigured' };
+
+  try {
+    const response = await fetch(`${API}/bot${token}/getUpdates?limit=100`, {
+      signal: AbortSignal.timeout(8000),
+    });
+    const body = (await response.json()) as {
+      ok: boolean;
+      description?: string;
+      result?: { message?: { chat?: { id: number; title?: string; type: string } } }[];
+    };
+
+    if (!body.ok) {
+      return { ok: false, kind: 'rejected', detail: scrub(body.description ?? String(response.status)) };
+    }
+
+    const current = process.env.TELEGRAM_CHAT_ID;
+    const seen = new Map<string, SeenChat>();
+
+    for (const update of body.result ?? []) {
+      const chat = update.message?.chat;
+      if (!chat) continue;
+      const id = String(chat.id);
+      seen.set(id, {
+        id,
+        title: chat.title ?? id,
+        type: chat.type,
+        current: id === current,
+      });
+    }
+
+    return { ok: true, chats: [...seen.values()] };
+  } catch (error) {
+    return { ok: false, kind: 'rejected', detail: scrub((error as Error).message) };
+  }
+}
+
 export async function sendTestNotification(origin: string): Promise<TestResult> {
   const state = notificationState();
   if (state.kind === 'off') {

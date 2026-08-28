@@ -453,6 +453,11 @@ export const uz: Dictionary = {
       unconfigured: 'Tekshirishga hech narsa yo‘q: {missing} berilmagan.',
       rejected: 'Telegram rad etdi: {detail}',
       unreachable: 'Telegramga yetib bo‘lmadi: {detail}',
+      findChats: 'Chat id topish',
+      findingChats: 'Qidirilmoqda…',
+      chatsNone: 'Bot so‘nggi sutkada birorta xabar ko‘rmadi. U a’zo bo‘lgan guruhga biror narsa yozing va yana bosing.',
+      chatsHint: 'Kerakli id ni to‘liq, minus bilan birga, Vercel dagi TELEGRAM_CHAT_ID ga qo‘ying va Redeploy qiling.',
+      chatCurrent: 'hozir shu sozlangan',
       redeploy:
         'O‘zgaruvchilar faqat yangi buildga tushadi — o‘zgartirgandan keyin qayta deploy qiling.',
     },

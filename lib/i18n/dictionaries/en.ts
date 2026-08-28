@@ -447,6 +447,11 @@ export const en: Dictionary = {
       unconfigured: 'Nothing to test: {missing} is not set.',
       rejected: 'Telegram refused: {detail}',
       unreachable: 'Telegram could not be reached: {detail}',
+      findChats: 'Find the chat id',
+      findingChats: 'Looking…',
+      chatsNone: 'The bot has seen no messages in the last day. Write anything in the group it belongs to, then press again.',
+      chatsHint: 'Copy the id you need in full, minus sign included, into TELEGRAM_CHAT_ID in Vercel, then Redeploy.',
+      chatCurrent: 'currently configured',
       redeploy: 'Environment variables only reach a new build — redeploy after changing them.',
     },
 

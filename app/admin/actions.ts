@@ -7,7 +7,7 @@ import { ADMIN_SESSION_COOKIE, verifyAdminSession } from '@/lib/auth/admin';
 import { composeConfigForOrderAnywhere } from '@/lib/card/compose-server';
 import { getOrder, removeOrder, updateOrder } from '@/lib/db';
 import { ORDER_STATUSES, isDeletable, type OrderStatus } from '@/lib/db/types';
-import { sendTestNotification, type TestResult } from '@/lib/notify/telegram';
+import { findChats, sendTestNotification, type ChatLookup, type TestResult } from '@/lib/notify/telegram';
 import { siteOrigin } from '@/lib/site-origin';
 
 /**
@@ -112,4 +112,10 @@ export async function testNotifications(): Promise<TestResult> {
   await requireAdmin();
 
   return sendTestNotification(await siteOrigin());
+}
+
+/** Какие чаты бот видел. Ответ никогда не содержит токена — см. `scrub`. */
+export async function lookUpChats(): Promise<ChatLookup> {
+  await requireAdmin();
+  return findChats();
 }

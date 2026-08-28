@@ -418,6 +418,15 @@ export type Dictionary = {
       unreachable: string;
       /** Environment variables only reach a new build. */
       redeploy: string;
+      /**
+       * Поиск chat id. Существует из-за одной ловушки: превращение группы в
+       * супергруппу молча меняет её id, и старый замолкает навсегда.
+       */
+      findChats: string;
+      findingChats: string;
+      chatsNone: string;
+      chatsHint: string;
+      chatCurrent: string;
     };
     orders: {
       title: string;
