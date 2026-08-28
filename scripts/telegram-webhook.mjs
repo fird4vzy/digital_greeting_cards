@@ -147,5 +147,62 @@ if (command === 'set') {
   process.exit(out.ok ? 0 : 1);
 }
 
-console.error('Команды: status | set <https://домен> | delete');
+if (command === 'topics') {
+  const chat = process.env.TELEGRAM_CHAT_ID;
+  if (!chat) {
+    console.error('TELEGRAM_CHAT_ID не задан — некуда слать.\n');
+    console.error('  Если вы тянули переменные из Vercel, он записал сюда [SENSITIVE]:');
+    console.error('  секретные значения он не отдаёт. Впишите chat id в .env.local руками.');
+    process.exit(1);
+  }
+
+  const targets = [
+    ['TELEGRAM_TOPIC_ORDERS', 'Заказы', process.env.TELEGRAM_TOPIC_ORDERS],
+    ['TELEGRAM_TOPIC_SUPPORT', 'Поддержка', process.env.TELEGRAM_TOPIC_SUPPORT],
+  ];
+
+  if (targets.every(([, , value]) => !value)) {
+    console.log('Ни одна тема не задана — всё уходит в общий поток.\n');
+    console.log('Номер темы берётся так: правый щелчок по теме в Telegram →');
+    console.log('«Копировать ссылку» → получится https://t.me/c/<чат>/<номер>.');
+    console.log('Вставьте ссылку целиком или только последнее число в:\n');
+    console.log('  TELEGRAM_TOPIC_ORDERS=<ссылка на тему «Заказы»>');
+    console.log('  TELEGRAM_TOPIC_SUPPORT=<ссылка на тему «Поддержка»>\n');
+    console.log('В Vercel (Production) и в .env.local. Потом Redeploy.');
+    process.exit(0);
+  }
+
+  for (const [name, label, value] of targets) {
+    if (!value) {
+      console.log(`${name}: не задана — «${label}» пойдёт в общий поток`);
+      continue;
+    }
+
+    // Тот же разбор, что и в приложении: принимаем и ссылку, и число.
+    const digits = String(value).trim().match(/(\d+)\/?\s*$/);
+    const thread = digits ? Number(digits[1]) : undefined;
+
+    if (!thread) {
+      console.log(`${name}: не удалось разобрать номер темы`);
+      continue;
+    }
+
+    const out = await call('sendMessage', {
+      chat_id: chat,
+      message_thread_id: thread,
+      text: `Проверка темы «${label}» — если видно здесь, адрес верный.`,
+    });
+
+    console.log(
+      out.ok
+        ? `${name}: ${thread} — доставлено в «${label}»`
+        : `${name}: ${thread} — отказ: ${out.description}`,
+    );
+  }
+
+  console.log('\nПосмотрите в группу: каждое сообщение должно лежать в своей теме.');
+  process.exit(0);
+}
+
+console.error('Команды: status | set <https://домен> | delete | topics');
 process.exit(1);

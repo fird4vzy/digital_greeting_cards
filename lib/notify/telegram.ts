@@ -23,6 +23,44 @@ import type { Order } from '@/lib/db/types';
 const API = 'https://api.telegram.org';
 
 /**
+ * Номер темы в супергруппе-форуме.
+ *
+ * Заказы и обращения в поддержку — разные разговоры, и валить их в общий
+ * поток значит терять оба: заказ тонет в переписке, вопрос теряется среди
+ * заказов. Telegram решает это темами, и адресуются они полем
+ * `message_thread_id`.
+ *
+ * **Принимается и число, и ссылка на тему.** Номер темы человек достаёт
+ * правым щелчком по ней → «Копировать ссылку», получая
+ * `https://t.me/c/2419.../7`. Требовать, чтобы он сам выковырял оттуда
+ * последнее число, — это лишний шаг и лишний способ ошибиться; пусть вставит
+ * как есть.
+ *
+ * Не задано — сообщение уходит в общий поток, как раньше. Это осознанный
+ * запасной путь: группа может и не быть форумом, и тогда `message_thread_id`
+ * вызвал бы отказ Telegram на каждом заказе.
+ */
+function topicId(raw: string | undefined): number | undefined {
+  if (!raw) return undefined;
+
+  // Ссылка, скопированная из Telegram, иногда заканчивается слэшем.
+  const digits = raw.trim().match(/(\d+)\/?\s*$/);
+  if (!digits) return undefined;
+
+  const value = Number(digits[1]);
+  return Number.isSafeInteger(value) && value > 0 ? value : undefined;
+}
+
+/** Куда именно писать: чат плюс, если задана, тема внутри него. */
+function target(topic: string | undefined) {
+  const thread = topicId(topic);
+  return {
+    chat_id: process.env.TELEGRAM_CHAT_ID,
+    ...(thread ? { message_thread_id: thread } : {}),
+  };
+}
+
+/**
  * Strips the bot token out of anything on its way to a browser.
  *
  * The token is in the request URL, so it can surface inside a thrown fetch
@@ -116,7 +154,7 @@ export async function notifyNewOrder(order: Order, origin: string): Promise<void
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
-        chat_id: chatId,
+        ...target(process.env.TELEGRAM_TOPIC_ORDERS),
         text,
         parse_mode: 'HTML',
         // The admin link is for the shop, not something to unfurl in the chat.
@@ -306,7 +344,7 @@ export async function forwardIncoming(update: unknown): Promise<void> {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
-        chat_id: chatId,
+        ...target(process.env.TELEGRAM_TOPIC_SUPPORT),
         text: lines.join('\n'),
         parse_mode: 'HTML',
         disable_web_page_preview: true,
@@ -347,7 +385,9 @@ export async function sendTestNotification(origin: string): Promise<TestResult> 
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
-        chat_id: process.env.TELEGRAM_CHAT_ID,
+        // Проверка идёт туда же, куда пойдут заказы: смысл её в том, чтобы
+        // увидеть сообщение там, где его будут ждать, а не просто где-нибудь.
+        ...target(process.env.TELEGRAM_TOPIC_ORDERS),
         text,
         parse_mode: 'HTML',
         disable_web_page_preview: true,
