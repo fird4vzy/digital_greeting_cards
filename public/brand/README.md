@@ -12,6 +12,30 @@ builds is not a brand.
 | `bouquet-tag-reel.mp4` | 5s vertical clip, silent. Not served by any page — upload it to Instagram and put music over it |
 | `wordmark.svg` | The Bir dunyo wordmark. Transparent, colours driven by `--wm-ink` / `--wm-surface` |
 | `icon-blossom.svg` | The first favicon — a bare blossom. Retired, unused, kept for the record |
+| `avatar-mark-*.png` | 1024² profile picture for Telegram and Instagram. **Use these two** |
+| `avatar-wordmark-*.png` | 1024² with the name spelled out, for anywhere the picture is shown large |
+| `wordmark-cream.png`, `wordmark-noir.png` | 2400×800 banner on a solid ground — channel headers, posts |
+| `wordmark-ink.png`, `wordmark-paper.png` | 3000×1000, transparent. `ink` for light grounds, `paper` for dark |
+
+Everything in the table above whose name starts with `avatar-` or
+`wordmark-` is built by `npm run brand:export`, from `wordmark.svg` and
+`app/icon.svg` — **do not edit them by hand.** They exist as files because
+Telegram and Instagram take PNG and compress it themselves; drawing that PNG
+once by hand would create a second logo that eventually disagrees with the
+site. Each also ships as `.svg` beside it, for print and for anyone who asks
+for "the logo file".
+
+Two pairs of avatars, and it is not a matter of taste: Telegram shows a
+profile as a forty-pixel circle, where *bir dunyo* fits but cannot be read.
+The mark goes in the profile; the name is for headers and posts. Sizes are
+chosen from that circle — the mark's corners land at 87% of its radius, and
+the square wordmark is set narrower than the banner one because the outermost
+letters sit exactly where the crop falls.
+
+In the transparent pair, the pale areas of the wordmark — the underside of the
+turned corner, the counters of *b* and *o* — are cut out with a mask rather
+than filled, for the same reason those shapes are `--wm-surface` on the web:
+they are the ground showing through, not white paint.
 
 The tag in these shots reads **Bir dunyo**, and so does the rest of the
 product: the rename is complete, and the name lives in `lib/site.ts`.
