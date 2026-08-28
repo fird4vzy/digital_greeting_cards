@@ -28,7 +28,15 @@ export type Work = {
   entry: string;
   /** Собственное имя работы, на её языке. Не переводится — это её название. */
   title: string;
-  /** Год. Строкой: часть из них датируется приблизительно. */
+  /**
+   * Год у витрины.
+   *
+   * Строкой, и с 28 августа у всех один — год запуска. Владелец решил так
+   * сознательно: настоящих дат у папок не было (у трёх стояла моя оценка, а
+   * mtime у всех сегодняшний из-за OneDrive), а витрина запускающегося
+   * продукта, где половина работ помечена позапрошлым годом, читается хуже,
+   * чем ровный ряд. Это подпись, а не метаданные.
+   */
   year: string;
   /** Повод из общей таксономии — чтобы фильтры совпадали с шаблонами. */
   occasion: string;
@@ -73,7 +81,7 @@ const WORKS: Work[] = [
     id: 'svechi',
     entry: 'index.html',
     title: 'С днём рождения, Алина',
-    year: '2025',
+    year: '2026',
     occasion: 'birthday',
     cover: '/w/_covers/svechi.jpg',
     coverRatio: '16 / 9',
@@ -82,7 +90,7 @@ const WORKS: Work[] = [
     id: 'loveis',
     entry: 'index.html',
     title: 'Love is…',
-    year: '2025',
+    year: '2026',
     occasion: 'love',
     cover: '/w/_covers/loveis.jpg',
     coverRatio: '16 / 9',
@@ -91,7 +99,7 @@ const WORKS: Work[] = [
     id: 'ilove',
     entry: 'index.html',
     title: 'Для тебя',
-    year: '2025',
+    year: '2026',
     occasion: 'love',
     cover: '/w/_covers/ilove.jpg',
     coverRatio: '16 / 9',
@@ -111,7 +119,7 @@ const WORKS: Work[] = [
     id: 'tebe',
     entry: 'index.html',
     title: 'Тебе.',
-    year: '2025',
+    year: '2026',
     occasion: 'love',
     cover: '/w/_covers/tebe.jpg',
     coverRatio: '16 / 9',
@@ -124,7 +132,7 @@ const WORKS: Work[] = [
     id: 'poydem',
     entry: 'main.html',
     title: 'Пойдём?',
-    year: '2024',
+    year: '2026',
     occasion: 'love',
     cover: '/w/_covers/poydem.jpg',
     coverRatio: '16 / 9',
@@ -133,7 +141,7 @@ const WORKS: Work[] = [
     id: 'genki',
     entry: 'index.html',
     title: '元気になってね',
-    year: '2024',
+    year: '2026',
     occasion: 'just-because',
     cover: '/w/_covers/genki.jpg',
     coverRatio: '16 / 9',
