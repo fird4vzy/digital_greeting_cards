@@ -5,6 +5,7 @@ import { cache } from 'react';
 import { fileStore } from './file-store';
 import { fileTemplateStore, type TemplateStore } from './templates';
 import { memoryCardFileStore, type CardFileStore } from './card-files';
+import { announceDatabase, databaseChoice } from './connection';
 import { createPostgresStore, type SqlPool } from './postgres';
 import type { OrderRepository } from './repository';
 import type { Order, PublishedCard } from './types';
@@ -44,7 +45,11 @@ type Stores = {
 let storesPromise: Promise<Stores> | null = null;
 
 async function resolveStores(): Promise<Stores> {
-  const url = process.env.DATABASE_URL;
+  // Вне продакшена побеждает DATABASE_URL_DEV, если он задан: локальная
+  // проверка формы не должна писать в ту же базу, что и сайт. См. connection.ts.
+  const choice = databaseChoice();
+  announceDatabase(choice);
+  const url = choice.url;
   const production = process.env.NODE_ENV === 'production';
 
   if (url) {

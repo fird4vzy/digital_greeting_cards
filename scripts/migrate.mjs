@@ -82,7 +82,13 @@ function sslOptionsFor(connectionString) {
   return { rejectUnauthorized: !connectionString.includes('sslmode=no-verify') };
 }
 
-const url = process.env.DATABASE_URL;
+// Та же развилка, что у приложения: вне продакшена DATABASE_URL_DEV
+// побеждает. Миграция, применённая не к той базе, обнаруживается позже всего,
+// поэтому выбор здесь обязан совпадать с выбором в lib/db/connection.ts.
+const devUrl = process.env.NODE_ENV === 'production' ? null : process.env.DATABASE_URL_DEV?.trim();
+const url = devUrl || process.env.DATABASE_URL;
+if (devUrl) console.log('База разработки (DATABASE_URL_DEV).
+');
 if (!url) {
   console.error('DATABASE_URL is not set, and no .env.local or .env supplied it.\n');
   console.error('  Best: put one line into .env.local — it is gitignored, and it is');
