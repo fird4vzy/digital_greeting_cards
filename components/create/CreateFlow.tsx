@@ -319,11 +319,9 @@ export function CreateFlow({
     return (
       <PublishedCard
         code={published.code}
-        url={published.url}
-        recipient={draft.recipientName}
-        // Черновик собран движком, и смотреть его стоит только тому, кто
-        // шаблон и правда выбирал.
-        hasDraft={!wish}
+        // Куда придёт ответ. Показываем то, что он сам оставил, — иначе
+        // «напишем вам» звучит обещанием без адреса.
+        contact={draft.telegram.trim() || draft.phone.trim()}
         strings={copy.done}
       />
     );

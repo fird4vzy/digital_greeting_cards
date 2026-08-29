@@ -234,16 +234,17 @@ export const en: Dictionary = {
         },
       },
       done: {
-        title: 'The order for {name} is in.',
-        lead: 'The shop will put the card together and get in touch. You can look at the draft now — it will change once they are finished.',
-        leadNoDraft:
-          'The shop will read what you asked for, make the card and get in touch. The code is already yours — it will open the finished card.',
-        openPreview: 'See the draft',
-        codeLabel: 'The code',
-        copyLink: 'Copy the link',
-        copied: 'Link copied',
-        openCard: 'Open the card',
-        printQr: 'Print the QR card for the bouquet',
+        title: 'Received.',
+        lead: 'Nothing more to do. We will put the card together by hand and send you the finished link and tag.',
+        stagesLabel: 'What happens next',
+        stages: [
+          'We read everything you wrote.',
+          'We choose a shape that fits the occasion.',
+          'We build the card by hand.',
+          'We send you the link and the printed tag.',
+        ],
+        answerHere: 'We will answer here: {contact}',
+        reference: 'Order number',
       },
     },
 

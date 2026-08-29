@@ -274,15 +274,16 @@ export type Dictionary = {
       };
       done: {
         title: string;
+        /** Без имени получателя: по-русски «для {name}» требует родительного
+            падежа, а склонять произвольное имя надёжно нельзя. Получателя
+            подтвердили шагом раньше, здесь он не нужен. */
         lead: string;
-        /** Когда шаблон не выбирали: черновика нет и обещать его нельзя. */
-        leadNoDraft: string;
-        openPreview: string;
-        codeLabel: string;
-        copyLink: string;
-        copied: string;
-        openCard: string;
-        printQr: string;
+        stagesLabel: string;
+        /** Что произойдёт с заказом. Не прогресс машины, а описание работы. */
+        stages: string[];
+        /** `{contact}` — телеграм или телефон, который оставил заказчик. */
+        answerHere: string;
+        reference: string;
       };
     };
     qr: {
