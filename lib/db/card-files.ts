@@ -13,11 +13,22 @@ import 'server-only';
  * файловой системы. Прецедент уже есть: фотографии заказов лежат тут же,
  * внутри JSON, как data-URL.
  *
- * **Чего это не умеет.** У Vercel тело запроса ограничено 4,5 МБ, поэтому
- * файл тяжелее лимита загрузить нельзя — ни одним запросом, ни этой формой.
- * Из семи существующих работ четыре пролезают целиком, у трёх не проходят
- * видео и звук. Когда это начнёт мешать, лечится не здесь, а загрузкой прямо
- * в объектное хранилище минуя функцию.
+ * **Тяжёлые файлы лежат не здесь.** У Vercel тело запроса ограничено 4,5 МБ,
+ * и файл тяжелее лимита не прошёл бы ни этой формой, ни любой другой — из семи
+ * работ у трёх не проходили видео и звук, то есть открытку, вся суть которой в
+ * записи, нельзя было привязать к заказу. Такие файлы браузер грузит прямо в
+ * объектное хранилище, минуя функцию, а сюда приезжает только адрес.
+ *
+ * Отсюда два источника у строки, и ровно один из них заполнен:
+ *
+ *   * `bytes` — маленькие файлы: вёрстка, стили, скрипт, картинки. Ходят одним
+ *     запросом и лежат в базе. Работают без единой внешней зависимости,
+ *     поэтому открытка собирается и там, где хранилища нет вовсе.
+ *   * `url` — тяжёлые. Требуют настроенного хранилища.
+ *
+ * Разделение по размеру, а не «всё в хранилище», выбрано осознанно: перевод
+ * всех файлов сделал бы хранилище обязательным, и продукт перестал бы работать
+ * там, где его не включили, — ради выигрыша, которого у мелких файлов нет.
  */
 
 /** Верхняя граница на файл. Ниже лимита Vercel, чтобы отказ был свой и внятный. */
@@ -33,10 +44,29 @@ export type CardFile = {
   updatedAt: string;
 };
 
+/**
+ * Содержимое файла: либо байты из базы, либо адрес в хранилище.
+ *
+ * Размеченное объединение, а не два необязательных поля: «ни одного» и «оба
+ * сразу» — состояния, которых не бывает, и тип не должен их допускать. То же
+ * правило записано ограничением в самой таблице (миграция 009).
+ */
+export type CardFileContent =
+  | { kind: 'bytes'; bytes: Buffer; mediaType: string }
+  | { kind: 'url'; url: string; mediaType: string };
+
 export interface CardFileStore {
   list(orderId: string): Promise<CardFile[]>;
-  read(orderId: string, path: string): Promise<{ bytes: Buffer; mediaType: string } | null>;
+  read(orderId: string, path: string): Promise<CardFileContent | null>;
   put(orderId: string, path: string, mediaType: string, bytes: Buffer): Promise<CardFile>;
+  /** Тяжёлый файл: он уже в хранилище, сюда кладётся только адрес. */
+  putRemote(
+    orderId: string,
+    path: string,
+    mediaType: string,
+    url: string,
+    size: number,
+  ): Promise<CardFile>;
   remove(orderId: string, path: string): Promise<boolean>;
   clear(orderId: string): Promise<number>;
 }
@@ -108,7 +138,14 @@ export function normalisePath(raw: string): string | null {
  * хранилище на деле живёт в памяти и теряется вместе с процессом.
  * ---------------------------------------------------------------------- */
 
-type Entry = { bytes: Buffer; mediaType: string; updatedAt: string };
+/** Запись в памяти. `url` и `size` есть только у тяжёлых файлов. */
+type Entry = {
+  bytes: Buffer;
+  mediaType: string;
+  updatedAt: string;
+  url?: string;
+  size?: number;
+};
 
 const globalState = globalThis as typeof globalThis & {
   __cardFiles?: Map<string, Map<string, Entry>>;
@@ -123,7 +160,7 @@ export const memoryCardFileStore: CardFileStore = {
       .map(([path, entry]) => ({
         path,
         mediaType: entry.mediaType,
-        size: entry.bytes.length,
+        size: entry.size ?? entry.bytes.length,
         updatedAt: entry.updatedAt,
       }))
       .sort((a, b) => a.path.localeCompare(b.path));
@@ -131,7 +168,10 @@ export const memoryCardFileStore: CardFileStore = {
 
   async read(orderId, path) {
     const entry = memory.get(orderId)?.get(path);
-    return entry ? { bytes: entry.bytes, mediaType: entry.mediaType } : null;
+    if (!entry) return null;
+    return entry.url
+      ? { kind: 'url', url: entry.url, mediaType: entry.mediaType }
+      : { kind: 'bytes', bytes: entry.bytes, mediaType: entry.mediaType };
   },
 
   async put(orderId, path, mediaType, bytes) {
@@ -140,6 +180,14 @@ export const memoryCardFileStore: CardFileStore = {
     files.set(path, { bytes, mediaType, updatedAt });
     memory.set(orderId, files);
     return { path, mediaType, size: bytes.length, updatedAt };
+  },
+
+  async putRemote(orderId, path, mediaType, url, size) {
+    const files = memory.get(orderId) ?? new Map<string, Entry>();
+    const updatedAt = new Date().toISOString();
+    files.set(path, { bytes: Buffer.alloc(0), url, size, mediaType, updatedAt });
+    memory.set(orderId, files);
+    return { path, mediaType, size, updatedAt };
   },
 
   async remove(orderId, path) {
@@ -187,6 +235,26 @@ function hasTable(pool: PgClient): Promise<boolean> {
   return tableProbe;
 }
 
+/**
+ * Есть ли колонка `url`. Спрашивается у базы один раз за процесс, как и
+ * остальные необязательные колонки в этом проекте.
+ */
+let urlColumnProbe: Promise<boolean> | null = null;
+
+function hasUrlColumn(pool: PgClient): Promise<boolean> {
+  urlColumnProbe ??= pool
+    .query(
+      `SELECT EXISTS (
+         SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'card_files' AND column_name = 'url'
+       ) AS present`,
+    )
+    .then(({ rows }) => Boolean((rows[0] as { present?: boolean } | undefined)?.present))
+    .catch(() => false);
+
+  return urlColumnProbe;
+}
+
 export function createPostgresCardFileStore(pool: PgClient): CardFileStore {
   const iso = (value: unknown) =>
     value instanceof Date ? value.toISOString() : String(value ?? new Date().toISOString());
@@ -209,13 +277,23 @@ export function createPostgresCardFileStore(pool: PgClient): CardFileStore {
 
     async read(orderId, path) {
       if (!(await hasTable(pool))) return null;
+      // `url` читается через запрос к схеме, а не предполагается: код уезжает
+      // на Vercel пушем, миграция запускается руками, и между этими событиями
+      // есть окно. Без проверки в этом окне ломалось бы чтение вообще всех
+      // файлов, а не только тяжёлых.
+      const columns = (await hasUrlColumn(pool)) ? 'bytes, url, media_type' : 'bytes, media_type';
       const { rows } = await pool.query(
-        'SELECT bytes, media_type FROM card_files WHERE order_id = $1 AND path = $2',
+        `SELECT ${columns} FROM card_files WHERE order_id = $1 AND path = $2`,
         [orderId, path],
       );
       const row = rows[0];
       if (!row) return null;
-      return { bytes: Buffer.from(row.bytes as Buffer), mediaType: String(row.media_type) };
+
+      const mediaType = String(row.media_type);
+      const url = row.url ? String(row.url) : null;
+      return url
+        ? { kind: 'url', url, mediaType }
+        : { kind: 'bytes', bytes: Buffer.from(row.bytes as Buffer), mediaType };
     },
 
     async put(orderId, path, mediaType, bytes) {
@@ -234,6 +312,30 @@ export function createPostgresCardFileStore(pool: PgClient): CardFileStore {
         [orderId, path, mediaType, bytes, bytes.length],
       );
       return { path, mediaType, size: bytes.length, updatedAt: iso(rows[0]?.updated_at) };
+    },
+
+    async putRemote(orderId, path, mediaType, url, size) {
+      if (!(await hasTable(pool))) {
+        throw new Error('card_files нет — запустите npm run db:migrate');
+      }
+      if (!(await hasUrlColumn(pool))) {
+        // Внятный отказ вместо ошибки Postgres про несуществующую колонку:
+        // оператор увидит, что делать, а не текст драйвера.
+        throw new Error('Колонки card_files.url нет — запустите npm run db:migrate');
+      }
+      const { rows } = await pool.query(
+        `INSERT INTO card_files (order_id, path, media_type, bytes, url, size)
+         VALUES ($1, $2, $3, NULL, $4, $5)
+         ON CONFLICT (order_id, path)
+         DO UPDATE SET bytes = NULL,
+                       url = EXCLUDED.url,
+                       media_type = EXCLUDED.media_type,
+                       size = EXCLUDED.size,
+                       updated_at = now()
+         RETURNING updated_at`,
+        [orderId, path, mediaType, url, size],
+      );
+      return { path, mediaType, size, updatedAt: iso(rows[0]?.updated_at) };
     },
 
     async remove(orderId, path) {

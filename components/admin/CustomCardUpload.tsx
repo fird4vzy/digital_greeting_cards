@@ -1,5 +1,16 @@
 'use client';
 
+import { upload } from '@vercel/blob/client';
+
+/**
+ * Порог, после которого файл идёт в хранилище, а не через функцию.
+ *
+ * Четыре мегабайта — с запасом ниже 4,5 МБ, которыми Vercel ограничивает тело
+ * запроса: к самому файлу в форме добавляются границы, имя и остальные поля,
+ * и упереться в предел на файле ровно в 4,5 МБ было бы обидно.
+ */
+const MAX_DIRECT_BYTES = 4 * 1024 * 1024;
+
 import { useRef, useState } from 'react';
 import type { CardFile } from '@/lib/db/card-files';
 
@@ -60,7 +71,7 @@ export function CustomCardUpload({
   const total = files.reduce((sum, file) => sum + file.size, 0);
   const entries = files.filter((file) => /\.html?$/i.test(file.path));
 
-  async function upload(picked: FileList | null) {
+  async function send(picked: FileList | null) {
     if (!picked || picked.length === 0) return;
 
     setError(null);
@@ -72,11 +83,38 @@ export function CustomCardUpload({
     for (const [index, file] of list.entries()) {
       const body = new FormData();
       body.set('orderId', orderId);
-      body.set('file', file);
       // `webkitRelativePath` включает саму папку первым сегментом — он лишний:
       // открытка должна открываться с `index.html`, а не с `iLove/index.html`.
       const relative = (file as File & { webkitRelativePath?: string }).webkitRelativePath;
-      body.set('path', relative ? relative.split('/').slice(1).join('/') : file.name);
+      const path = relative ? relative.split('/').slice(1).join('/') : file.name;
+      body.set('path', path);
+
+      // ТЯЖЁЛЫЙ ФАЙЛ ИДЁТ МИМО ФУНКЦИИ.
+      //
+      // У Vercel тело запроса ограничено 4,5 МБ, и до сих пор на этом всё и
+      // заканчивалось: видео и звук трёх работ из семи привязать к заказу было
+      // нельзя ничем. Теперь браузер грузит такой файл прямо в хранилище, а
+      // сюда отправляет только адрес. Маленькие идут как шли — так папка
+      // целиком собирается и там, где хранилище не включали.
+      if (file.size > MAX_DIRECT_BYTES) {
+        try {
+          const { url } = await upload(`cards/${orderId}/${path}`, file, {
+            access: 'public',
+            contentType: file.type || 'application/octet-stream',
+            handleUploadUrl: '/api/admin/card-files/token',
+          });
+          body.set('url', url);
+          body.set('size', String(file.size));
+        } catch (error) {
+          setError(
+            `«${path}» весит ${(file.size / 1024 / 1024).toFixed(1)} МБ и не прошёл в хранилище: ` +
+              `${(error as Error).message}. Включите Blob в Vercel и задайте BLOB_READ_WRITE_TOKEN.`,
+          );
+          break;
+        }
+      } else {
+        body.set('file', file);
+      }
 
       const response = await fetch('/api/admin/card-files', { method: 'POST', body });
 
@@ -183,7 +221,7 @@ export function CustomCardUpload({
         // Не в JSX-типах React, но поддерживается всеми браузерами, где
         // администратор реально работает.
         {...({ webkitdirectory: '' } as Record<string, string>)}
-        onChange={(event) => upload(event.target.files)}
+        onChange={(event) => send(event.target.files)}
         className="hidden"
         id={`upload-${orderId}`}
       />

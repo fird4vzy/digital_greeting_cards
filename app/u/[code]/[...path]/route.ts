@@ -54,10 +54,27 @@ export async function GET(_request: Request, { params }: Params) {
   const file = await store.read(order.id, path.join('/'));
   if (!file) return new Response('Not found', { status: 404 });
 
-  return new Response(new Uint8Array(file.bytes), {
+  // Тяжёлый файл лежит в объектном хранилище, но отдаётся всё равно отсюда, а
+  // не редиректом на его адрес. Редирект был бы дешевле и соблазнительнее, но
+  // он снял бы разом обе гарантии этого маршрута: заголовок с песочницей
+  // ставим мы, а не хранилище, и проверку «заказ существует и не отменён»
+  // делать было бы негде — адрес в хранилище вечен и никого не спрашивает.
+  // Лишний переход байтов через функцию — цена этих двух гарантий.
+  const body =
+    file.kind === 'url'
+      ? await fetch(file.url, { cache: 'no-store' }).then((upstream) =>
+          upstream.ok ? upstream.arrayBuffer() : null,
+        )
+      : file.bytes;
+
+  if (!body) return new Response('Not found', { status: 404 });
+
+  const bytes = body instanceof ArrayBuffer ? new Uint8Array(body) : new Uint8Array(body);
+
+  return new Response(bytes, {
     headers: {
       'Content-Type': file.mediaType,
-      'Content-Length': String(file.bytes.length),
+      'Content-Length': String(bytes.length),
       'Access-Control-Allow-Origin': '*',
       // Песочница на уровне документа. `allow-scripts` — потому что открытки
       // анимированы и без скриптов мертвы; `allow-popups` — потому что ссылка
