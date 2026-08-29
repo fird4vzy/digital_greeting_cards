@@ -104,7 +104,7 @@ export function PublishedCard({
           ) : null}
         </div>
 
-        <p className="mt-6 break-all text-caption text-ink-faint">{url}</p>
+        <p className="mt-6 break-all text-caption text-ink-muted">{url}</p>
       </div>
 
       <ButtonLink href={`/c/${code}/qr`} variant="ghost" className="mt-8">

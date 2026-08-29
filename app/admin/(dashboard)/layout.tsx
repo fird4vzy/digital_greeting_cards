@@ -66,14 +66,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <div className="ml-auto flex items-center gap-5 max-md:order-first">
             <LocaleSwitcher locale={locale} label={dict.ui.localeSwitcher.label} />
 
-            <Link href="/" className="text-caption text-ink-muted transition-colors hover:text-ink">
+            <Link href="/" className="tap-44 text-caption text-ink-muted transition-colors hover:text-ink">
               {nav.viewSite}
             </Link>
 
             <form action={signOut}>
               <button
                 type="submit"
-                className="text-caption text-ink-muted transition-colors hover:text-ink"
+                className="tap-44 text-caption text-ink-muted transition-colors hover:text-ink"
               >
                 {nav.signOut}
               </button>

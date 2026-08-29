@@ -54,7 +54,7 @@ export function MemoriesSection({ dict, counter }: { dict: Dictionary; counter?:
                 className="h-full rounded-[1.25rem] border border-edge bg-surface-2/70 p-6 shadow-[var(--shadow-lift)] transition-transform duration-700 ease-[var(--ease-out-expo)] hover:rotate-0 sm:p-7"
                 style={{ rotate: item.tilt }}
               >
-                <span className="eyebrow text-brand">{item.label}</span>
+                <span className="eyebrow text-brand-soft">{item.label}</span>
                 <p
                   className={
                     'display' in item && item.display
@@ -74,7 +74,7 @@ export function MemoriesSection({ dict, counter }: { dict: Dictionary; counter?:
               className="h-full rounded-[1.25rem] border border-edge bg-surface-2/70 p-6 shadow-[var(--shadow-lift)] sm:p-7"
               style={{ rotate: '1.4deg' }}
             >
-              <span className="eyebrow text-brand">{dict.ui.memories.labels.photos}</span>
+              <span className="eyebrow text-brand-soft">{dict.ui.memories.labels.photos}</span>
               <div className="mt-4 grid grid-cols-4 gap-2">
                 {PHOTOS.map((url, index) => (
                   <span

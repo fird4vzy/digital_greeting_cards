@@ -483,10 +483,10 @@ export function CreateFlow({
                 rows={10}
                 autoFocus
                 placeholder={copy.steps.story.placeholder}
-                className="w-full resize-none rounded-[1rem] border border-line-strong bg-white/60 p-6 font-sans text-body leading-[1.8] text-ink outline-none transition-colors duration-400 placeholder:text-ink-faint focus:border-ink focus:bg-white"
+                className="w-full resize-none rounded-[1rem] border border-line-strong bg-white/60 p-6 font-sans text-body leading-[1.8] text-ink outline-none transition-colors duration-400 placeholder:text-ink-muted focus:border-ink focus:bg-white"
               />
             </label>
-            <p className="mt-3 text-caption text-ink-faint">
+            <p className="mt-3 text-caption text-ink-muted">
               {draft.story.trim().length > 0
                 ? t(copy.steps.story.wordCount, { count: draft.story.trim().split(/\s+/).length })
                 : copy.steps.story.emptyHint}
@@ -660,7 +660,7 @@ export function CreateFlow({
                 rows={7}
                 maxLength={4000}
                 placeholder={copy.steps.template.ownPlaceholder}
-                className="mt-8 w-full resize-none rounded-[1rem] border border-line-strong bg-white/60 p-5 text-body leading-relaxed text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-ink"
+                className="mt-8 w-full resize-none rounded-[1rem] border border-line-strong bg-white/60 p-5 text-body leading-relaxed text-ink outline-none transition-colors placeholder:text-ink-muted focus:border-ink"
               />
             ) : null}
 
@@ -730,7 +730,7 @@ export function CreateFlow({
                 rows={6}
                 autoFocus
                 placeholder={copy.steps.brief.placeholder}
-                className="w-full resize-none rounded-[1rem] border border-line-strong bg-white/60 p-6 font-sans text-body leading-[1.8] text-ink outline-none transition-colors duration-400 placeholder:text-ink-faint focus:border-ink focus:bg-white"
+                className="w-full resize-none rounded-[1rem] border border-line-strong bg-white/60 p-6 font-sans text-body leading-[1.8] text-ink outline-none transition-colors duration-400 placeholder:text-ink-muted focus:border-ink focus:bg-white"
               />
             </label>
           </StepShell>
@@ -831,7 +831,7 @@ export function CreateFlow({
                 </div>
 
                 {!hasContact ? (
-                  <p className="mt-4 text-caption text-ink-faint">{copy.steps.contact.required}</p>
+                  <p className="mt-4 text-caption text-ink-muted">{copy.steps.contact.required}</p>
                 ) : null}
               </div>
 
@@ -878,7 +878,7 @@ function Field({
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
         autoFocus={autoFocus}
-        className="w-full border-b border-line-strong bg-transparent pb-3 font-display text-title text-ink outline-none transition-colors duration-400 placeholder:text-ink-faint focus:border-ink"
+        className="w-full border-b border-line-strong bg-transparent pb-3 font-display text-title text-ink outline-none transition-colors duration-400 placeholder:text-ink-muted focus:border-ink"
       />
     </label>
   );
@@ -887,7 +887,7 @@ function Field({
 function Summary({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-baseline justify-between gap-4 border-b border-line pb-2.5">
-      <dt className="eyebrow text-ink-faint">{label}</dt>
+      <dt className="eyebrow text-ink-muted">{label}</dt>
       <dd className="text-ink">{children}</dd>
     </div>
   );

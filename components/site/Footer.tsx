@@ -54,7 +54,7 @@ export function Footer({ strings }: { strings: Dictionary['ui']['footer'] }) {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-caption text-on-surface-soft transition-colors duration-300 hover:text-brand"
+                    className="tap-44 text-caption text-on-surface-soft transition-colors duration-300 hover:text-brand"
                   >
                     {link.label}
                   </Link>

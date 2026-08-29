@@ -67,7 +67,7 @@ export function EarningsCalculator({
 
       <p className="mt-5 text-caption text-ink-muted">
         {strings.fee.replace('{amount}', money(feePerMonth))}{' '}
-        <span className="text-ink-faint">{strings.feeNote}</span>
+        <span className="text-ink-muted">{strings.feeNote}</span>
       </p>
     </div>
   );
@@ -114,7 +114,7 @@ function Slider({
 function Figure({ label, value, emphasis }: { label: string; value: string; emphasis?: boolean }) {
   return (
     <div className="bg-paper p-5">
-      <dt className="text-[0.75rem] leading-snug text-ink-faint">{label}</dt>
+      <dt className="text-[0.75rem] leading-snug text-ink-muted">{label}</dt>
       <dd
         className={
           emphasis

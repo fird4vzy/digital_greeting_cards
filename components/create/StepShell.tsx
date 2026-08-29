@@ -106,7 +106,7 @@ export function StepShell({
 
       {/* Uzbek puts the total before the current step, so the whole sentence
           is one dictionary string with slots rather than assembled here. */}
-      <p className="mt-6 text-caption text-ink-faint">
+      <p className="mt-6 text-caption text-ink-muted">
         {strings.progress
           .replace('{current}', String(index + 1))
           .replace('{total}', String(total))}

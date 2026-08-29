@@ -66,7 +66,7 @@ export default async function OrderDetail({ params }: Props) {
         </div>
         <div className="flex items-center gap-3">
           <StatusPill status={order.status} />
-          <span className="eyebrow text-ink-faint tabular-nums">{order.code}</span>
+          <span className="eyebrow text-ink-muted tabular-nums">{order.code}</span>
         </div>
       </header>
 
@@ -185,7 +185,7 @@ export default async function OrderDetail({ params }: Props) {
                   </p>
                 ))
               ) : (
-                <p className="text-caption italic text-ink-faint">{t.noMessage}</p>
+                <p className="text-caption italic text-ink-muted">{t.noMessage}</p>
               )}
             </div>
           </section>
@@ -216,7 +216,7 @@ export default async function OrderDetail({ params }: Props) {
               <ul className="divide-y divide-line border-y border-line">
                 {order.moments.map((moment, index) => (
                   <li key={`moment-${index}`} className="flex gap-5 py-3.5">
-                    <span className="eyebrow w-32 shrink-0 text-ink-faint">{moment.date}</span>
+                    <span className="eyebrow w-32 shrink-0 text-ink-muted">{moment.date}</span>
                     <span className="text-caption text-ink-soft">
                       {moment.title}
                       {moment.text ? ` — ${moment.text}` : ''}
@@ -225,7 +225,7 @@ export default async function OrderDetail({ params }: Props) {
                 ))}
                 {order.memories.map((memory, index) => (
                   <li key={`memory-${index}`} className="flex gap-5 py-3.5">
-                    <span className="eyebrow w-32 shrink-0 text-ink-faint">{memory.label}</span>
+                    <span className="eyebrow w-32 shrink-0 text-ink-muted">{memory.label}</span>
                     <span className="text-caption text-ink-soft">{memory.text}</span>
                   </li>
                 ))}
@@ -242,7 +242,7 @@ export default async function OrderDetail({ params }: Props) {
                 rows={3}
                 defaultValue={order.notes ?? ''}
                 placeholder={t.notesPlaceholder}
-                className="w-full resize-none bg-transparent text-body text-ink outline-none placeholder:text-ink-faint"
+                className="w-full resize-none bg-transparent text-body text-ink outline-none placeholder:text-ink-muted"
               />
               <button
                 type="submit"
@@ -367,7 +367,7 @@ export default async function OrderDetail({ params }: Props) {
             <ol className="space-y-3 text-caption leading-relaxed text-ink-soft">
               {t.howSteps.map((line, index) => (
                 <li key={line} className="flex gap-3">
-                  <span className="eyebrow shrink-0 pt-[0.15rem] text-ink-faint tabular-nums">
+                  <span className="eyebrow shrink-0 pt-[0.15rem] text-ink-muted tabular-nums">
                     {index + 1}
                   </span>
                   <span>{line}</span>
@@ -408,7 +408,7 @@ export default async function OrderDetail({ params }: Props) {
               </p>
             ) : null}
 
-            <p className="mt-4 break-all text-[0.7rem] leading-relaxed text-ink-faint">{url}</p>
+            <p className="mt-4 break-all text-[0.7rem] leading-relaxed text-ink-muted">{url}</p>
           </Panel>
 
           <Panel title={t.panelDanger}>
@@ -454,7 +454,7 @@ async function destroy(formData: FormData) {
 function Detail({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="border-b border-line pb-3">
-      <dt className="eyebrow text-ink-faint">{label}</dt>
+      <dt className="eyebrow text-ink-muted">{label}</dt>
       <dd className="mt-1.5 text-caption text-ink">{children}</dd>
     </div>
   );
@@ -491,7 +491,7 @@ function ActionLink({
 }) {
   if (disabled) {
     return (
-      <span className="block w-full cursor-not-allowed rounded-[0.5rem] border border-line px-4 py-2 text-center text-caption text-ink-faint">
+      <span className="block w-full cursor-not-allowed rounded-[0.5rem] border border-line px-4 py-2 text-center text-caption text-ink-muted">
         {children}
       </span>
     );

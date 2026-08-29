@@ -141,7 +141,7 @@ export function WorksRail({
                 <span className="mt-1.5 block font-display text-[1.35rem] leading-tight text-on-surface">
                   {work.title}
                 </span>
-                <span className="mt-2 inline-block text-caption text-brand opacity-75 transition-opacity duration-500 group-hover:opacity-100">
+                <span className="mt-2 inline-block text-caption text-brand-soft opacity-90 transition-opacity duration-500 group-hover:opacity-100">
                   {openLabel} &rarr;
                 </span>
               </Link>

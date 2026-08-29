@@ -60,7 +60,7 @@ export default async function AdminOverview() {
               <p className="mt-4 font-display text-[2.5rem] leading-none tabular-nums text-ink">
                 {counts[status]}
               </p>
-              <p className="mt-2 text-[0.75rem] leading-snug text-ink-faint">{meta.hint}</p>
+              <p className="mt-2 text-[0.75rem] leading-snug text-ink-muted">{meta.hint}</p>
             </Link>
           );
         })}
@@ -93,11 +93,11 @@ export default async function AdminOverview() {
                     {occasionLabel(order.occasion, dict)} ·{' '}
                     {localiseTemplate(resolveTemplate(order.templateId), dict).name}
                   </span>
-                  <span className="text-caption text-ink-faint">
+                  <span className="text-caption text-ink-muted">
                     {order.customer.shop ?? dict.admin.order.direct}
                   </span>
                   <StatusPill status={order.status} className="ml-auto" />
-                  <span className="eyebrow w-16 text-right text-ink-faint tabular-nums">
+                  <span className="eyebrow w-16 text-right text-ink-muted tabular-nums">
                     {order.code}
                   </span>
                 </Link>

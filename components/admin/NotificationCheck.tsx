@@ -115,7 +115,7 @@ export function NotificationCheck({
       <p className="mt-3 text-caption leading-relaxed text-ink-muted">{summary}</p>
 
       {state.kind === 'partial' ? (
-        <p className="mt-2 text-caption leading-relaxed text-ink-faint">{strings.redeploy}</p>
+        <p className="mt-2 text-caption leading-relaxed text-ink-muted">{strings.redeploy}</p>
       ) : null}
 
       {result ? (
@@ -148,7 +148,7 @@ export function NotificationCheck({
                   </li>
                 ))}
               </ul>
-              <p className="mt-3 text-ink-faint">{strings.chatsHint}</p>
+              <p className="mt-3 text-ink-muted">{strings.chatsHint}</p>
             </>
           )}
         </div>

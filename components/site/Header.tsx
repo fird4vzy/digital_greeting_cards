@@ -71,7 +71,7 @@ export function Header({
               <Link
                 key={link.href}
                 href={link.href}
-                className="relative text-caption text-on-surface-soft transition-colors duration-300 hover:text-on-surface"
+                className="tap-44 relative text-caption text-on-surface-soft transition-colors duration-300 hover:text-on-surface"
               >
                 {link.label}
               </Link>

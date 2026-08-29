@@ -182,7 +182,7 @@ export function CustomCardUpload({
     <div className="space-y-3 text-caption">
       <p className="leading-relaxed text-ink-muted">{strings.lead}</p>
 
-      <p className={entry ? 'text-ink' : 'text-ink-faint'}>
+      <p className={entry ? 'text-ink' : 'text-ink-muted'}>
         {entry ? strings.showing : strings.showingEngine}
       </p>
 
@@ -193,12 +193,12 @@ export function CustomCardUpload({
             .replace('{size}', humanSize(total, strings))}
         </p>
       ) : (
-        <p className="text-ink-faint">{strings.empty}</p>
+        <p className="text-ink-muted">{strings.empty}</p>
       )}
 
       {entries.length > 0 ? (
         <label className="block">
-          <span className="eyebrow mb-1.5 block text-ink-faint">{strings.entryLabel}</span>
+          <span className="eyebrow mb-1.5 block text-ink-muted">{strings.entryLabel}</span>
           <select
             value={entry ?? ''}
             onChange={(event) => selectEntry(event.target.value || null)}

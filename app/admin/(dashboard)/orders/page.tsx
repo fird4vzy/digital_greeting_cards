@@ -87,7 +87,7 @@ export default async function OrdersPage({ searchParams }: Props) {
             name="q"
             defaultValue={q ?? ''}
             placeholder={t.searchPlaceholder}
-            className="h-9 w-56 rounded-full border border-line-strong bg-white/60 px-4 text-caption text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-ink"
+            className="h-9 w-56 rounded-full border border-line-strong bg-white/60 px-4 text-caption text-ink outline-none transition-colors placeholder:text-ink-muted focus:border-ink"
           />
           <button
             type="submit"
@@ -142,7 +142,7 @@ export default async function OrdersPage({ searchParams }: Props) {
                   t.columns.status,
                   t.columns.code,
                 ].map((heading) => (
-                  <th key={heading} className="eyebrow pb-3 pr-4 font-medium text-ink-faint">
+                  <th key={heading} className="eyebrow pb-3 pr-4 font-medium text-ink-muted">
                     {heading}
                   </th>
                 ))}
@@ -152,16 +152,23 @@ export default async function OrdersPage({ searchParams }: Props) {
               {orders.map((order) => (
                 <tr
                   key={order.id}
-                  className="group border-b border-line transition-colors hover:bg-white/70"
+                  // `relative` — половина приёма «растянутая ссылка», которой
+                  // не хватало: без неё `after:absolute` у ссылки ниже цепляется
+                  // за произвольного предка, а не за строку.
+                  className="group relative border-b border-line transition-colors hover:bg-white/70"
                 >
                   <td className="py-4 pr-4">
                     <Link
                       href={`/admin/orders/${order.id}`}
-                      className="font-display text-[1.15rem] leading-none text-ink after:absolute"
+                      // Вторая половина: без `inset-0` псевдоэлемент имеет
+                      // нулевой размер, и целью остаётся сам текст — 73×16,
+                      // то есть отказ по WCAG 2.5.8 на главном действии
+                      // оператора. Теперь нажимается вся строка.
+                      className="font-display text-[1.15rem] leading-none text-ink after:absolute after:inset-0"
                     >
                       {order.recipient.name}
                     </Link>
-                    <span className="mt-1 block text-[0.75rem] text-ink-faint">
+                    <span className="mt-1 block text-[0.75rem] text-ink-muted">
                       {t.from} {order.customer.name}
                     </span>
                   </td>

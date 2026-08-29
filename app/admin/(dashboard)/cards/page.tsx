@@ -65,14 +65,14 @@ export default async function CardsPage() {
                   <p className="mt-2 text-caption text-ink-muted">
                     {t.from} {card.senderName} · {occasionLabel(card.occasion, dict)}
                   </p>
-                  <p className="mt-1 text-caption text-ink-faint">
+                  <p className="mt-1 text-caption text-ink-muted">
                     {localiseTemplate(resolveTemplate(card.templateId), dict).name}
                   </p>
                 </div>
               </div>
 
-              <p className="mt-4 eyebrow text-ink-faint tabular-nums">{card.code}</p>
-              <p className="mt-2 break-all text-[0.7rem] leading-relaxed text-ink-faint">
+              <p className="mt-4 eyebrow text-ink-muted tabular-nums">{card.code}</p>
+              <p className="mt-2 break-all text-[0.7rem] leading-relaxed text-ink-muted">
                 {card.url}
               </p>
 

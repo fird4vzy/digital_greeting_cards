@@ -31,7 +31,7 @@ export function LoginForm({ labels }: { labels: LoginLabels }) {
         autoFocus
         required
         aria-describedby={state.error ? 'login-error' : undefined}
-        className="mt-2 h-12 w-full rounded-2xl border border-line-strong bg-white/60 px-4 text-body text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-ink"
+        className="mt-2 h-12 w-full rounded-2xl border border-line-strong bg-white/60 px-4 text-body text-ink outline-none transition-colors placeholder:text-ink-muted focus:border-ink"
       />
 
       {/* Announced on arrival: the field is focused, so a screen reader user

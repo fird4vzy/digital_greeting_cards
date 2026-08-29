@@ -123,7 +123,7 @@ export function PhotoStep({
             ))}
           </div>
 
-          <p className="mt-4 text-caption text-ink-faint">
+          <p className="mt-4 text-caption text-ink-muted">
             {strings.count.replace('{count}', String(photos.length))}
           </p>
         </>

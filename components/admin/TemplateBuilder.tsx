@@ -238,7 +238,7 @@ export function TemplateBuilder({
             </button>
           </div>
 
-          <p className="mt-5 text-caption text-ink-faint">{t.importOr}</p>
+          <p className="mt-5 text-caption text-ink-muted">{t.importOr}</p>
 
           <label className="mt-3 inline-flex cursor-pointer items-center gap-3 rounded-full border border-dashed border-line-strong px-5 py-2.5 text-caption text-ink-soft transition-colors hover:border-ink hover:text-ink">
             <input
@@ -257,10 +257,14 @@ export function TemplateBuilder({
             {t.importFiles}
           </label>
 
-          <p className="mt-2 text-[0.72rem] text-ink-faint">{t.importFilesHint}</p>
+          <p className="mt-2 text-[0.72rem] text-ink-muted">{t.importFilesHint}</p>
 
           {unmapped.length > 0 ? (
-            <div className="mt-5 rounded-[0.6rem] border-l-2 border-accent bg-accent/[0.06] px-4 py-3">
+            // Полоса сбоку заменена на тонкую рамку по кругу: двухпиксельный
+            // цветной борт с одной стороны — самый узнаваемый штамп панелей,
+            // собранных наспех, и он ничего не сообщает сверх заливки. Заливка
+            // и так говорит, что это предупреждение.
+            <div className="mt-5 rounded-[0.6rem] border border-accent/30 bg-accent/[0.06] px-4 py-3">
               <p className="text-caption text-ink">{t.unmapped}</p>
               <ul className="mt-2 space-y-1">
                 {unmapped.map((item, index) => (
@@ -351,7 +355,7 @@ export function TemplateBuilder({
             selected={form.occasions}
             onToggle={(id) => set('occasions', toggle(form.occasions, id))}
           />
-          <p className="eyebrow mt-6 text-ink-faint">{t.moods}</p>
+          <p className="eyebrow mt-6 text-ink-muted">{t.moods}</p>
           <Chips
             options={vocabulary.moods}
             selected={form.moods}
@@ -501,15 +505,15 @@ export function TemplateBuilder({
       </div>
 
       <aside>
-        <p className="eyebrow text-ink-faint">{t.existing}</p>
+        <p className="eyebrow text-ink-muted">{t.existing}</p>
         {stored.length === 0 ? (
-          <p className="mt-4 text-caption text-ink-faint">{t.none}</p>
+          <p className="mt-4 text-caption text-ink-muted">{t.none}</p>
         ) : (
           <ul className="mt-4 space-y-4">
             {stored.map((recipe) => (
               <li key={recipe.id} className="rounded-[0.75rem] border border-line bg-white/50 p-4">
                 <p className="text-caption text-ink">{recipe.strings.en.name}</p>
-                <code className="text-[0.7rem] text-ink-faint">{recipe.id}</code>
+                <code className="text-[0.7rem] text-ink-muted">{recipe.id}</code>
                 <div className="mt-3 flex flex-wrap gap-3">
                   <Link
                     href={`/templates/${recipe.id}`}
@@ -525,7 +529,7 @@ export function TemplateBuilder({
                         await deleteTemplate(recipe.id);
                       });
                     }}
-                    className="text-[0.72rem] text-ink-faint underline-offset-4 hover:text-accent-deep hover:underline"
+                    className="text-[0.72rem] text-ink-muted underline-offset-4 hover:text-accent-deep hover:underline"
                   >
                     {t.remove}
                   </button>
@@ -571,9 +575,9 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="eyebrow block text-ink-faint">{label}</span>
+      <span className="eyebrow block text-ink-muted">{label}</span>
       <span className="mt-2 block">{children}</span>
-      {hint ? <span className="mt-1.5 block text-[0.72rem] text-ink-faint">{hint}</span> : null}
+      {hint ? <span className="mt-1.5 block text-[0.72rem] text-ink-muted">{hint}</span> : null}
     </label>
   );
 }

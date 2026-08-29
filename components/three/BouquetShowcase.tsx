@@ -58,7 +58,7 @@ export function BouquetShowcase({
       ) : null}
 
       {enabled && ready ? (
-        <p className="pointer-events-none absolute bottom-1 left-1/2 -translate-x-1/2 text-[0.7rem] tracking-[0.04em] text-ink-faint">
+        <p className="pointer-events-none absolute bottom-1 left-1/2 -translate-x-1/2 text-[0.7rem] tracking-[0.04em] text-ink-muted">
           {strings.hint}
         </p>
       ) : null}

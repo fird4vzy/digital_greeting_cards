@@ -83,7 +83,7 @@ export default async function AdminTemplatesPage() {
                       style={{ background: swatch }}
                     />
                   ))}
-                  <span className="ml-2 text-[0.7rem] text-ink-faint">{palette.name}</span>
+                  <span className="ml-2 text-[0.7rem] text-ink-muted">{palette.name}</span>
                 </p>
               </div>
 
@@ -165,7 +165,7 @@ export default async function AdminTemplatesPage() {
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex gap-3">
-      <dt className="eyebrow w-20 shrink-0 pt-[0.15rem] text-ink-faint">{label}</dt>
+      <dt className="eyebrow w-20 shrink-0 pt-[0.15rem] text-ink-muted">{label}</dt>
       <dd className="text-ink-soft">{children}</dd>
     </div>
   );

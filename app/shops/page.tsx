@@ -228,7 +228,7 @@ export default async function ShopsPage() {
             <Reveal preset="fade">
               <div className="mt-9 flex flex-col items-center gap-4">
                 <ButtonLink href={telegramUrl}>{t.contact.cta}</ButtonLink>
-                <p className="text-caption text-ink-faint">{t.contact.note}</p>
+                <p className="text-caption text-ink-muted">{t.contact.note}</p>
                 <Link
                   href={telegramUrl}
                   className="text-caption text-ink-muted underline underline-offset-4 hover:text-ink"
