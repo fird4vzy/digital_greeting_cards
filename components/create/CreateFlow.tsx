@@ -321,6 +321,9 @@ export function CreateFlow({
         code={published.code}
         url={published.url}
         recipient={draft.recipientName}
+        // Черновик собран движком, и смотреть его стоит только тому, кто
+        // шаблон и правда выбирал.
+        hasDraft={!wish}
         strings={copy.done}
       />
     );

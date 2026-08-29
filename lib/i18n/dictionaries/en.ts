@@ -236,6 +236,8 @@ export const en: Dictionary = {
       done: {
         title: 'The order for {name} is in.',
         lead: 'The shop will put the card together and get in touch. You can look at the draft now — it will change once they are finished.',
+        leadNoDraft:
+          'The shop will read what you asked for, make the card and get in touch. The code is already yours — it will open the finished card.',
         openPreview: 'See the draft',
         codeLabel: 'The code',
         copyLink: 'Copy the link',

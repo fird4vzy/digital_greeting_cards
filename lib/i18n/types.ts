@@ -275,6 +275,8 @@ export type Dictionary = {
       done: {
         title: string;
         lead: string;
+        /** Когда шаблон не выбирали: черновика нет и обещать его нельзя. */
+        leadNoDraft: string;
         openPreview: string;
         codeLabel: string;
         copyLink: string;

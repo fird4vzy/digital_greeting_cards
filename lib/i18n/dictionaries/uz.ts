@@ -240,6 +240,8 @@ export const uz: Dictionary = {
       done: {
         title: '{name} uchun ariza qabul qilindi.',
         lead: 'Salon otkritkani yig‘adi va siz bilan bog‘lanadi. Qoralamani hozir ham ko‘rish mumkin — salon tugatgach u o‘zgaradi.',
+        leadNoDraft:
+          'Salon so‘rovingizni o‘qiydi, kartochkani tayyorlaydi va siz bilan bog‘lanadi. Kod allaqachon biriktirilgan — tayyor kartochka o‘sha kod bilan ochiladi.',
         openPreview: 'Qoralamani ko‘rish',
         codeLabel: 'Kod',
         copyLink: 'Havolani nusxalash',

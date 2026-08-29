@@ -18,11 +18,20 @@ export function PublishedCard({
   code,
   url,
   recipient,
+  /**
+   * Есть ли что показывать в черновике.
+   *
+   * Ложь, когда заказчик шаблон не выбирал: черновик собран подобранным
+   * шаблоном — тем самым, от которого он отказался. Предлагать «посмотреть»
+   * то, что человек только что отклонил, — обещание не того, что он получит.
+   */
+  hasDraft,
   strings,
 }: {
   code: string;
   url: string;
   recipient: string;
+  hasDraft: boolean;
   strings: Dictionary['ui']['create']['done'];
 }) {
   const { reduced } = useMotionPrefs();
@@ -56,7 +65,11 @@ export function PublishedCard({
         {strings.title.replace('{name}', recipient)}
       </h1>
 
-      <p className="mt-5 max-w-[42ch] text-body-lg text-pretty text-ink-soft">{strings.lead}</p>
+      {/* Текст тоже обещал черновик, а не только кнопка. Оставить его при
+          выключенной кнопке значило бы поменять одну несостыковку на другую. */}
+      <p className="mt-5 max-w-[42ch] text-body-lg text-pretty text-ink-soft">
+        {hasDraft ? strings.lead : strings.leadNoDraft}
+      </p>
 
       <div className="mt-12 w-full rounded-[1.25rem] border border-line-strong bg-white/70 p-7">
         <span className="eyebrow block text-ink-muted">{strings.codeLabel}</span>
@@ -77,12 +90,18 @@ export function PublishedCard({
           >
             {copied ? strings.copied : strings.copyLink}
           </Button>
-          {/* The draft, not `/c/[code]`: that URL stays published-only so a
-              printed tag can never resolve to an unfinished card. */}
-          <ButtonLink href={`/c/${code}/preview`} variant="secondary">
-            {strings.openPreview}
-            <ArrowGlyph />
-          </ButtonLink>
+          {/* Черновик, а не `/c/[code]`: тот адрес остаётся только для
+              опубликованных, чтобы напечатанная бирка никогда не привела к
+              недоделанной открытке.
+
+              А когда шаблон не выбирали, кнопки нет вовсе: показывать нечего,
+              и предложение «посмотреть» вело бы к отклонённому шаблону. */}
+          {hasDraft ? (
+            <ButtonLink href={`/c/${code}/preview`} variant="secondary">
+              {strings.openPreview}
+              <ArrowGlyph />
+            </ButtonLink>
+          ) : null}
         </div>
 
         <p className="mt-6 break-all text-caption text-ink-faint">{url}</p>
