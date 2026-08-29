@@ -1,10 +1,11 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { blobUrlsOf, eraseBlobs } from '@/lib/storage/erase';
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/lib/auth/guard';
 import { composeConfigForOrderAnywhere } from '@/lib/card/compose-server';
-import { getOrder, removeOrder, updateOrder } from '@/lib/db';
+import { getCardFileStore, getOrder, removeOrder, updateOrder } from '@/lib/db';
 import { ORDER_STATUSES, canTransition, isDeletable, type OrderStatus } from '@/lib/db/types';
 import { findChats, sendTestNotification, type ChatLookup, type TestResult } from '@/lib/notify/telegram';
 import { siteOrigin } from '@/lib/site-origin';
@@ -95,6 +96,13 @@ export async function deleteOrder(id: string) {
 
   const order = await getOrder(id);
   if (!order || !isDeletable(order)) return;
+
+  // Сначала файлы в хранилище, потом строка. Порядок важен: адреса записаны
+  // только в самом заказе, и удалив строку первой, мы потеряли бы единственный
+  // способ узнать, что стирать. Отказ хранилища не мешает удалению — стирание
+  // ошибок не бросает, а считает их и пишет в лог.
+  const store = await getCardFileStore();
+  await eraseBlobs(blobUrlsOf(order, await store.remoteUrls(id)));
 
   await removeOrder(id);
 

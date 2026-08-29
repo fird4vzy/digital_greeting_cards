@@ -69,6 +69,14 @@ export interface CardFileStore {
   ): Promise<CardFile>;
   remove(orderId: string, path: string): Promise<boolean>;
   clear(orderId: string): Promise<number>;
+  /**
+   * Адреса файлов этого заказа в объектном хранилище.
+   *
+   * Нужны при удалении: строки в базе уносит `ON DELETE CASCADE`, а файлы по
+   * публичным адресам он не трогает. Без этого списка «удалить заказ»
+   * означало бы «убрать из панели», а видео продолжало бы открываться.
+   */
+  remoteUrls(orderId: string): Promise<string[]>;
 }
 
 /**
@@ -192,6 +200,12 @@ export const memoryCardFileStore: CardFileStore = {
 
   async remove(orderId, path) {
     return memory.get(orderId)?.delete(path) ?? false;
+  },
+
+  async remoteUrls(orderId) {
+    const files = memory.get(orderId);
+    if (!files) return [];
+    return [...files.values()].map((entry) => entry.url).filter((url): url is string => !!url);
   },
 
   async clear(orderId) {
@@ -354,6 +368,15 @@ export function createPostgresCardFileStore(pool: PgClient): CardFileStore {
         [orderId],
       );
       return rows.length;
+    },
+
+    async remoteUrls(orderId) {
+      if (!(await hasTable(pool)) || !(await hasUrlColumn(pool))) return [];
+      const { rows } = await pool.query(
+        'SELECT url FROM card_files WHERE order_id = $1 AND url IS NOT NULL',
+        [orderId],
+      );
+      return rows.map((row) => String(row.url));
     },
   };
 }
